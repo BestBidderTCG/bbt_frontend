@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import com.spekulatersG6.bestbiddertcg.ui.theme.BestBidderTCGTheme
 
 /**
  * Main screen of BestBidderTCG.
@@ -34,5 +36,13 @@ fun HomeScreen() {
             modifier = Modifier.padding(top = 12.dp),
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenPreview() {
+    BestBidderTCGTheme {
+        HomeScreen()
     }
 }

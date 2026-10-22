@@ -2,11 +2,16 @@ package com.spekulatersG6.bestbiddertcg.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-/**
- * TODO Change it later.
- */
-val PrimaryColor = Color(0xFF3949AB)
-val SecondaryColor = Color(0xFF7986CB)
-val BackgroundColor = Color(0xFFF8F9FC)
-val SurfaceColor = Color(0xFFFFFFFF)
-val TextColor = Color(0xFF1B1B1F)
+val Primary = Color(0xFFC2410C)
+val PrimaryLight = Color(0xFFFFEDD5)
+val Accent = Color(0xFFF97316)
+
+val Background = Color(0xFFFFF9F5)
+val Surface = Color(0xFFFFFFFF)
+val Border = Color(0xFFE5E7EB)
+
+val TextPrimary = Color(0xFF1F2937)
+val TextSecondary = Color(0xFF6B7280)
+
+val Success = Color(0xFF15803D)
+val Error = Color(0xFFB91C1C)
