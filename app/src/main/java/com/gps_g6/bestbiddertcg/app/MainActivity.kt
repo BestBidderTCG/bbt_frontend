@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.spekulatersG6.bestbiddertcg.ui.theme.BestBidderTCGTheme
+import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 
 /**
  *

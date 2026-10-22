@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
-import com.spekulatersG6.bestbiddertcg.ui.theme.BestBidderTCGTheme
+import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 
 /**
  * Main screen of BestBidderTCG.

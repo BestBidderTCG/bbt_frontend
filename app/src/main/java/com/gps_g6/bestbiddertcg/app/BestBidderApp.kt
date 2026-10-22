@@ -5,8 +5,8 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.spekulatersG6.bestbiddertcg.ui.home.HomeScreen
-import com.spekulatersG6.bestbiddertcg.ui.profile.ProfileScreen
+import com.gps_g6.bestbiddertcg.feature.home.presentation.HomeScreen
+import com.gps_g6.bestbiddertcg.feature.profile.presentation.ProfileScreen
 
 /**
  * Coordinates the main screens and horizontal navigation.
