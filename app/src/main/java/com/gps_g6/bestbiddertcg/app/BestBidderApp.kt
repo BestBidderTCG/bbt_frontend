@@ -1,4 +1,4 @@
-package com.spekulatersG6.bestbiddertcg.ui.main
+package com.gps_g6.bestbiddertcg.app
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager

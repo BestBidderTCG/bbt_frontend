@@ -1,4 +1,4 @@
-package com.spekulatersG6.bestbiddertcg.ui.profile
+package com.gps_g6.bestbiddertcg.feature.profile.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
