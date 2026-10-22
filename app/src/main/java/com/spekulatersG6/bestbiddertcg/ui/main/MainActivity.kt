@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.spekulatersG6.bestbiddertcg.ui.theme.BestBidderTCGTheme
 
 /**
  *
@@ -25,7 +26,7 @@ class MainActivity : ComponentActivity() {
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
         setContent {
-            BsstBidderTCGTheme {
+            BestBidderTCGTheme {
                 BestBidderApp()
             }
         }
