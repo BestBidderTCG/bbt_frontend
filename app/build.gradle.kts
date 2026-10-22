@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.bestbiddertcg"
+    namespace = "com.spekulatersG6.bestbiddertcg"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1

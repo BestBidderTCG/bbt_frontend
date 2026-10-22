@@ -1,4 +1,4 @@
-package com.example.bestbiddertcg
+package com.spekulatersG6.bestbiddertcg
 
 import org.junit.Test
 
