@@ -1,4 +1,4 @@
-package com.spekulatersG6.bestbiddertcg.ui.main
+package com.gps_g6.bestbiddertcg.app
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

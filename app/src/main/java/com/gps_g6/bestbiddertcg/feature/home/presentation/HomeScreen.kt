@@ -1,4 +1,4 @@
-package com.spekulatersG6.bestbiddertcg.ui.profile
+package com.gps_g6.bestbiddertcg.feature.home.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,13 +10,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import com.spekulatersG6.bestbiddertcg.ui.theme.BestBidderTCGTheme
 
 /**
- * Profile screen of BestBidderTCG.
+ * Main screen of BestBidderTCG.
  *
  */
 @Composable
-fun ProfileScreen() {
+fun HomeScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -24,12 +26,23 @@ fun ProfileScreen() {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Text(
+            text = "BestBidderTCG",
+            style = MaterialTheme.typography.headlineMedium
+        )
 
         Text(
-            text = "Profile Page",
+            text = "Home Page",
             modifier = Modifier.padding(top = 12.dp),
             style = MaterialTheme.typography.bodyLarge
         )
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+private fun HomeScreenPreview() {
+    BestBidderTCGTheme {
+        HomeScreen()
+    }
+}
