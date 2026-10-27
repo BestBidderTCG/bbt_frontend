@@ -1,4 +1,4 @@
-package com.gps_g6.bestbiddertcg.feature.home.presentation
+package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,11 +14,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 
 /**
- * Main screen of BestBidderTCG.
+ * Explore screen of BestBidderTCG.
  *
  */
 @Composable
-fun HomeScreen() {
+fun ExploreScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -32,7 +32,7 @@ fun HomeScreen() {
         )
 
         Text(
-            text = "Home Page",
+            text = "Explore Page",
             modifier = Modifier.padding(top = 12.dp),
             style = MaterialTheme.typography.bodyLarge
         )
@@ -41,8 +41,8 @@ fun HomeScreen() {
 
 @Preview(showBackground = true)
 @Composable
-private fun HomeScreenPreview() {
+private fun ExploreScreenPreview() {
     BestBidderTCGTheme {
-        HomeScreen()
+        ExploreScreen()
     }
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.spekulatersG6.bestbiddertcg"
+    namespace = "com.gps_g6.bestbiddertcg"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -12,7 +12,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.bestbiddertcg"
+        applicationId = "com.gps_g6.bestbiddertcg"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
