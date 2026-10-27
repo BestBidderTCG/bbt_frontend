@@ -13,7 +13,7 @@
         android:theme="@style/Theme.BestBidderTCG">
 
             <activity
-                android:name=".ui.main.MainActivity"
+                android:name=".app.MainActivity"
                 android:exported="true">
                 <intent-filter>
                     <action android:name="android.intent.action.MAIN" />

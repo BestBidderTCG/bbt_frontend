@@ -4,6 +4,8 @@ package com.gps_g6.bestbiddertcg.app
  * Defines the main pages available in the application
  */
 enum class AppPage {
-    HOME,
+    EXPLORE,
+    SOCIAL,
+    FAVORITES,
     PROFILE
 }
