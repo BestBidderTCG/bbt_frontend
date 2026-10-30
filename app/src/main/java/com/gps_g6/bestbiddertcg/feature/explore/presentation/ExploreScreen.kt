@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -45,17 +42,19 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 
 /**
- * Pantalla Explore.
+ * Pantalla explore de la aplicacion.
  */
 @Composable
 fun ExploreScreen() {
 
-    // Busqueda
+    // Barra de busqueda
     var searchQuery by remember { mutableStateOf("") }
 
-    // Filtro seleccionado
+    // Filtro seleccionado de colecciones de cartas
     var selectedCardCollection by remember { mutableStateOf("Todas") }
 
     Column(
@@ -68,21 +67,21 @@ fun ExploreScreen() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = AppSpacing.l)
         ) {
             SearchInput(
                 value = searchQuery,
                 onValueChange = { searchQuery = it }
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.m))
 
             CardCollectionFilters(
                 selectedCardCollection = selectedCardCollection,
                 onCardCollectionSelected = { selectedCardCollection = it }
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.l))
 
             SectionHeader(
                 onFiltersClick = {
@@ -90,7 +89,7 @@ fun ExploreScreen() {
                 }
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.xxl))
 
             EmptyState(
                 onClearFilters = {
@@ -102,6 +101,9 @@ fun ExploreScreen() {
     }
 }
 
+/**
+ * Barra superior de la pantalla explore.
+ */
 @Composable
 private fun ExploreHeader() {
     Row(
@@ -109,19 +111,16 @@ private fun ExploreHeader() {
             .fillMaxWidth()
             .height(56.dp)
             .background(Surface)
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = AppSpacing.xl),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Explorar",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            )
+            style = MaterialTheme.typography.headlineLarge
         )
 
-        // Quitamos recuadro gris al hacer click
+        // Quitamos recuadro gris al hacer clic
         Box(
             modifier = Modifier.size(48.dp),
             contentAlignment = Alignment.Center
@@ -144,6 +143,9 @@ private fun ExploreHeader() {
     }
 }
 
+/**
+ * Barra de busqueda en la pantalla explore.
+ */
 @Composable
 private fun SearchInput(
     value: String,
@@ -152,16 +154,16 @@ private fun SearchInput(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 12.dp)
+            .padding(top = AppSpacing.m)
             .height(40.dp),
-        shape = RoundedCornerShape(8.dp),
+        shape = RoundedCornerShape(AppCornerRadius.small),
         color = Surface,
         border = BorderStroke(1.dp, Border)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp),
+            modifier = Modifier.padding(horizontal = AppSpacing.s),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.s)
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_search),
@@ -198,6 +200,9 @@ private fun SearchInput(
     }
 }
 
+/**
+ * Filtros de colecciones de cartas en la pantalla explore.
+ */
 @Composable
 private fun CardCollectionFilters(
     selectedCardCollection: String,
@@ -207,7 +212,7 @@ private fun CardCollectionFilters(
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.s),
         verticalAlignment = Alignment.CenterVertically
     ) {
         cardCollections.forEach { cardCollection ->
@@ -227,12 +232,10 @@ private fun CardCollectionFilters(
                 Text(
                     text = cardCollection,
                     modifier = Modifier.padding(
-                        horizontal = 12.dp,
-                        vertical = 7.dp
+                        horizontal = AppSpacing.m,
+                        vertical = AppSpacing.s
                     ),
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
+                    style = MaterialTheme.typography.labelMedium,
                     color = if (isSelected) Primary else TextPrimary
                 )
             }
@@ -240,6 +243,9 @@ private fun CardCollectionFilters(
     }
 }
 
+/**
+ * Encabezado de seccion en la pantalla explore.
+ */
 @Composable
 private fun SectionHeader(
     onFiltersClick: () -> Unit
@@ -251,21 +257,12 @@ private fun SectionHeader(
     ) {
         Text(
             text = "Subastas activas",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold
-            ),
+            style = MaterialTheme.typography.headlineMedium,
             color = TextPrimary
         )
 
         Row(
             modifier = Modifier
-                .indication(
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    },
-                    indication = null
-                )
                 .clickable(
                     interactionSource = remember {
                         MutableInteractionSource()
@@ -275,7 +272,7 @@ private fun SectionHeader(
                     onFiltersClick()
                 },
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_filters),
@@ -285,15 +282,16 @@ private fun SectionHeader(
 
             Text(
                 text = "Filtros",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = MaterialTheme.typography.labelMedium,
                 color = Primary
             )
         }
     }
 }
 
+/**
+ * Estado vacio en la pantalla explore.
+ */
 @Composable
 private fun EmptyState(
     onClearFilters: () -> Unit
@@ -301,7 +299,7 @@ private fun EmptyState(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = AppSpacing.l),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
@@ -310,18 +308,15 @@ private fun EmptyState(
             modifier = Modifier.size(75.dp)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.l))
 
         Text(
             text = "No se han encontrado subastas",
-            style = MaterialTheme.typography.headlineMedium.copy(
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            ),
+            style = MaterialTheme.typography.headlineMedium,
             color = TextPrimary
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.s))
 
         Text(
             text = "Prueba a cambiar los filtros o realiza otra búsqueda.",
@@ -329,19 +324,19 @@ private fun EmptyState(
             color = TextSecondary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppSpacing.l))
 
         Button(
             onClick = onClearFilters,
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(AppCornerRadius.medium),
             colors = buttonColors(
                 containerColor = Primary
             )
         ) {
             Text(
                 text = "Limpiar filtros",
-                color = Surface,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.labelMedium,
+                color = Surface
             )
         }
     }
@@ -349,7 +344,9 @@ private fun EmptyState(
 }
 
 
-
+/**
+ * Vista previa de la pantalla explore.
+ */
 @Preview(showBackground = true)
 @Composable
 private fun ExploreScreenPreview() {
