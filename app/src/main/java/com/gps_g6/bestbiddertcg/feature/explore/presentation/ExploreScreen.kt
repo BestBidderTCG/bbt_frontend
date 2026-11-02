@@ -1,5 +1,7 @@
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -27,7 +29,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +54,20 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
  */
 @Composable
 fun ExploreScreen() {
+
+    // Obtiene el ViewModel utilizando nuestra Factory.
+    val viewModel: ExploreViewModel = viewModel(
+        factory = ExploreViewModelFactory()
+    )
+
+    // Observa los estados del ViewModel.
+    val auctions by viewModel.auctions.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadAuctions()
+    }
 
     // Barra de busqueda
     var searchQuery by remember { mutableStateOf("") }
@@ -91,12 +109,42 @@ fun ExploreScreen() {
 
             Spacer(modifier = Modifier.height(AppSpacing.xxl))
 
-            EmptyState(
-                onClearFilters = {
-                    searchQuery = ""
-                    selectedCardCollection = "Todas"
+            when {
+                // Muestra el estado de carga
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
-            )
+
+                // Muestra el estado de error
+                error != null -> {
+                    Text(
+                        text = error ?: "",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                // Muestra el estado vacio
+                auctions.isEmpty() -> {
+                    EmptyState(
+                        onClearFilters = {
+                            searchQuery = ""
+                            selectedCardCollection = "Todas"
+                        }
+                    )
+                }
+
+                // Muestra el estado de carga de subastas
+                else -> {
+                    Text(
+                        text = "Subastas encontradas: ${auctions.size}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextPrimary
+                    )
+                }
+            }
         }
     }
 }
