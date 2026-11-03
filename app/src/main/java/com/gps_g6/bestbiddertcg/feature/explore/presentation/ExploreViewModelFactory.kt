@@ -2,10 +2,12 @@ package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
+import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 
 // Crea el ViewModel con las dependencias necesarias.
-class ExploreViewModelFactory : ViewModelProvider.Factory {
+class ExploreViewModelFactory(
+    private val auctionRepository: AuctionRepository
+) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
 
@@ -17,7 +19,7 @@ class ExploreViewModelFactory : ViewModelProvider.Factory {
 
             // Crea y devuelve el ViewModel.
             return ExploreViewModel(
-                auctionRepository = AuctionModule.auctionRepository
+                auctionRepository = auctionRepository
             ) as T
         }
 

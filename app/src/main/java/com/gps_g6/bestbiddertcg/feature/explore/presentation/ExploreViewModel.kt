@@ -24,6 +24,11 @@ class ExploreViewModel(
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> = _error.asStateFlow()
 
+    // Carga las subastas cuando se crea el ViewModel.
+    init {
+        loadAuctions()
+    }
+
     // Obtiene las subastas activas desde el repositorio.
     fun loadAuctions() {
         viewModelScope.launch {
