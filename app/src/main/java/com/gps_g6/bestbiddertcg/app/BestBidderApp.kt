@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
 import com.gps_g6.bestbiddertcg.core.ui.components.BottomNavigationBar
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreScreen
 import com.gps_g6.bestbiddertcg.feature.favorites.presentation.FavoritesScreen
@@ -49,7 +50,9 @@ fun BestBidderApp() {
                 .padding(innerPadding)
         ) { page ->
             when (AppPage.entries[page]) {
-                AppPage.EXPLORE -> ExploreScreen()
+                AppPage.EXPLORE -> ExploreScreen(
+                    auctionRepository = AuctionModule.auctionRepository
+                )
                 AppPage.SOCIAL -> SocialScreen()
                 AppPage.FAVORITES -> FavoritesScreen()
                 AppPage.PROFILE -> ProfileScreen()
