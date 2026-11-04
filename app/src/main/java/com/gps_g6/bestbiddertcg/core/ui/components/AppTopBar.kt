@@ -2,7 +2,6 @@ package com.gps_g6.bestbiddertcg.core.ui.components
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +14,9 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.*
 fun AppTopBar(
     title: String,
     modifier: Modifier = Modifier,
+    @DrawableRes navigationIcon: Int? = null,
+    navigationDescription: String? = null,
+    onNavigationClick: (() -> Unit)? = null,
     @DrawableRes actionIcon: Int? = null,
     actionDescription: String? = null,
     onActionClick: (() -> Unit)? = null
@@ -26,19 +28,38 @@ fun AppTopBar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    horizontal = AppSpacing.xl,
-                    vertical = AppSpacing.s
-                ),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .heightIn(min = AppSpacing.xxl + AppSpacing.xl)
+                .padding(horizontal = AppSpacing.l),
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            // navigation icon opcional
+            if (navigationIcon != null) {
+                IconButton(
+                    onClick = { onNavigationClick?.invoke() },
+                    enabled = onNavigationClick != null
+                ) {
+                    Icon(
+                        painter = painterResource(navigationIcon),
+                        contentDescription = navigationDescription,
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(AppSpacing.xs))
+            } else {
+                Spacer(modifier = Modifier.width(AppSpacing.s))
+            }
+
+            // Screen title
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f),
+                maxLines = 1
             )
 
+            // acción opcional
             if (actionIcon != null) {
                 if (onActionClick != null) {
                     IconButton(onClick = onActionClick) {
@@ -65,8 +86,6 @@ fun AppTopBar(
 @Composable
 private fun AppTopBarPreview() {
     BestBidderTCGTheme {
-        AppTopBar(
-            title = "Mi perfil"
-        )
+        AppTopBar(title = "Iniciar sesión")
     }
 }
