@@ -38,6 +38,7 @@ class ExploreViewModel(
             try {
                 _auctions.value = auctionRepository.getActiveAuctions()
             } catch (exception: Exception) {
+                exception.printStackTrace()
                 _error.value = "No se han podido cargar las subastas."
             } finally {
                 _isLoading.value = false
