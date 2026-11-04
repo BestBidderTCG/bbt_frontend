@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.gps_g6.bestbiddertcg.app.navigation.AppNavigation
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 
 /**
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             BestBidderTCGTheme {
-                BestBidderApp()
+                AppNavigation()
             }
         }
     }

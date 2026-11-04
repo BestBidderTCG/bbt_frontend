@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- quitar lo del cleartexttraffic (false) cuando acabe el desarrollo) -->
     <application
         android:usesCleartextTraffic="true"
         android:allowBackup="true"
