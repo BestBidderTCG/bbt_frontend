@@ -1,5 +1,7 @@
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -14,6 +16,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import java.time.Duration
+import java.time.Instant
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.components.AuctionItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.ui.Alignment
@@ -27,6 +35,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,6 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.Background
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
@@ -44,61 +54,31 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
+import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 
 /**
- * Pantalla explore de la aplicacion.
+ * Pantalla explore de la aplicacion. Agregado el AuctionRepository para pruebas.
  */
 @Composable
-fun ExploreScreen() {
+fun ExploreScreen(
+    auctionRepository: AuctionRepository
+) {
 
-    // Barra de busqueda
-    var searchQuery by remember { mutableStateOf("") }
+    // Obtiene el ViewModel utilizando nuestra Factory.
+    val viewModel: ExploreViewModel = viewModel(
+        factory = ExploreViewModelFactory(auctionRepository)
+    )
 
-    // Filtro seleccionado de colecciones de cartas
-    var selectedCardCollection by remember { mutableStateOf("Todas") }
+    // Observa los estados del ViewModel.
+    val auctions by viewModel.auctions.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-    ) {
-        ExploreHeader()
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = AppSpacing.l)
-        ) {
-            SearchInput(
-                value = searchQuery,
-                onValueChange = { searchQuery = it }
-            )
-
-            Spacer(modifier = Modifier.height(AppSpacing.m))
-
-            CardCollectionFilters(
-                selectedCardCollection = selectedCardCollection,
-                onCardCollectionSelected = { selectedCardCollection = it }
-            )
-
-            Spacer(modifier = Modifier.height(AppSpacing.l))
-
-            SectionHeader(
-                onFiltersClick = {
-                    // TODO: Implementar filtros
-                }
-            )
-
-            Spacer(modifier = Modifier.height(AppSpacing.xxl))
-
-            EmptyState(
-                onClearFilters = {
-                    searchQuery = ""
-                    selectedCardCollection = "Todas"
-                }
-            )
-        }
-    }
+    ExploreContent(
+        auctions = auctions,
+        isLoading = isLoading,
+        error = error
+    )
 }
 
 /**
@@ -343,14 +323,147 @@ private fun EmptyState(
 
 }
 
+/**
+ * Contenido de la pantalla explore.
+ */
+@Composable
+private fun ExploreContent(
+    auctions: List<Auction>,
+    isLoading: Boolean,
+    error: String?
+) {
+    // Barra de busqueda
+    var searchQuery by remember { mutableStateOf("") }
+
+    // Filtro seleccionado de colecciones de cartas
+    var selectedCardCollection by remember { mutableStateOf("Todas") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Background)
+    ) {
+        ExploreHeader()
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AppSpacing.l)
+        ) {
+            SearchInput(
+                value = searchQuery,
+                onValueChange = { searchQuery = it }
+            )
+
+            Spacer(modifier = Modifier.height(AppSpacing.m))
+
+            CardCollectionFilters(
+                selectedCardCollection = selectedCardCollection,
+                onCardCollectionSelected = { selectedCardCollection = it }
+            )
+
+            Spacer(modifier = Modifier.height(AppSpacing.l))
+
+            SectionHeader(
+                onFiltersClick = {
+                    // TODO: Implementar filtros
+                }
+            )
+
+            Spacer(modifier = Modifier.height(AppSpacing.xxl))
+
+            when {
+                // Muestra el estado de carga
+                isLoading -> {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                // Muestra el estado de error
+                error != null -> {
+                    Text(
+                        text = error ?: "",
+                        color = TextSecondary,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                // Muestra el estado vacio
+                auctions.isEmpty() -> {
+                    EmptyState(
+                        onClearFilters = {
+                            searchQuery = ""
+                            selectedCardCollection = "Todas"
+                        }
+                    )
+                }
+
+                // Muestra el estado de carga de subastas
+
+                else -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.spacedBy(AppSpacing.m),
+                        verticalArrangement = Arrangement.spacedBy(AppSpacing.m)
+                    ) {
+                        items(
+                            items = auctions,
+                            key = { auction -> auction.id }
+                        ) { auction ->
+                            AuctionItem(
+                                cardName = auction.card,
+                                initialPrice = auction.minPrize,
+                                currentBid = null,
+                                remainingTime = formatRemainingTime(auction.endsAt)
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+}
+
+// Calcula el tiempo restante hasta el final de la subasta.
+private fun formatRemainingTime(endsAt: String): String {
+    return try {
+        val endInstant = Instant.parse(endsAt)
+        val duration = Duration.between(Instant.now(), endInstant)
+
+        if (duration.isNegative || duration.isZero) {
+            "Finalizada"
+        } else {
+            val days = duration.toDays()
+            val hours = duration.toHours() % 24
+            val minutes = duration.toMinutes() % 60
+
+            when {
+                days > 0 -> "${days}d ${hours}h"
+                hours > 0 -> "${hours}h ${minutes}min"
+                else -> "${minutes}min"
+            }
+        }
+    } catch (exception: Exception) {
+        "Tiempo no disponible"
+    }
+}
 
 /**
- * Vista previa de la pantalla explore.
+ * Vista previa de la pantalla explore. Usada para pruebas de diseño.
  */
 @Preview(showBackground = true)
 @Composable
 private fun ExploreScreenPreview() {
     BestBidderTCGTheme {
-        ExploreScreen()
+        ExploreContent(
+            auctions = emptyList(),
+            isLoading = false,
+            error = null
+        )
     }
 }
