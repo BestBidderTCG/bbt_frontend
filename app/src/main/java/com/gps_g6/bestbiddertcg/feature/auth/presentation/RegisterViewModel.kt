@@ -19,7 +19,8 @@ import java.io.IOException
 
 class RegisterViewModel(
     private val repository: AuthRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val saveProfile: suspend (String?, Int?) -> Unit
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -152,13 +153,12 @@ class RegisterViewModel(
             return
         }
 
-        // Revalidate all required account credentials.
-        if (!validateCredentials() || !validateProfileData()) {
-            _uiState.update {
-                it.copy(
-                    errorMessage = "Revisa los datos del registro."
-                )
-            }
+        // Validate credentials only before account creation
+        if (!current.accountCreated && !validateCredentials()) {
+            return
+        }
+
+        if (!validateProfileData()) {
             return
         }
 
@@ -173,10 +173,11 @@ class RegisterViewModel(
 
         viewModelScope.launch {
             var created = state.accountCreated
+            var loggedIn = state.loginCompleted
 
             try {
+                // 1. Create the account only once
                 if (!created) {
-                    // 1: create the account
                     withContext(Dispatchers.IO) {
                         repository.register(
                             email = state.email.trim(),
@@ -192,27 +193,44 @@ class RegisterViewModel(
                     }
                 }
 
-                // 2: Login with the new account
-                val session = withContext(Dispatchers.IO) {
-                    repository.login(
-                        identifier = state.email.trim(),
-                        password = state.password
-                    )
+                // 2. Log in only if not already completed
+                if (!loggedIn) {
+                    val session = withContext(Dispatchers.IO) {
+                        repository.login(
+                            identifier = state.email.trim(),
+                            password = state.password
+                        )
+                    }
+
+                    withContext(Dispatchers.IO) {
+                        sessionManager.saveSession(
+                            accessToken = session.accessToken,
+                            refreshToken = session.refreshToken
+                        )
+                    }
+
+                    loggedIn = true
+
+                    _uiState.update {
+                        it.copy(
+                            loginCompleted = true,
+                            password = "",
+                            confirmPassword = ""
+                        )
+                    }
                 }
 
-                // 3: Persist the authenticated session
+                // 3. Save the initial profile
                 withContext(Dispatchers.IO) {
-                    sessionManager.saveSession(
-                        accessToken = session.accessToken,
-                        refreshToken = session.refreshToken
+                    saveProfile(
+                        state.description,
+                        state.avatarNum
                     )
                 }
 
-                // Remove passwords after successful authentication.
+                // 4. Finish only after the profile is saved
                 _uiState.update {
                     it.copy(
-                        password = "",
-                        confirmPassword = "",
                         isLoading = false,
                         isRegistered = true,
                         errorMessage = null
@@ -223,60 +241,68 @@ class RegisterViewModel(
                 throw e
 
             } catch (e: HttpException) {
+                val message = when {
+                    loggedIn ->
+                        "La cuenta se ha creado, pero no se ha podido guardar el perfil. Inténtalo de nuevo."
 
-                if (BuildConfig.DEBUG) {
-                    val errorBody = e.response()
-                        ?.errorBody()
-                        ?.string()
+                    created ->
+                        "La cuenta se ha creado, pero no se ha podido iniciar sesión."
 
-                    android.util.Log.e(
-                        "BestBidderRegister",
-                        "Error HTTP ${e.code()}: $errorBody"
-                    )
-                }
+                    e.code() == 400 || e.code() == 409 ->
+                        "El email o nombre de usuario ya existe, o los datos no son válidos."
 
-                val message = if (created) {
-                    when (e.code()) {
-                        400, 401, 403 ->
-                            "La cuenta se ha creado, pero no se ha podido iniciar sesión."
-                        else ->
-                            "La cuenta se ha creado, pero ha fallado el inicio de sesión."
-                    }
-                } else {
-                    when (e.code()) {
-                        400, 409 ->
-                            "El email o nombre de usuario puede estar en uso, o los datos no son válidos."
-                        429 ->
-                            "Demasiados intentos. Inténtalo más tarde."
-                        in 500..599 ->
-                            "El servidor no está disponible en este momento."
-                        else ->
-                            "No se ha podido crear la cuenta."
-                    }
+                    e.code() == 429 ->
+                        "Demasiados intentos. Inténtalo más tarde."
+
+                    e.code() in 500..599 ->
+                        "El servidor no está disponible en este momento."
+
+                    else ->
+                        "No se ha podido crear la cuenta."
                 }
 
                 _uiState.update {
                     it.copy(
                         accountCreated = created,
+                        loginCompleted = loggedIn,
                         isLoading = false,
                         errorMessage = message
                     )
                 }
 
             } catch (e: IOException) {
+                val message = when {
+                    loggedIn ->
+                        "No se ha podido guardar el perfil. Comprueba la conexión e inténtalo de nuevo."
+
+                    created ->
+                        "La cuenta se ha creado, pero no se ha podido iniciar sesión por un problema de conexión."
+
+                    else ->
+                        "No se ha podido conectar. Comprueba la conexión e inténtalo de nuevo."
+                }
+
                 _uiState.update {
                     it.copy(
                         accountCreated = created,
+                        loginCompleted = loggedIn,
                         isLoading = false,
-                        errorMessage =
-                            "No se ha podido conectar. Comprueba la conexión e inténtalo de nuevo."
+                        errorMessage = message
                     )
                 }
 
-            } catch (e: Exception) {
+            } catch (e: HttpException) {
+
+                android.util.Log.e(
+                    "BestBidderRegister",
+                    "Registro rechazado: HTTP ${e.code()} - " +
+                            e.response()?.errorBody()?.string()
+                )
+
                 _uiState.update {
                     it.copy(
                         accountCreated = created,
+                        loginCompleted = loggedIn,
                         isLoading = false,
                         errorMessage = "Ha ocurrido un error inesperado."
                     )

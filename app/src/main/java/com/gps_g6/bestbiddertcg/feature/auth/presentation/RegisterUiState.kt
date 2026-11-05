@@ -20,6 +20,8 @@ data class RegisterUiState(
     // Registration request
     val isLoading: Boolean = false,
     val accountCreated: Boolean = false,
+    val loginCompleted: Boolean = false,
     val isRegistered: Boolean = false,
-    val errorMessage: String? = null,
+    val errorMessage: String? = null
+
 )
