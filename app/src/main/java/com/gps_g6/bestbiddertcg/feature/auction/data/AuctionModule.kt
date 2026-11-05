@@ -3,6 +3,7 @@ package com.gps_g6.bestbiddertcg.feature.auction.data
 
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
+import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
 
 // Proporciona las dependencias necesarias para la funcionalidad de subastas.
 object AuctionModule {
@@ -15,5 +16,10 @@ object AuctionModule {
     // Crea el repositorio que utilizará la capa de dominio.
     val auctionRepository: AuctionRepository by lazy {
         AuctionRepositoryImpl(auctionApi)
+    }
+
+    // Crea el caso de uso para crear una nueva subasta.
+    val createAuctionUseCase: CreateAuctionUseCase by lazy {
+        CreateAuctionUseCase(auctionRepository)
     }
 }
