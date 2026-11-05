@@ -1,0 +1,48 @@
+
+name: CI Android
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Compilar y ejecutar tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v6
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v4
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v6
+
+      - name: Dar permisos a Gradle Wrapper
+        run: chmod +x ./gradlew
+
+      - name: Compilar aplicación
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Ejecutar tests unitarios
+        run: ./gradlew testDebugUnitTest --no-daemon
+
+      - name: Guardar informes de tests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informes-tests
+          path: app/build/reports/tests/
+          if-no-files-found: ignore
+          retention-days: 7
