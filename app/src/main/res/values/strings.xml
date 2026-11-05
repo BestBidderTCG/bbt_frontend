@@ -33,6 +33,11 @@
     <string name="auth_login_link">Inicia sesión</string>
     <string name="auth_show_password">Mostrar</string>
     <string name="auth_hide_password">Ocultar</string>
+    <string name="register_email_error">Introduce un correo electrónico válido.</string>
+    <string name="register_password_error">La contraseña debe tener entre 6 y 50 caracteres.</string>
+    <string name="register_confirm_password_error">Las contraseñas no coinciden.</string>
+    <string name="register_username_error">Usa entre 3 y 50 caracteres: letras minúsculas, números, puntos o guiones bajos. Incluye al menos una letra.</string>
+
 
     <!-- Create profile -->
     <string name="create_profile_title">Crear perfil</string>
@@ -41,7 +46,7 @@
     <string name="create_profile_description">Elige cómo quieres aparecer en BestBidder TCG.</string>
     <string name="create_profile_avatar">Elegir avatar *</string>
     <string name="create_profile_username">Nombre de usuario *</string>
-    <string name="create_profile_username_hint">Ej. BestBidderTCG</string>
+    <string name="create_profile_username_hint">Ej. best.bidder_tcg</string>
     <string name="create_profile_username_help">Debe ser único.</string>
     <string name="create_profile_bio">Descripción</string>
     <string name="create_profile_bio_hint">Cuéntanos algo sobre ti...</string>
