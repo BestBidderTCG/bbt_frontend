@@ -1,6 +1,7 @@
 
 package com.gps_g6.bestbiddertcg.app.navigation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,6 +22,8 @@ import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
 import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RefreshSessionUseCase
 import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RestoreSessionUseCase
 import com.gps_g6.bestbiddertcg.feature.auth.presentation.*
+import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
+import com.gps_g6.bestbiddertcg.feature.profile.domain.usecase.ProfileSetupUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
 
 /**
@@ -49,10 +52,21 @@ fun AppNavigation() {
 
                 val repository = AuthRepositoryImpl(api)
 
+                val profileSetupUseCase = ProfileSetupUseCase(
+                    profileManager = ProfileModule.profileManager
+                )
+
                 return RegisterViewModel(
                     repository = repository,
-                    sessionManager = NetworkModule.sessionManager
+                    sessionManager = NetworkModule.sessionManager,
+                    saveProfile = { description, avatarNum ->
+                        profileSetupUseCase(
+                            description = description,
+                            avatarNum = avatarNum
+                        )
+                    }
                 ) as T
+
             }
         }
     }
@@ -301,6 +315,13 @@ fun AppNavigation() {
 
         // Preferences - Step 2
         composable(AppDestination.PREFERENCES.route) {
+
+            BackHandler(
+                enabled = registerState.isLoading ||
+                        registerState.accountCreated
+            ) {
+                // Prevent leaving an incomplete registration flow
+            }
 
             LaunchedEffect(registerState.isRegistered) {
                 if (registerState.isRegistered) {

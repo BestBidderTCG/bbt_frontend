@@ -8,11 +8,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.*
 import com.gps_g6.bestbiddertcg.R
-import java.nio.file.WatchEvent
 
 /**
  * Profile screen of BestBidderTCG.
@@ -22,7 +26,8 @@ import java.nio.file.WatchEvent
 fun ProfileScreen(
     profile: ProfileUiState = ProfileSampleData.profile,
     onEditProfile: () -> Unit = {},
-    initialTab: ProfileTab = ProfileTab.COLLECTION
+    initialTab: ProfileTab = ProfileTab.COLLECTION,
+    onRetryClick: () -> Unit = {}
 ) {
     var selectedTab by rememberSaveable {
         mutableStateOf(initialTab)
@@ -34,7 +39,7 @@ fun ProfileScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
 
-        // Top bar fija
+    // Top bar fija
         AppTopBar(
             title = stringResource(R.string.profile_title),
             actionIcon = R.drawable.ic_notifications,
@@ -43,15 +48,53 @@ fun ProfileScreen(
             )
         )
 
-        // Profile card fija
-        ProfileHeader(
-            profile = profile,
-            onEditClick = onEditProfile,
-            modifier = Modifier.padding(
-                horizontal = AppSpacing.l,
-                vertical = AppSpacing.l
-            )
-        )
+        // Profile header: loading, error or data
+        when {
+            profile.isLoading -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+
+            profile.errorMessage != null -> {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(AppSpacing.l),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = profile.errorMessage,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
+                    )
+
+                    Spacer(
+                        modifier = Modifier.height(AppSpacing.m)
+                    )
+
+                    Button(onClick = onRetryClick) {
+                        Text("Reintentar")
+                    }
+                }
+            }
+
+            else -> {
+                ProfileHeader(
+                    profile = profile,
+                    onEditClick = onEditProfile,
+                    modifier = Modifier.padding(
+                        horizontal = AppSpacing.l,
+                        vertical = AppSpacing.l
+                    )
+                )
+            }
+        }
 
         // Tabs fijas
         ProfileTabs(

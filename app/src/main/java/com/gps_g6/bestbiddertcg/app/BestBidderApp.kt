@@ -21,7 +21,7 @@ import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
 import com.gps_g6.bestbiddertcg.core.ui.components.BottomNavigationBar
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreScreen
 import com.gps_g6.bestbiddertcg.feature.favorites.presentation.FavoritesScreen
-import com.gps_g6.bestbiddertcg.feature.profile.presentation.ProfileScreen
+import com.gps_g6.bestbiddertcg.feature.profile.presentation.ProfileRoute
 import com.gps_g6.bestbiddertcg.feature.social.presentation.SocialScreen
 import kotlinx.coroutines.launch
 
@@ -83,7 +83,7 @@ fun BestBidderApp() {
                     )
                     AppPage.SOCIAL -> SocialScreen()
                     AppPage.FAVORITES -> FavoritesScreen()
-                    AppPage.PROFILE -> ProfileScreen()
+                    AppPage.PROFILE -> ProfileRoute()
                 }
             }
         }
