@@ -291,23 +291,27 @@ class RegisterViewModel(
                     )
                 }
 
-            } catch (e: HttpException) {
 
-                android.util.Log.e(
-                    "BestBidderRegister",
-                    "Registro rechazado: HTTP ${e.code()} - " +
-                            e.response()?.errorBody()?.string()
-                )
-
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         accountCreated = created,
                         loginCompleted = loggedIn,
                         isLoading = false,
-                        errorMessage = "Ha ocurrido un error inesperado."
+                        errorMessage = when {
+                            loggedIn ->
+                                "No se ha podido guardar el perfil. Inténtalo de nuevo."
+
+                            created ->
+                                "La cuenta se ha creado, pero no se ha podido iniciar sesión."
+
+                            else ->
+                                "Ha ocurrido un error inesperado."
+                        }
                     )
                 }
             }
+
         }
     }
 
