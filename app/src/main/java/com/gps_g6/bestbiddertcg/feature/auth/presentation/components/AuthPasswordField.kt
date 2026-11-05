@@ -23,7 +23,8 @@ fun AuthPasswordField(
     onValueChange: (String) -> Unit,
     label: String,
     placeholder: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     var passwordVisible by rememberSaveable {
         mutableStateOf(false)
@@ -42,6 +43,7 @@ fun AuthPasswordField(
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
+            enabled = enabled,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),

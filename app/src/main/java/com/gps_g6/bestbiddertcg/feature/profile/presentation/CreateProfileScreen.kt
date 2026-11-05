@@ -33,7 +33,8 @@ fun CreateProfileScreen(
     avatarNum: Int?,
     onAvatarClick: () -> Unit,
     onContinueClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    usernameError: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -153,6 +154,7 @@ fun CreateProfileScreen(
                     color = TextPrimary
                 ),
                 singleLine = true,
+                isError = usernameError,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text
                 ),
@@ -167,6 +169,16 @@ fun CreateProfileScreen(
                     unfocusedContainerColor = Surface
                 )
             )
+
+            if (usernameError) {
+                Spacer(modifier = Modifier.height(AppSpacing.xs))
+
+                Text(
+                    text = stringResource(R.string.register_username_error),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             Spacer(modifier = Modifier.height(AppSpacing.xs))
 

@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.auth.presentation
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -28,14 +29,17 @@ fun LoginScreen(
     onLoginClick: () -> Unit,
     onRegisterClick: () -> Unit,
     onBackClick: () -> Unit,
-    onForgotPasswordClick: () -> Unit = {}
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Background)
-            .windowInsetsPadding(WindowInsets.displayCutout)
-    ) {
+    onForgotPasswordClick: () -> Unit = {},
+    isLoading: Boolean = false,
+    errorMessage: String? = null
+)
+ {
+     Column(
+         modifier = Modifier
+             .fillMaxSize()
+             .background(Background)
+             .windowInsetsPadding(WindowInsets.displayCutout)
+     ) {
         // Fixed top bar
         AppTopBar(
             title = stringResource(R.string.auth_login),
@@ -93,6 +97,7 @@ fun LoginScreen(
             OutlinedTextField(
                 value = identifier,
                 onValueChange = onIdentifierChange,
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
@@ -135,7 +140,8 @@ fun LoginScreen(
                 ),
                 placeholder = stringResource(
                     R.string.login_password_hint
-                )
+                ),
+                enabled = !isLoading
             )
 
             // Forgot password
@@ -161,9 +167,24 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(AppSpacing.m))
 
+
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(
+                    modifier = Modifier.height(AppSpacing.m)
+                )
+            }
+
             // Login button
             Button(
                 onClick = onLoginClick,
+                enabled = true,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -175,10 +196,20 @@ fun LoginScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(
-                    text = stringResource(R.string.auth_login),
-                    style = MaterialTheme.typography.labelMedium
-                )
+
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary,
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.auth_login),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.height(AppSpacing.s))

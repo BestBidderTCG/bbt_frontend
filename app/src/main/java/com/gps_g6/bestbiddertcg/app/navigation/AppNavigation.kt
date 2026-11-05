@@ -1,91 +1,114 @@
 
 package com.gps_g6.bestbiddertcg.app.navigation
 
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.listSaver
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.saveable.*
+import androidx.compose.ui.*
+import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gps_g6.bestbiddertcg.app.BestBidderApp
 import com.gps_g6.bestbiddertcg.core.model.CardCategory
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule
+import com.gps_g6.bestbiddertcg.feature.auth.data.AuthRepositoryImpl
+import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
+import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RefreshSessionUseCase
+import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RestoreSessionUseCase
 import com.gps_g6.bestbiddertcg.feature.auth.presentation.*
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
 
 /**
  * Coordinates navigation between authentication,
  * profile creation and the main application.
- *
- * Authentication and profile persistence are not
- * implemented yet.
  */
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    // Login state
-    var loginIdentifier by rememberSaveable {
-        mutableStateOf("")
-    }
+    val registerFactory = remember {
+        object : ViewModelProvider.Factory {
 
-    var loginPassword by remember {
-        mutableStateOf("")
-    }
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>
+            ): T {
+                require(
+                    modelClass.isAssignableFrom(
+                        RegisterViewModel::class.java
+                    )
+                )
 
-    // Registration state
-    var registerEmail by rememberSaveable {
-        mutableStateOf("")
-    }
+                val api = NetworkModule.retrofit
+                    .create(AuthApi::class.java)
 
-    var registerPassword by remember {
-        mutableStateOf("")
-    }
+                val repository = AuthRepositoryImpl(api)
 
-    var confirmPassword by remember {
-        mutableStateOf("")
-    }
-
-    // Profile creation state
-    var username by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    var description by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    var avatarNum by rememberSaveable {
-        mutableStateOf<Int?>(null)
-    }
-
-    // Preferences state
-    var preferenceIds by rememberSaveable {
-        mutableStateOf("")
-    }
-
-    var selectedPreferences by rememberSaveable(
-        stateSaver = listSaver<Set<CardCategory>, String>(
-            save = { categories ->
-                categories.map { it.name }
-            },
-            restore = { names ->
-                names.mapNotNull { name ->
-                    CardCategory.entries.find {
-                        it.name == name
-                    }
-                }.toSet()
+                return RegisterViewModel(
+                    repository = repository,
+                    sessionManager = NetworkModule.sessionManager
+                ) as T
             }
-        )
-    ) {
-        mutableStateOf(emptySet<CardCategory>())
+        }
     }
 
+    val registerViewModel: RegisterViewModel = viewModel(
+        factory = registerFactory
+    )
 
-    // Demo-only transition to the main application.
+    val registerState by registerViewModel.uiState.collectAsState()
+
+    val startupFactory = remember {
+        object : ViewModelProvider.Factory {
+
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>
+            ): T {
+                require(
+                    modelClass.isAssignableFrom(
+                        StartupViewModel::class.java
+                    )
+                )
+
+                val api = NetworkModule.retrofit
+                    .create(AuthApi::class.java)
+
+                val repository = AuthRepositoryImpl(api)
+
+                val refreshSession = RefreshSessionUseCase(
+                    repository = repository,
+                    sessionManager = NetworkModule.sessionManager
+                )
+
+                val restoreSession = RestoreSessionUseCase(
+                    sessionManager = NetworkModule.sessionManager,
+                    refreshSession = refreshSession
+                )
+
+                return StartupViewModel(
+                    restoreSession = restoreSession,
+                    sessionManager = NetworkModule.sessionManager
+                ) as T
+            }
+        }
+    }
+
+    val startupViewModel: StartupViewModel = viewModel(
+        factory = startupFactory
+    )
+
+    val startupState by startupViewModel.uiState.collectAsState()
+
     fun enterMainApp() {
-        loginPassword = ""
-        registerPassword = ""
-        confirmPassword = ""
+        if (!NetworkModule.sessionManager.isAuthenticated()) {
+            return
+        }
 
         navController.navigate(AppDestination.MAIN.route) {
             popUpTo(AppDestination.WELCOME.route) {
@@ -95,12 +118,59 @@ fun AppNavigation() {
         }
     }
 
+
+    when (val state = startupState) {
+
+        StartupUiState.Checking -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+            return
+        }
+
+        is StartupUiState.ConnectionError -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = state.message)
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Button(
+                    onClick = startupViewModel::checkSession
+                ) {
+                    Text("Reintentar")
+                }
+
+                TextButton(
+                    onClick = startupViewModel::discardSessionAndContinue
+                ) {
+                    Text("Cerrar sesión")
+                }
+            }
+            return
+        }
+
+        StartupUiState.Authenticated,
+        StartupUiState.Unauthenticated -> Unit
+    }
+
+    val initialDestination = when (startupState) {
+        StartupUiState.Authenticated -> AppDestination.MAIN.route
+        else -> AppDestination.WELCOME.route
+    }
+
     NavHost(
         navController = navController,
-        startDestination = AppDestination.WELCOME.route
+        startDestination = initialDestination
     ) {
 
-        // Welcome
+    // Welcome
         composable(AppDestination.WELCOME.route) {
             WelcomeScreen(
                 onLoginClick = {
@@ -118,17 +188,8 @@ fun AppNavigation() {
 
         // Login
         composable(AppDestination.LOGIN.route) {
-            LoginScreen(
-                identifier = loginIdentifier,
-                onIdentifierChange = {
-                    loginIdentifier = it
-                },
-                password = loginPassword,
-                onPasswordChange = {
-                    loginPassword = it
-                },
-                onLoginClick = {
-                    // Demo only: authentication is pending.
+            LoginRoute(
+                onLoginSuccess = {
                     enterMainApp()
                 },
                 onRegisterClick = {
@@ -142,27 +203,29 @@ fun AppNavigation() {
             )
         }
 
+
         // Register
         composable(AppDestination.REGISTER.route) {
             RegisterScreen(
-                email = registerEmail,
-                onEmailChange = {
-                    registerEmail = it
-                },
-                password = registerPassword,
-                onPasswordChange = {
-                    registerPassword = it
-                },
-                confirmPassword = confirmPassword,
-                onConfirmPasswordChange = {
-                    confirmPassword = it
-                },
+                email = registerState.email,
+                onEmailChange = registerViewModel::onEmailChange,
+
+                password = registerState.password,
+                onPasswordChange = registerViewModel::onPasswordChange,
+
+                confirmPassword = registerState.confirmPassword,
+                onConfirmPasswordChange =
+                    registerViewModel::onConfirmPasswordChange,
+
+
                 onContinueClick = {
-                    // Validation and registration pending.
-                    navController.navigate(
-                        AppDestination.CREATE_PROFILE.route
-                    )
+                    if (registerViewModel.validateCredentials()) {
+                        navController.navigate(
+                            AppDestination.CREATE_PROFILE.route
+                        )
+                    }
                 },
+
                 onLoginClick = {
                     navController.navigate(
                         AppDestination.LOGIN.route
@@ -171,50 +234,65 @@ fun AppNavigation() {
                         launchSingleTop = true
                     }
                 },
+
                 onBackClick = {
                     navController.popBackStack()
-                }
+                },
+
+                emailError = registerState.emailError,
+                passwordError = registerState.passwordError,
+                confirmPasswordError = registerState.confirmPasswordError
+
             )
         }
 
         // Create profile - Step 1
         composable(AppDestination.CREATE_PROFILE.route) {
             CreateProfileScreen(
-                username = username,
-                onUsernameChange = {
-                    username = it
-                },
-                description = description,
-                onDescriptionChange = {
-                    description = it
-                },
-                avatarNum = avatarNum,
+                username = registerState.username,
+                onUsernameChange = registerViewModel::onUsernameChange,
+
+                description = registerState.description,
+                onDescriptionChange =
+                    registerViewModel::onDescriptionChange,
+
+                avatarNum = registerState.avatarNum,
+
                 onAvatarClick = {
                     navController.navigate(
                         AppDestination.AVATAR_SELECTION.route
                     )
                 },
+
                 onContinueClick = {
-                    navController.navigate(
-                        AppDestination.PREFERENCES.route
-                    )
+                    if (registerViewModel.validateProfileData()) {
+                        navController.navigate(
+                            AppDestination.PREFERENCES.route
+                        )
+                    }
                 },
+
                 onBackClick = {
                     navController.popBackStack()
-                }
+                },
+
+                usernameError = registerState.usernameError
+
             )
         }
 
         // Avatar selection
         composable(AppDestination.AVATAR_SELECTION.route) {
             AvatarSelectionScreen(
-                selectedAvatar = avatarNum,
-                onAvatarSelected = {
-                    avatarNum = it
-                },
+                selectedAvatar = registerState.avatarNum,
+
+                onAvatarSelected =
+                    registerViewModel::onAvatarSelected,
+
                 onConfirmClick = {
                     navController.popBackStack()
                 },
+
                 onBackClick = {
                     navController.popBackStack()
                 }
@@ -223,26 +301,37 @@ fun AppNavigation() {
 
         // Preferences - Step 2
         composable(AppDestination.PREFERENCES.route) {
-            PreferencesScreen(
-                selectedPreferences = selectedPreferences,
-                onPreferenceToggle = { category ->
-                    selectedPreferences =
-                        if (category in selectedPreferences) {
-                            selectedPreferences - category
-                        } else {
-                            selectedPreferences + category
-                        }
-                },
-                onFinishClick = {
-                    // Demo only: profile is not persisted.
+
+            LaunchedEffect(registerState.isRegistered) {
+                if (registerState.isRegistered) {
                     enterMainApp()
-                },
-                onBackClick = {
-                    navController.popBackStack()
+                    registerViewModel.clearRegistration()
                 }
+            }
+
+            PreferencesScreen(
+                selectedPreferences = registerState.selectedPreferences,
+
+                onPreferenceToggle =
+                    registerViewModel::onPreferenceToggle,
+
+                onFinishClick = {
+                    registerViewModel.registerAndLogin()
+                },
+
+                onBackClick = {
+                    if (
+                        !registerState.isLoading &&
+                        !registerState.accountCreated
+                    ) {
+                        navController.popBackStack()
+                    }
+                },
+
+                isLoading = registerState.isLoading,
+                errorMessage = registerState.errorMessage
             )
         }
-
 
         // Main application
         composable(AppDestination.MAIN.route) {

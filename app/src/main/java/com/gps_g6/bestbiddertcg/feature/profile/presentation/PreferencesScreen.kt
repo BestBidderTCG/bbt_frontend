@@ -22,7 +22,9 @@ fun PreferencesScreen(
     selectedPreferences: Set<CardCategory>,
     onPreferenceToggle: (CardCategory) -> Unit,
     onFinishClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isLoading: Boolean = false,
+    errorMessage: String? = null
 ) {
 
     Column(
@@ -99,10 +101,22 @@ fun PreferencesScreen(
 
             Spacer(modifier = Modifier.height(AppSpacing.xxl))
 
+            if (errorMessage != null) {
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+
+                Spacer(
+                    modifier = Modifier.height(AppSpacing.m)
+                )
+            }
+
             // Finish button
             Button(
                 onClick = onFinishClick,
-                enabled = selectedPreferences.isNotEmpty(),
+                enabled = selectedPreferences.isNotEmpty() && !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -114,10 +128,20 @@ fun PreferencesScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
-                Text(
-                    text = stringResource(R.string.preferences_finish),
-                    style = MaterialTheme.typography.labelMedium
-                )
+
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        strokeWidth = 2.dp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                } else {
+                    Text(
+                        text = stringResource(R.string.preferences_finish),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+
             }
 
             Spacer(modifier = Modifier.height(AppSpacing.xl))

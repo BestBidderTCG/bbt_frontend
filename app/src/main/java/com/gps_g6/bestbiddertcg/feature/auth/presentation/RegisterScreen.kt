@@ -29,7 +29,10 @@ fun RegisterScreen(
     onConfirmPasswordChange: (String) -> Unit,
     onContinueClick: () -> Unit,
     onLoginClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    emailError: Boolean = false,
+    passwordError: Boolean = false,
+    confirmPasswordError: Boolean = false
 ) {
     Column(
         modifier = Modifier
@@ -102,6 +105,7 @@ fun RegisterScreen(
                     color = TextPrimary
                 ),
                 singleLine = true,
+                isError = emailError,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
                 ),
@@ -115,6 +119,16 @@ fun RegisterScreen(
                 )
             )
 
+            if (emailError) {
+                Spacer(modifier = Modifier.height(AppSpacing.xs))
+
+                Text(
+                    text = stringResource(R.string.register_email_error),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
             Spacer(modifier = Modifier.height(AppSpacing.l))
 
             // Password
@@ -125,6 +139,16 @@ fun RegisterScreen(
                 placeholder = stringResource(R.string.register_password_hint)
             )
 
+            if (passwordError) {
+                Spacer(modifier = Modifier.height(AppSpacing.xs))
+
+                Text(
+                    text = stringResource(R.string.register_password_error),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+
             Spacer(modifier = Modifier.height(AppSpacing.l))
 
             // Confirm password
@@ -134,6 +158,18 @@ fun RegisterScreen(
                 label = stringResource(R.string.register_confirm_password),
                 placeholder = stringResource(R.string.register_confirm_hint)
             )
+
+            if (confirmPasswordError) {
+                Spacer(modifier = Modifier.height(AppSpacing.xs))
+
+                Text(
+                    text = stringResource(
+                        R.string.register_confirm_password_error
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
 
             Spacer(modifier = Modifier.height(AppSpacing.xxl))
 
