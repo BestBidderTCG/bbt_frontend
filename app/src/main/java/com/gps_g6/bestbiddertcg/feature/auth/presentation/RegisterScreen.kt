@@ -35,6 +35,7 @@ fun RegisterScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(Background)
+            .windowInsetsPadding(WindowInsets.displayCutout)
     ) {
         // Fixed top bar
         AppTopBar(
