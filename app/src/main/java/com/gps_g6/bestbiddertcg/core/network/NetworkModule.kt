@@ -1,33 +1,66 @@
+
 package com.gps_g6.bestbiddertcg.core.network
 
+import android.content.Context
+import android.util.Log
+import com.gps_g6.bestbiddertcg.BuildConfig
+import com.gps_g6.bestbiddertcg.core.auth.EncryptedTokenStorage
+import com.gps_g6.bestbiddertcg.core.auth.SessionManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 
 object NetworkModule {
 
-    // URL base del baackend al que se conectará la aplicación.
     private const val BASE_URL = "http://10.0.2.2:8080/"
 
-    // Configura la conversión de JSON a objetos Kotlin.
-    // Ignora los campos de la respuesta que no estén definidos en los DTO.
+    lateinit var sessionManager: SessionManager
+        private set
+
+    fun initialize(context: Context) {
+        if (::sessionManager.isInitialized) return
+
+        sessionManager = SessionManager(
+            tokenStorage = EncryptedTokenStorage(
+                context.applicationContext
+            )
+        )
+    }
+
     private val json = Json {
         ignoreUnknownKeys = true
     }
 
-    // Configura el cliente HTTP encargado de gestionar las conexiones con el servidor.
-    private val okHttpClient = OkHttpClient.Builder()
-        .build()
+    private val loggingInterceptor = HttpLoggingInterceptor { message ->
+        Log.d("BestBidderHTTP", message)
+    }.apply {
+        level = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor.Level.BASIC
+        } else {
+            HttpLoggingInterceptor.Level.NONE
+        }
+    }
 
-    // Crea una única instancia de Retrofit cuando se utiliza por primera vez.
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(
+                AuthInterceptor(sessionManager)
+            )
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
     val retrofit: Retrofit by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(
-                json.asConverterFactory("application/json".toMediaType())
+                json.asConverterFactory(
+                    "application/json".toMediaType()
+                )
             )
             .build()
     }
