@@ -23,6 +23,7 @@ import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.AppStepProgress
+import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.ProfileAvatarImage
 
 @Composable
 fun CreateProfileScreen(
@@ -88,35 +89,22 @@ fun CreateProfileScreen(
             Spacer(modifier = Modifier.height(AppSpacing.xxl))
 
             // Avatar selector
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onAvatarClick),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(88.dp)
-                        .clip(CircleShape)
-                        .background(PrimaryLight),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(
-                            R.drawable.ic_profile_active
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(48.dp),
-                        tint = Primary
-                    )
-                }
+                ProfileAvatarImage(
+                    avatarNum = avatarNum,
+                    modifier = Modifier.size(88.dp)
+                )
 
                 Spacer(modifier = Modifier.height(AppSpacing.m))
 
                 Text(
-                    text = stringResource(
-                        R.string.create_profile_avatar
-                    ),
+                    text = stringResource(R.string.create_profile_avatar),
                     style = MaterialTheme.typography.labelMedium,
                     color = Primary
                 )
