@@ -13,6 +13,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Icon
+import androidx.compose.ui.res.painterResource
+import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
@@ -122,11 +125,10 @@ fun EstimatedEndDate(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "✓",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-                color = Primary
+            Icon(
+                painter = painterResource(id = R.drawable.ic_calendar_check),
+                contentDescription = "Fecha de finalización estimada",
+                tint = Primary
             )
 
             Spacer(modifier = Modifier.width(AppSpacing.m))
