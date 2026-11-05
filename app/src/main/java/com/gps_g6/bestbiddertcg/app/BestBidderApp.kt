@@ -13,6 +13,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModel
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModelFactory
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.CreateAuctionScreen
 import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
 import com.gps_g6.bestbiddertcg.core.ui.components.BottomNavigationBar
@@ -23,7 +26,7 @@ import com.gps_g6.bestbiddertcg.feature.social.presentation.SocialScreen
 import kotlinx.coroutines.launch
 
 /**
- * Coordinates the main screens and horizontal navigation.
+ * Página principal de la aplicación.
  */
 @Composable
 fun BestBidderApp() {
@@ -33,6 +36,11 @@ fun BestBidderApp() {
     )
     val scope = rememberCoroutineScope()
     var isCreatingAuction by remember { mutableStateOf(false) }
+
+    // Gestiona el estado de la pantalla Explore.
+    val exploreViewModel: ExploreViewModel = viewModel(
+        factory = ExploreViewModelFactory(AuctionModule.auctionRepository)
+    )
 
     Scaffold(
         bottomBar = {
@@ -55,6 +63,11 @@ fun BestBidderApp() {
             CreateAuctionScreen(
                 onBackClick = {
                     isCreatingAuction = false
+                },
+                onAuctionCreated = {
+                    isCreatingAuction = false
+                    // TODO: cuando haya sse quitamos
+                    exploreViewModel.loadAuctions()
                 }
             )
         } else {

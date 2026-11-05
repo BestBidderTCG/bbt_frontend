@@ -9,7 +9,7 @@ import retrofit2.Retrofit
 object NetworkModule {
 
     // URL base del baackend al que se conectará la aplicación.
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val BASE_URL = "http://localhost:8080/"
 
     // Configura la conversión de JSON a objetos Kotlin.
     // Ignora los campos de la respuesta que no estén definidos en los DTO.
