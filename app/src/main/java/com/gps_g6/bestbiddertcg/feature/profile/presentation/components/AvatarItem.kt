@@ -39,7 +39,9 @@ fun AvatarItem(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource(R.drawable.sample_piplup_avatar),
+                painter = painterResource(
+                    AvatarResources.getDrawable(avatarNum)
+                ),
                 contentDescription = "Avatar $avatarNum",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Fit

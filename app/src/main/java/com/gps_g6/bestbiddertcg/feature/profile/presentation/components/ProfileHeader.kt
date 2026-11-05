@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,7 +51,10 @@ fun ProfileHeader(
                     AppSpacing.m
                 )
             ) {
-                ProfileAvatar()
+                ProfileAvatarImage(
+                    avatarNum = profile.avatarNum,
+                    modifier = Modifier.size(76.dp)
+                )
 
                 Column(
                     modifier = Modifier.weight(1f),
@@ -103,6 +105,18 @@ fun ProfileHeader(
                 overflow = TextOverflow.Ellipsis
             )
 
+            if (!profile.description.isNullOrBlank()) {
+                Spacer(modifier = Modifier.height(AppSpacing.s))
+
+                Text(
+                    text = profile.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary,
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+
             Spacer(modifier = Modifier.height(AppSpacing.m))
 
             OutlinedButton(
@@ -126,28 +140,6 @@ fun ProfileHeader(
         }
     }
 }
-
-
-@Composable
-private fun ProfileAvatar() {
-    Box(
-        modifier = Modifier
-            .size(76.dp)
-            .clip(CircleShape)
-            .background(PrimaryLight),
-        contentAlignment = Alignment.Center
-    ) {
-        Icon(
-            painter = painterResource(
-                R.drawable.ic_profile_active
-            ),
-            contentDescription = stringResource(R.string.profile_avatar_description),
-            modifier = Modifier.size(44.dp),
-            tint = Primary
-        )
-    }
-}
-
 
 @Composable
 private fun ProfileStat(
