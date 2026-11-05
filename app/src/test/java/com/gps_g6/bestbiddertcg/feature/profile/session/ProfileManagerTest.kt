@@ -5,6 +5,8 @@ import com.gps_g6.bestbiddertcg.core.auth.SessionTokens
 import com.gps_g6.bestbiddertcg.core.auth.TokenStorage
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.domain.repository.ProfileRepository
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Test
@@ -174,4 +176,27 @@ class ProfileManagerTest {
 
         assertNull(manager.profile.value)
     }
+
+
+    @Test
+    fun `concurrent loads share the cached profile`() = runBlocking {
+        val repository = FakeProfileRepository()
+        val session = SessionManager(FakeTokenStorage())
+
+        session.saveSession("access-1", "refresh-1")
+
+        val manager = ProfileManager(repository, session)
+
+        val requests = List(5) {
+            async {
+                manager.loadProfile()
+            }
+        }
+
+        val profiles = requests.awaitAll()
+
+        assertEquals(1, repository.getCalls)
+        assertTrue(profiles.all { it.username == "testuser" })
+    }
+
 }

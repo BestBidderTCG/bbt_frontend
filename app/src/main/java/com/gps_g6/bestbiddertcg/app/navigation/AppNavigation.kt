@@ -316,11 +316,8 @@ fun AppNavigation() {
         // Preferences - Step 2
         composable(AppDestination.PREFERENCES.route) {
 
-            BackHandler(
-                enabled = registerState.isLoading ||
-                        registerState.accountCreated
-            ) {
-                // Prevent leaving an incomplete registration flow
+            BackHandler(enabled = registerState.isLoading) {
+                // Bloquear la navegación solo durante la operación
             }
 
             LaunchedEffect(registerState.isRegistered) {
@@ -341,10 +338,7 @@ fun AppNavigation() {
                 },
 
                 onBackClick = {
-                    if (
-                        !registerState.isLoading &&
-                        !registerState.accountCreated
-                    ) {
+                    if (!registerState.isLoading) {
                         navController.popBackStack()
                     }
                 },

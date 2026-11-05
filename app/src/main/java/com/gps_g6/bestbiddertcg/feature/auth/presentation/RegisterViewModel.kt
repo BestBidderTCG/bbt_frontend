@@ -9,6 +9,7 @@ import com.gps_g6.bestbiddertcg.feature.auth.domain.repository.AuthRepository
 import com.gps_g6.bestbiddertcg.feature.auth.domain.validation.AuthValidator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +21,8 @@ import java.io.IOException
 class RegisterViewModel(
     private val repository: AuthRepository,
     private val sessionManager: SessionManager,
-    private val saveProfile: suspend (String?, Int?) -> Unit
+    private val saveProfile: suspend (String?, Int?) -> Unit,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -178,7 +180,7 @@ class RegisterViewModel(
             try {
                 // 1. Create the account only once
                 if (!created) {
-                    withContext(Dispatchers.IO) {
+                    withContext(ioDispatcher) {
                         repository.register(
                             email = state.email.trim(),
                             username = state.username.trim(),
@@ -195,14 +197,14 @@ class RegisterViewModel(
 
                 // 2. Log in only if not already completed
                 if (!loggedIn) {
-                    val session = withContext(Dispatchers.IO) {
+                    val session = withContext(ioDispatcher) {
                         repository.login(
                             identifier = state.email.trim(),
                             password = state.password
                         )
                     }
 
-                    withContext(Dispatchers.IO) {
+                    withContext(ioDispatcher) {
                         sessionManager.saveSession(
                             accessToken = session.accessToken,
                             refreshToken = session.refreshToken
@@ -221,7 +223,7 @@ class RegisterViewModel(
                 }
 
                 // 3. Save the initial profile
-                withContext(Dispatchers.IO) {
+                withContext(ioDispatcher) {
                     saveProfile(
                         state.description,
                         state.avatarNum
@@ -291,23 +293,27 @@ class RegisterViewModel(
                     )
                 }
 
-            } catch (e: HttpException) {
 
-                android.util.Log.e(
-                    "BestBidderRegister",
-                    "Registro rechazado: HTTP ${e.code()} - " +
-                            e.response()?.errorBody()?.string()
-                )
-
+            } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         accountCreated = created,
                         loginCompleted = loggedIn,
                         isLoading = false,
-                        errorMessage = "Ha ocurrido un error inesperado."
+                        errorMessage = when {
+                            loggedIn ->
+                                "No se ha podido guardar el perfil. Inténtalo de nuevo."
+
+                            created ->
+                                "La cuenta se ha creado, pero no se ha podido iniciar sesión."
+
+                            else ->
+                                "Ha ocurrido un error inesperado."
+                        }
                     )
                 }
             }
+
         }
     }
 
