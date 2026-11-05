@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -15,46 +16,87 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
+import com.gps_g6.bestbiddertcg.core.ui.theme.Error as ErrorColor
 import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
+import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardOptionRow
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardPickerDialog
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardSelectionList
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DropdownField
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DurationSelector
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.EstimatedEndDate
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.FormCard
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.FormInput
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SearchDropdownField
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SectionTitle
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SelectionPlaceholder
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DurationSelector
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartDatePickerDialog
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartTimePickerDialog
+import com.gps_g6.bestbiddertcg.feature.card.data.CardModule
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH'h'mm")
 
 /**
  * Pantalla de creacion de subastas.
  */
 @Composable
 fun CreateAuctionScreen(
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onAuctionCreated: () -> Unit = {}
 ) {
+
+    val viewModel: CreateAuctionViewModel = viewModel(
+        factory = CreateAuctionViewModelFactory(
+            createAuctionUseCase = AuctionModule.createAuctionUseCase,
+            getMyCardsUseCase = CardModule.getMyCardsUseCase
+        )
+    )
+
+    val uiState by viewModel.uiState.collectAsState()
+
     var selectedMode by remember { mutableStateOf("collection") }
 
+    // Campos de "Nueva carta" (pendientes de implementar).
     var cardName by remember { mutableStateOf("") }
     var cardNumber by remember { mutableStateOf("") }
     var cardDescription by remember { mutableStateOf("") }
 
-    var startingPrice by remember { mutableStateOf("") }
-    var auctionDescription by remember { mutableStateOf("") }
+    // Selector de fecha y hora (primero fecha, luego hora).
+    var showDatePicker by remember { mutableStateOf(false) }
+    var showCardPicker by remember { mutableStateOf(false) }
+    var showTimePicker by remember { mutableStateOf(false) }
+    var pickedDate by remember { mutableStateOf<LocalDate?>(null) }
 
-    var selectedDuration by remember { mutableIntStateOf(3) }
+    // Reinicia el formulario y carga las cartas al abrir la pantalla.
+    LaunchedEffect(Unit) {
+        viewModel.start()
+    }
+
+    // Cuando la subasta se crea correctamente, se cierra la pantalla.
+    LaunchedEffect(uiState.createdAuction) {
+        if (uiState.createdAuction != null) {
+            viewModel.onAuctionCreatedHandled()
+            onAuctionCreated()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -142,11 +184,34 @@ fun CreateAuctionScreen(
 
                 if (selectedMode == "collection") {
 
-                    SelectionPlaceholder(
-                        icon = R.drawable.ic_grid,
-                        title = "Seleccionar de mi colección",
-                        description = "Elige una carta que ya tengas registrada"
-                    )
+                    val selectedCard = uiState.selectedCard
+
+                    if (selectedCard == null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(AppCornerRadius.medium))
+                                .clickable {
+                                    viewModel.loadCards()
+                                    showCardPicker = true
+                                }
+                        ) {
+                            SelectionPlaceholder(
+                                icon = R.drawable.ic_grid,
+                                title = "Seleccionar de mi colección",
+                                description = "Elige una carta que ya tengas registrada"
+                            )
+                        }
+                    } else {
+                        CardOptionRow(
+                            card = selectedCard,
+                            selected = true,
+                            onClick = {
+                                viewModel.loadCards()
+                                showCardPicker = true
+                            }
+                        )
+                    }
 
                 } else {
 
@@ -206,15 +271,16 @@ fun CreateAuctionScreen(
 
                 FormInput(
                     label = "Precio inicial (€)",
-                    value = startingPrice,
-                    onValueChange = { startingPrice = it },
-                    placeholder = "0,00"
+                    value = uiState.startingPrice,
+                    onValueChange = viewModel::updateStartingPrice,
+                    placeholder = "0,00",
+                    keyboardType = KeyboardType.Decimal
                 )
 
                 FormInput(
                     label = "Descripción de la subasta (opcional)",
-                    value = auctionDescription,
-                    onValueChange = { auctionDescription = it },
+                    value = uiState.description,
+                    onValueChange = viewModel::updateDescription,
                     placeholder = "Añade información sobre la subasta...",
                     multiline = true
                 )
@@ -227,7 +293,10 @@ fun CreateAuctionScreen(
 
                 Spacer(modifier = Modifier.height(AppSpacing.m))
 
-                DateTimeField()
+                DateTimeField(
+                    value = dateTimeFormatter.format(uiState.startDateTime),
+                    onClick = { showDatePicker = true }
+                )
 
                 Spacer(modifier = Modifier.height(AppSpacing.s))
 
@@ -240,49 +309,120 @@ fun CreateAuctionScreen(
                 Spacer(modifier = Modifier.height(AppSpacing.xl))
 
                 DurationSelector(
-                    selectedDuration = selectedDuration,
-                    onDurationSelected = {
-                        selectedDuration = it
-                    }
+                    selectedDuration = uiState.durationInDays,
+                    onDurationSelected = viewModel::updateDuration
                 )
 
                 Spacer(modifier = Modifier.height(AppSpacing.xxl))
 
-                EstimatedEndDate()
+                EstimatedEndDate(
+                    dateText = dateTimeFormatter.format(
+                        uiState.startDateTime.plusDays(uiState.durationInDays.toLong())
+                    )
+                )
             }
         }
 
-        // Fixed bottom button
+        // Fixed bottom area
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = AppSurface,
             shadowElevation = 4.dp
         ) {
-            Button(
-                onClick = {
-                    // TODO: Create auction
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = AppSpacing.l,
-                        vertical = AppSpacing.m
-                    )
-                    .height(60.dp),
-                shape = RoundedCornerShape(AppCornerRadius.medium),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary,
-                    contentColor = AppSurface
+            Column(
+                modifier = Modifier.padding(
+                    horizontal = AppSpacing.l,
+                    vertical = AppSpacing.m
                 )
             ) {
-                Text(
-                    text = "Crear subasta",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        fontWeight = FontWeight.SemiBold
+
+                uiState.errorMessage?.let { message ->
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = ErrorColor,
+                        modifier = Modifier.padding(bottom = AppSpacing.s)
                     )
-                )
+                }
+
+                Button(
+                    onClick = {
+                        if (selectedMode == "collection") {
+                            viewModel.createAuction()
+                        } else {
+                            viewModel.showError(
+                                "Crear cartas nuevas aún no está disponible. Usa «Mi colección»."
+                            )
+                        }
+                    },
+                    enabled = !uiState.isCreating,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    shape = RoundedCornerShape(AppCornerRadius.medium),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Primary,
+                        contentColor = AppSurface
+                    )
+                ) {
+                    if (uiState.isCreating) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = AppSurface,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Crear subasta",
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        )
+                    }
+                }
             }
         }
+    }
+
+    if (showDatePicker) {
+        StartDatePickerDialog(
+            initialDate = uiState.startDateTime.toLocalDate(),
+            onDateSelected = { date ->
+                pickedDate = date
+                showDatePicker = false
+                showTimePicker = true
+            },
+            onDismiss = { showDatePicker = false }
+        )
+    }
+
+    if (showTimePicker) {
+        StartTimePickerDialog(
+            initialTime = uiState.startDateTime.toLocalTime(),
+            onTimeSelected = { time ->
+                viewModel.updateStartDateTime(
+                    date = pickedDate ?: uiState.startDateTime.toLocalDate(),
+                    time = time
+                )
+                showTimePicker = false
+            },
+            onDismiss = { showTimePicker = false }
+        )
+    }
+
+    if (showCardPicker) {
+        CardPickerDialog(
+            cards = uiState.cards,
+            selectedCardId = uiState.selectedCard?.id,
+            isLoading = uiState.isLoadingCards,
+            errorMessage = uiState.cardsError,
+            onCardSelected = { card ->
+                viewModel.selectCard(card)
+                showCardPicker = false
+            },
+            onRetry = viewModel::loadCards,
+            onDismiss = { showCardPicker = false }
+        )
     }
 }
 
@@ -290,7 +430,10 @@ fun CreateAuctionScreen(
  * Campo de fecha y hora de inicio.
  */
 @Composable
-private fun DateTimeField() {
+private fun DateTimeField(
+    value: String,
+    onClick: () -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -306,17 +449,16 @@ private fun DateTimeField() {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
-                .background(
-                    AppSurface,
-                    RoundedCornerShape(AppCornerRadius.large)
-                )
+                .clip(RoundedCornerShape(AppCornerRadius.large))
+                .background(AppSurface)
+                .clickable(onClick = onClick)
                 .padding(horizontal = AppSpacing.l),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Selecciona fecha y hora",
+                text = value,
                 style = MaterialTheme.typography.bodyLarge,
-                color = TextSecondary,
+                color = TextPrimary,
                 modifier = Modifier.weight(1f)
             )
 

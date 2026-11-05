@@ -12,6 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
@@ -25,7 +27,8 @@ fun FormInput(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    multiline: Boolean = false
+    multiline: Boolean = false,
+    keyboardType: KeyboardType = KeyboardType.Text
 ) {
     Column(
         modifier = Modifier
@@ -79,7 +82,8 @@ fun FormInput(
                     textStyle = MaterialTheme.typography.bodyLarge.copy(
                         color = TextPrimary
                     ),
-                    singleLine = !multiline
+                    singleLine = !multiline,
+                    keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
                 )
             }
         }
