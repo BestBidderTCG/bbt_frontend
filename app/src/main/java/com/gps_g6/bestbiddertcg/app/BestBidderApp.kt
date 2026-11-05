@@ -9,6 +9,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.CreateAuctionScreen
 import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
 import com.gps_g6.bestbiddertcg.core.ui.components.BottomNavigationBar
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreScreen
@@ -27,35 +32,46 @@ fun BestBidderApp() {
         pageCount = { AppPage.entries.size }
     )
     val scope = rememberCoroutineScope()
+    var isCreatingAuction by remember { mutableStateOf(false) }
 
     Scaffold(
         bottomBar = {
-            BottomNavigationBar(
-                selectedPage = AppPage.entries[pagerState.currentPage],
-                onPageSelected = { page ->
-                    scope.launch {
-                        pagerState.animateScrollToPage(page.ordinal)
+            if (!isCreatingAuction) {
+                BottomNavigationBar(
+                    selectedPage = AppPage.entries[pagerState.currentPage],
+                    onPageSelected = { page ->
+                        scope.launch {
+                            pagerState.animateScrollToPage(page.ordinal)
+                        }
+                    },
+                    onAddClick = {
+                        isCreatingAuction = true
                     }
-                },
-                onAddClick = {
-                    // TODO: Add auction creation action
-                }
-            )
+                )
+            }
         }
     ) { innerPadding ->
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) { page ->
-            when (AppPage.entries[page]) {
-                AppPage.EXPLORE -> ExploreScreen(
-                    auctionRepository = AuctionModule.auctionRepository
-                )
-                AppPage.SOCIAL -> SocialScreen()
-                AppPage.FAVORITES -> FavoritesScreen()
-                AppPage.PROFILE -> ProfileScreen()
+        if (isCreatingAuction) {
+            CreateAuctionScreen(
+                onBackClick = {
+                    isCreatingAuction = false
+                }
+            )
+        } else {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+            ) { page ->
+                when (AppPage.entries[page]) {
+                    AppPage.EXPLORE -> ExploreScreen(
+                        auctionRepository = AuctionModule.auctionRepository
+                    )
+                    AppPage.SOCIAL -> SocialScreen()
+                    AppPage.FAVORITES -> FavoritesScreen()
+                    AppPage.PROFILE -> ProfileScreen()
+                }
             }
         }
     }
