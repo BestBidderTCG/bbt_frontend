@@ -61,13 +61,8 @@ import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionReposit
  */
 @Composable
 fun ExploreScreen(
-    auctionRepository: AuctionRepository
+    viewModel: ExploreViewModel
 ) {
-
-    // Obtiene el ViewModel utilizando nuestra Factory.
-    val viewModel: ExploreViewModel = viewModel(
-        factory = ExploreViewModelFactory(auctionRepository)
-    )
 
     // Observa los estados del ViewModel.
     val auctions by viewModel.auctions.collectAsState()

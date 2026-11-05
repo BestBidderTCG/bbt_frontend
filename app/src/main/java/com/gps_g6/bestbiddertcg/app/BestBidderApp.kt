@@ -79,7 +79,7 @@ fun BestBidderApp() {
             ) { page ->
                 when (AppPage.entries[page]) {
                     AppPage.EXPLORE -> ExploreScreen(
-                        auctionRepository = AuctionModule.auctionRepository
+                        viewModel = exploreViewModel
                     )
                     AppPage.SOCIAL -> SocialScreen()
                     AppPage.FAVORITES -> FavoritesScreen()
