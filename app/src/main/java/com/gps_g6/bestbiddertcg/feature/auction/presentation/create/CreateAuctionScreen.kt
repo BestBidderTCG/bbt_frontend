@@ -49,6 +49,7 @@ import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.S
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartDatePickerDialog
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartTimePickerDialog
 import com.gps_g6.bestbiddertcg.feature.card.data.CardModule
+import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -66,7 +67,8 @@ fun CreateAuctionScreen(
     val viewModel: CreateAuctionViewModel = viewModel(
         factory = CreateAuctionViewModelFactory(
             createAuctionUseCase = AuctionModule.createAuctionUseCase,
-            getMyCardsUseCase = CardModule.getMyCardsUseCase
+            getMyCardsUseCase = CardModule.getMyCardsUseCase,
+            profileManager = ProfileModule.profileManager
         )
     )
 

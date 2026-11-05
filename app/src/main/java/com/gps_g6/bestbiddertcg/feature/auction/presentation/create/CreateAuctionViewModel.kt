@@ -6,6 +6,7 @@ import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
 import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
+import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -22,15 +23,9 @@ import java.time.ZoneId
  */
 class CreateAuctionViewModel(
     private val createAuctionUseCase: CreateAuctionUseCase,
-    private val getMyCardsUseCase: GetMyCardsUseCase
+    private val getMyCardsUseCase: GetMyCardsUseCase,
+    private val profileManager: ProfileManager
 ) : ViewModel() {
-
-    private companion object {
-        // TODO: sustituir por el usuario autenticado cuando exista el login.
-        // Debe coincidir con el usuario cuyas cartas se listan (usuarios de prueba del backend).
-        const val TEMP_CREATOR_ID = "11111111-1111-1111-1111-111111111111"
-        const val TEMP_CREATOR_USERNAME = "user1"
-    }
 
     private val _uiState = MutableStateFlow(CreateAuctionUiState())
     val uiState: StateFlow<CreateAuctionUiState> = _uiState.asStateFlow()
@@ -52,10 +47,7 @@ class CreateAuctionViewModel(
             _uiState.update { it.copy(isLoadingCards = true, cardsError = null) }
 
             try {
-                // TODO: revisar
-                val cards = getMyCardsUseCase().filter {
-                    it.ownerId.equals(TEMP_CREATOR_ID, ignoreCase = true)
-                }
+                val cards = getMyCardsUseCase()
                 _uiState.update { it.copy(cards = cards, isLoadingCards = false) }
             } catch (exception: Exception) {
                 _uiState.update {
@@ -131,10 +123,12 @@ class CreateAuctionViewModel(
             _uiState.update { it.copy(isCreating = true, errorMessage = null) }
 
             try {
+                val profile = profileManager.loadProfile()
+
                 val auction = createAuctionUseCase(
                     CreateAuction(
-                        creatorId = TEMP_CREATOR_ID,
-                        creatorUsername = TEMP_CREATOR_USERNAME,
+                        creatorId = profile.id,
+                        creatorUsername = profile.username,
                         cardId = card.id,
                         description = state.description.trim().ifBlank { null },
                         minPrize = price,
