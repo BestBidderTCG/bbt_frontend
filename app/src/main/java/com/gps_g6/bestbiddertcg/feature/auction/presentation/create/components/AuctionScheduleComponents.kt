@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Icon
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
@@ -142,4 +143,19 @@ fun EstimatedEndDate(
             )
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DurationSelectorPreview() {
+    DurationSelector(
+        selectedDuration = 3,
+        onDurationSelected = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun EstimatedEndDatePreview() {
+    EstimatedEndDate()
 }

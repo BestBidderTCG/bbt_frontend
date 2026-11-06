@@ -15,6 +15,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
@@ -166,4 +167,22 @@ private fun ChevronDown() {
             style = Stroke(width = 2.dp.toPx())
         )
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun DropdownFieldPreview() {
+    DropdownField(
+        label = "Colección",
+        placeholder = "Selecciona una colección"
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SearchDropdownFieldPreview() {
+    SearchDropdownField(
+        label = "Carta",
+        placeholder = "Busca una carta"
+    )
 }

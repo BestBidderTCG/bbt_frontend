@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.tooling.preview.Preview
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
@@ -180,5 +181,56 @@ fun CardPickerDialog(
                 Text(text = "Cancelar")
             }
         }
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CardSelectionListPreview() {
+    CardSelectionList(
+        cards = emptyList(),
+        selectedCardId = null,
+        isLoading = false,
+        errorMessage = null,
+        onCardSelected = {},
+        onRetry = {}
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CardSelectionList2Preview() {
+    val cards = listOf(
+        Card(
+            id = "card-1",
+            ownerId = "user-1",
+            name = "Pikachu",
+            image = "",
+            category = "Pokémon",
+            collection = "Base Set",
+            num = 25,
+            state = "NEAR_MINT",
+            description = null
+        ),
+        Card(
+            id = "card-2",
+            ownerId = "user-1",
+            name = "Charizard",
+            image = "",
+            category = "Pokémon",
+            collection = "Base Set",
+            num = 4,
+            state = "NEW",
+            description = null
+        )
+    )
+
+    CardSelectionList(
+        cards = cards,
+        selectedCardId = "card-1",
+        isLoading = false,
+        errorMessage = null,
+        onCardSelected = {},
+        onRetry = {}
     )
 }

@@ -23,10 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.Background
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Error as ErrorColor
 import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
@@ -34,10 +34,8 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.auction.data.AuctionModule
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardOptionRow
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardPickerDialog
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardSelectionList
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DropdownField
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DurationSelector
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.EstimatedEndDate
@@ -48,8 +46,8 @@ import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.S
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SelectionPlaceholder
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartDatePickerDialog
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartTimePickerDialog
-import com.gps_g6.bestbiddertcg.feature.card.data.CardModule
-import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import java.time.LocalTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -60,19 +58,17 @@ private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH'h'mm
  */
 @Composable
 fun CreateAuctionScreen(
-    onBackClick: () -> Unit = {},
-    onAuctionCreated: () -> Unit = {}
+    uiState: CreateAuctionUiState,
+    onBackClick: () -> Unit,
+    onLoadCards: () -> Unit,
+    onCardSelected: (Card) -> Unit,
+    onStartingPriceChange: (String) -> Unit,
+    onDescriptionChange: (String) -> Unit,
+    onDurationSelected: (Int) -> Unit,
+    onStartDateTimeChange: (LocalDate, LocalTime) -> Unit,
+    onCreateAuction: () -> Unit,
+    onShowError: (String) -> Unit
 ) {
-
-    val viewModel: CreateAuctionViewModel = viewModel(
-        factory = CreateAuctionViewModelFactory(
-            createAuctionUseCase = AuctionModule.createAuctionUseCase,
-            getMyCardsUseCase = CardModule.getMyCardsUseCase,
-            profileManager = ProfileModule.profileManager
-        )
-    )
-
-    val uiState by viewModel.uiState.collectAsState()
 
     var selectedMode by remember { mutableStateOf("collection") }
 
@@ -87,23 +83,10 @@ fun CreateAuctionScreen(
     var showTimePicker by remember { mutableStateOf(false) }
     var pickedDate by remember { mutableStateOf<LocalDate?>(null) }
 
-    // Reinicia el formulario y carga las cartas al abrir la pantalla.
-    LaunchedEffect(Unit) {
-        viewModel.start()
-    }
-
-    // Cuando la subasta se crea correctamente, se cierra la pantalla.
-    LaunchedEffect(uiState.createdAuction) {
-        if (uiState.createdAuction != null) {
-            viewModel.onAuctionCreatedHandled()
-            onAuctionCreated()
-        }
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(PrimaryLight)
+            .background(Background)
     ) {
 
         // Header
@@ -159,7 +142,7 @@ fun CreateAuctionScreen(
                         .fillMaxWidth()
                         .height(56.dp)
                         .background(
-                            PrimaryLight,
+                            Background,
                             RoundedCornerShape(AppCornerRadius.medium)
                         )
                         .padding(AppSpacing.s),
@@ -194,7 +177,7 @@ fun CreateAuctionScreen(
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(AppCornerRadius.medium))
                                 .clickable {
-                                    viewModel.loadCards()
+                                    onLoadCards()
                                     showCardPicker = true
                                 }
                         ) {
@@ -209,7 +192,7 @@ fun CreateAuctionScreen(
                             card = selectedCard,
                             selected = true,
                             onClick = {
-                                viewModel.loadCards()
+                                onLoadCards()
                                 showCardPicker = true
                             }
                         )
@@ -274,7 +257,7 @@ fun CreateAuctionScreen(
                 FormInput(
                     label = "Precio inicial (€)",
                     value = uiState.startingPrice,
-                    onValueChange = viewModel::updateStartingPrice,
+                    onValueChange = onStartingPriceChange,
                     placeholder = "0,00",
                     keyboardType = KeyboardType.Decimal
                 )
@@ -282,7 +265,7 @@ fun CreateAuctionScreen(
                 FormInput(
                     label = "Descripción de la subasta (opcional)",
                     value = uiState.description,
-                    onValueChange = viewModel::updateDescription,
+                    onValueChange = onDescriptionChange,
                     placeholder = "Añade información sobre la subasta...",
                     multiline = true
                 )
@@ -312,7 +295,7 @@ fun CreateAuctionScreen(
 
                 DurationSelector(
                     selectedDuration = uiState.durationInDays,
-                    onDurationSelected = viewModel::updateDuration
+                    onDurationSelected = onDurationSelected
                 )
 
                 Spacer(modifier = Modifier.height(AppSpacing.xxl))
@@ -350,9 +333,9 @@ fun CreateAuctionScreen(
                 Button(
                     onClick = {
                         if (selectedMode == "collection") {
-                            viewModel.createAuction()
+                            onCreateAuction()
                         } else {
-                            viewModel.showError(
+                            onShowError(
                                 "Crear cartas nuevas aún no está disponible. Usa «Mi colección»."
                             )
                         }
@@ -402,9 +385,9 @@ fun CreateAuctionScreen(
         StartTimePickerDialog(
             initialTime = uiState.startDateTime.toLocalTime(),
             onTimeSelected = { time ->
-                viewModel.updateStartDateTime(
-                    date = pickedDate ?: uiState.startDateTime.toLocalDate(),
-                    time = time
+                onStartDateTimeChange(
+                    pickedDate ?: uiState.startDateTime.toLocalDate(),
+                    time
                 )
                 showTimePicker = false
             },
@@ -419,10 +402,10 @@ fun CreateAuctionScreen(
             isLoading = uiState.isLoadingCards,
             errorMessage = uiState.cardsError,
             onCardSelected = { card ->
-                viewModel.selectCard(card)
+                onCardSelected(card)
                 showCardPicker = false
             },
-            onRetry = viewModel::loadCards,
+            onRetry = onLoadCards,
             onDismiss = { showCardPicker = false }
         )
     }
@@ -516,6 +499,17 @@ private fun AuctionModeTab(
 @Composable
 private fun CreateAuctionScreenPreview() {
     BestBidderTCGTheme {
-        CreateAuctionScreen()
+        CreateAuctionScreen(
+            uiState = CreateAuctionSampleData.uiState,
+            onBackClick = {},
+            onLoadCards = {},
+            onCardSelected = {},
+            onStartingPriceChange = {},
+            onDescriptionChange = {},
+            onDurationSelected = {},
+            onStartDateTimeChange = { _, _ -> },
+            onCreateAuction = {},
+            onShowError = {}
+        )
     }
 }
