@@ -14,6 +14,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.CreateAuctionViewModel
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.CreateAuctionViewModelFactory
+import com.gps_g6.bestbiddertcg.feature.card.data.CardModule
+import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModel
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModelFactory
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.CreateAuctionScreen
@@ -59,15 +65,58 @@ fun BestBidderApp() {
             }
         }
     ) { innerPadding ->
+
         if (isCreatingAuction) {
+            val createAuctionViewModel: CreateAuctionViewModel = viewModel(
+                factory = CreateAuctionViewModelFactory(
+                    createAuctionUseCase = AuctionModule.createAuctionUseCase,
+                    getMyCardsUseCase = CardModule.getMyCardsUseCase,
+                    profileManager = ProfileModule.profileManager
+                )
+            )
+
+            val uiState by createAuctionViewModel.uiState.collectAsState()
+
+            LaunchedEffect(Unit) {
+                createAuctionViewModel.start()
+            }
+
+            LaunchedEffect(uiState.createdAuction) {
+                if (uiState.createdAuction != null) {
+                    isCreatingAuction = false
+                    exploreViewModel.loadAuctions()
+                    createAuctionViewModel.onAuctionCreatedHandled()
+                }
+            }
+
             CreateAuctionScreen(
+                uiState = uiState,
                 onBackClick = {
                     isCreatingAuction = false
                 },
-                onAuctionCreated = {
-                    isCreatingAuction = false
-                    // TODO: cuando haya sse quitamos
-                    exploreViewModel.loadAuctions()
+                onLoadCards = {
+                    createAuctionViewModel.loadCards()
+                },
+                onCardSelected = {
+                    createAuctionViewModel.selectCard(it)
+                },
+                onStartingPriceChange = {
+                    createAuctionViewModel.updateStartingPrice(it)
+                },
+                onDescriptionChange = {
+                    createAuctionViewModel.updateDescription(it)
+                },
+                onDurationSelected = {
+                    createAuctionViewModel.updateDuration(it)
+                },
+                onStartDateTimeChange = { date, time ->
+                    createAuctionViewModel.updateStartDateTime(date, time)
+                },
+                onCreateAuction = {
+                    createAuctionViewModel.createAuction()
+                },
+                onShowError = {
+                    createAuctionViewModel.showError(it)
                 }
             )
         } else {
