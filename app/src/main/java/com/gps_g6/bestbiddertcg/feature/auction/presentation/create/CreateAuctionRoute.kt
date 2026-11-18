@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.create
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,8 +13,8 @@ import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 
 @Composable
 fun CreateAuctionRoute(
-    onBackClick: () -> Unit = {},
-    onAuctionCreated: () -> Unit = {}
+    onBackClick: () -> Unit,
+    onAuctionCreated: () -> Unit
 ) {
     val factory = remember {
         CreateAuctionViewModelFactory(
@@ -29,6 +30,14 @@ fun CreateAuctionRoute(
 
     val uiState by viewModel.uiState.collectAsState()
 
+    val goBack = {
+        if (!uiState.isCreating) {
+            onBackClick()
+        }
+    }
+
+    BackHandler(onBack = goBack)
+
     LaunchedEffect(Unit) {
         viewModel.start()
     }
@@ -42,7 +51,7 @@ fun CreateAuctionRoute(
 
     CreateAuctionScreen(
         uiState = uiState,
-        onBackClick = onBackClick,
+        onBackClick = goBack,
         onLoadCards = viewModel::loadCards,
         onCardSelected = viewModel::selectCard,
         onStartingPriceChange = viewModel::updateStartingPrice,

@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
-import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.*
 import com.gps_g6.bestbiddertcg.R
@@ -38,15 +37,6 @@ fun ProfileScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-
-    // Top bar fija
-        AppTopBar(
-            title = stringResource(R.string.profile_title),
-            actionIcon = R.drawable.ic_notifications,
-            actionDescription = stringResource(
-                R.string.notifications_description
-            )
-        )
 
         // Profile header: loading, error or data
         when {

@@ -19,11 +19,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.R
+import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.Background
@@ -89,32 +91,12 @@ fun CreateAuctionScreen(
             .background(Background)
     ) {
 
-        // Header
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(68.dp)
-                .background(AppSurface)
-                .padding(horizontal = AppSpacing.xl),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_left_arrow),
-                contentDescription = "Volver",
-                tint = TextPrimary,
-                modifier = Modifier
-                    .size(26.dp)
-                    .clickable(onClick = onBackClick)
-            )
-
-            Spacer(modifier = Modifier.width(AppSpacing.xl))
-
-            Text(
-                text = "Crear subasta",
-                style = MaterialTheme.typography.headlineMedium,
-                color = TextPrimary
-            )
-        }
+        AppTopBar(
+            title = stringResource(R.string.create_auction_title),
+            navigationIcon = R.drawable.ic_arrow_back,
+            navigationDescription = stringResource(R.string.common_back),
+            onNavigationClick = onBackClick
+        )
 
         // Scrollable content
         Column(

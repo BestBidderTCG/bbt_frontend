@@ -1,4 +1,3 @@
-
 package com.gps_g6.bestbiddertcg.feature.favorites.presentation
 
 import androidx.compose.foundation.layout.Arrangement

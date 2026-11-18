@@ -19,7 +19,8 @@ fun AppTopBar(
     onNavigationClick: (() -> Unit)? = null,
     @DrawableRes actionIcon: Int? = null,
     actionDescription: String? = null,
-    onActionClick: (() -> Unit)? = null
+    onActionClick: (() -> Unit)? = null,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -32,7 +33,7 @@ fun AppTopBar(
                 .padding(horizontal = AppSpacing.l),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // navigation icon opcional
+            // Optional back navigation
             if (navigationIcon != null) {
                 IconButton(
                     onClick = { onNavigationClick?.invoke() },
@@ -50,7 +51,6 @@ fun AppTopBar(
                 Spacer(modifier = Modifier.width(AppSpacing.s))
             }
 
-            // Screen title
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
@@ -59,7 +59,6 @@ fun AppTopBar(
                 maxLines = 1
             )
 
-            // acción opcional
             if (actionIcon != null) {
                 if (onActionClick != null) {
                     IconButton(onClick = onActionClick) {
@@ -78,6 +77,9 @@ fun AppTopBar(
                     )
                 }
             }
+
+            // Additional actions supplied by specialized top bars
+            actions()
         }
     }
 }
