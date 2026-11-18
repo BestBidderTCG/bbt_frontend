@@ -16,6 +16,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.gps_g6.bestbiddertcg.app.BestBidderApp
 import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
@@ -30,6 +31,7 @@ import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountRequestedScreen
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountScreen
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountUiState
+import com.gps_g6.bestbiddertcg.feature.settings.presentation.SettingsRoute
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.SettingsScreen
 
 /**
@@ -368,52 +370,28 @@ fun AppNavigation() {
 
         // Settings
         composable(AppDestination.SETTINGS.route) {
-            val context = LocalContext.current
-
-            var notificationsEnabled by rememberSaveable {
-                mutableStateOf(false)
-            }
-
-            // TODO: temporal, se eliminará al implementar
-            fun showNotAvailable() {
-                Toast.makeText(
-                    context,
-                    "Funcionalidad todavía no disponible",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
-            SettingsScreen(
-                notificationsEnabled = notificationsEnabled,
-
-                onNotificationsChange = { enabled ->
-                    notificationsEnabled = enabled
+            SettingsRoute(
+                onBackClick = {
+                    navController.popBackStack()
                 },
-
-                onChangePasswordClick = {
-                    showNotAvailable()
-                },
-
-                onPrivacyClick = {
-                    showNotAvailable()
-                },
-
-                onTermsClick = {
-                    showNotAvailable()
-                },
-
-                onLogoutClick = {
-                    showNotAvailable()
-                },
-
                 onDeleteAccountClick = {
-                    navController.navigate(AppDestination.DELETE_ACCOUNT.route) {
+                    navController.navigate(
+                        AppDestination.DELETE_ACCOUNT.route
+                    ) {
                         launchSingleTop = true
                     }
                 },
-
-                onBackClick = {
-                    navController.popBackStack()
+                onLogoutSuccess = {
+                    navController.navigate(
+                        AppDestination.WELCOME.route
+                    ) {
+                        popUpTo(
+                            navController.graph.findStartDestination().id
+                        ) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             )
         }

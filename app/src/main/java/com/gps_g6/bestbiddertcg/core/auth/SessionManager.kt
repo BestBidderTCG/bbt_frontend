@@ -45,6 +45,24 @@ class SessionManager(
     }
 
     @Synchronized
+    fun saveSessionIfRefreshTokenMatches(
+        expectedRefreshToken: String,
+        accessToken: String,
+        refreshToken: String
+    ): Boolean {
+        if (_session.value?.refreshToken != expectedRefreshToken) {
+            return false
+        }
+
+        saveSession(
+            accessToken = accessToken,
+            refreshToken = refreshToken
+        )
+
+        return true
+    }
+
+    @Synchronized
     fun restoreSession(): Boolean {
         val tokens = tokenStorage.getTokens()
 

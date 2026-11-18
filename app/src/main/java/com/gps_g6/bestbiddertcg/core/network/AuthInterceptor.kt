@@ -17,7 +17,8 @@ class AuthInterceptor(
         if (
             path == "/api/auth/login" ||
             path == "/api/auth/register" ||
-            path == "/api/auth/refresh"
+            path == "/api/auth/refresh" ||
+            path == "/api/auth/logout"
         ) {
             return chain.proceed(request)
         }

@@ -30,7 +30,8 @@ fun SettingsScreen(
     onTermsClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onDeleteAccountClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    isLoggingOut: Boolean = false
 ) {
     var showLogoutDialog by rememberSaveable {
         mutableStateOf(false)
@@ -175,6 +176,7 @@ fun SettingsScreen(
                 onClick = {
                     showLogoutDialog = true
                 },
+                enabled = !isLoggingOut,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),

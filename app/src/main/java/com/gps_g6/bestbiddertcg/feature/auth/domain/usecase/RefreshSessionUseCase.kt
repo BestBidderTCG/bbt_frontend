@@ -14,11 +14,11 @@ class RefreshSessionUseCase(
 
         val session = repository.refresh(refreshToken)
 
-        sessionManager.saveSession(
+        return sessionManager.saveSessionIfRefreshTokenMatches(
+            expectedRefreshToken = refreshToken,
             accessToken = session.accessToken,
             refreshToken = session.refreshToken
         )
 
-        return true
     }
 }
