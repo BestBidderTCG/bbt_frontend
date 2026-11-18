@@ -8,5 +8,6 @@ enum class AppDestination(val route: String) {
     AVATAR_SELECTION("avat" +
             "ar_selection"),
     PREFERENCES("preferences"),
-    MAIN("main")
+    MAIN("main"),
+    SETTINGS("settings")
 }

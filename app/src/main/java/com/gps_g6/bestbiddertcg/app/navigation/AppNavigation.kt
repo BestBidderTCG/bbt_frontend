@@ -1,12 +1,14 @@
 
 package com.gps_g6.bestbiddertcg.app.navigation
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -15,7 +17,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gps_g6.bestbiddertcg.app.BestBidderApp
-import com.gps_g6.bestbiddertcg.core.model.CardCategory
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.feature.auth.data.AuthRepositoryImpl
 import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
@@ -25,6 +26,7 @@ import com.gps_g6.bestbiddertcg.feature.auth.presentation.*
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 import com.gps_g6.bestbiddertcg.feature.profile.domain.usecase.ProfileSetupUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
+import com.gps_g6.bestbiddertcg.feature.settings.presentation.SettingsScreen
 
 /**
  * Coordinates navigation between authentication,
@@ -184,7 +186,7 @@ fun AppNavigation() {
         startDestination = initialDestination
     ) {
 
-    // Welcome
+        // Welcome
         composable(AppDestination.WELCOME.route) {
             WelcomeScreen(
                 onLoginClick = {
@@ -350,7 +352,65 @@ fun AppNavigation() {
 
         // Main application
         composable(AppDestination.MAIN.route) {
-            BestBidderApp()
+            BestBidderApp(
+                onSettingsClick = {
+                    navController.navigate(AppDestination.SETTINGS.route) {
+                        launchSingleTop = true
+                    }
+                }
+            )
         }
+
+
+        // Settings
+        composable(AppDestination.SETTINGS.route) {
+            val context = LocalContext.current
+
+            var notificationsEnabled by rememberSaveable {
+                mutableStateOf(false)
+            }
+
+            // TODO: temporal, se eliminará al implementar
+            fun showNotAvailable() {
+                Toast.makeText(
+                    context,
+                    "Funcionalidad todavía no disponible",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+            SettingsScreen(
+                notificationsEnabled = notificationsEnabled,
+
+                onNotificationsChange = { enabled ->
+                    notificationsEnabled = enabled
+                },
+
+                onChangePasswordClick = {
+                    showNotAvailable()
+                },
+
+                onPrivacyClick = {
+                    showNotAvailable()
+                },
+
+                onTermsClick = {
+                    showNotAvailable()
+                },
+
+                onLogoutClick = {
+                    showNotAvailable()
+                },
+
+                onDeleteAccountClick = {
+                    showNotAvailable()
+                },
+
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
     }
 }
