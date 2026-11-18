@@ -18,6 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
+import com.gps_g6.bestbiddertcg.core.ui.components.ConfirmationDialog
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
 
 @Composable
@@ -31,6 +32,10 @@ fun SettingsScreen(
     onDeleteAccountClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    var showLogoutDialog by rememberSaveable {
+        mutableStateOf(false)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -167,7 +172,9 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(52.dp))
 
             Button(
-                onClick = onLogoutClick,
+                onClick = {
+                    showLogoutDialog = true
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(48.dp),
@@ -211,6 +218,23 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(AppSpacing.xl))
         }
     }
+
+    if (showLogoutDialog) {
+        ConfirmationDialog(
+            title = stringResource(R.string.settings_logout_confirm_title),
+            message = stringResource(R.string.settings_logout_confirm_message),
+            confirmText = stringResource(R.string.settings_logout),
+            cancelText = stringResource(R.string.common_cancel),
+            onDismiss = {
+                showLogoutDialog = false
+            },
+            onConfirm = {
+                showLogoutDialog = false
+                onLogoutClick()
+            }
+        )
+    }
+
 }
 
 @Composable

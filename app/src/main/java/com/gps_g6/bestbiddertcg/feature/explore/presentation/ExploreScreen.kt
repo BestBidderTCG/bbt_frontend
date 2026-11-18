@@ -77,48 +77,6 @@ fun ExploreScreen(
 }
 
 /**
- * Barra superior de la pantalla explore.
- */
-@Composable
-private fun ExploreHeader() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(Surface)
-            .padding(horizontal = AppSpacing.xl),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            text = "Explorar",
-            style = MaterialTheme.typography.headlineLarge
-        )
-
-        // Quitamos recuadro gris al hacer clic
-        Box(
-            modifier = Modifier.size(48.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource(R.drawable.ic_bell),
-                contentDescription = "Notificaciones",
-                modifier = Modifier
-                    .size(24.dp)
-                    .clickable(
-                        interactionSource = remember {
-                            MutableInteractionSource()
-                        },
-                        indication = null
-                    ) {
-                        // TODO: Notificaciones
-                    }
-            )
-        }
-    }
-}
-
-/**
  * Barra de busqueda en la pantalla explore.
  */
 @Composable
@@ -338,7 +296,6 @@ private fun ExploreContent(
             .fillMaxSize()
             .background(Background)
     ) {
-        ExploreHeader()
 
         Column(
             modifier = Modifier

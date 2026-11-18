@@ -98,7 +98,6 @@
     <string name="auction_best_bidder">Best Bidder: %1$s</string>
     <string name="auction_start_date">Inicio: %1$s</string>
 
-
     <!-- Settings -->
     <string name="settings_title">Ajustes</string>
     <string name="settings_preferences">PREFERENCIAS</string>
@@ -110,6 +109,13 @@
     <string name="settings_terms">Términos y condiciones</string>
     <string name="settings_logout">Cerrar sesión</string>
     <string name="settings_delete_account">Eliminar cuenta</string>
+
+    <!-- Logout -->
+    <string name="settings_logout_confirm_title">¿Quieres cerrar sesión?</string>
+    <string name="settings_logout_confirm_message">Tendrás que iniciar sesión de nuevo para acceder a tu cuenta.</string>
+
+    <!-- Common strings -->
+    <string name="common_cancel">Cancelar</string>
 
     <!-- Accessibility -->
     <string name="profile_avatar_description">Avatar del usuario</string>
