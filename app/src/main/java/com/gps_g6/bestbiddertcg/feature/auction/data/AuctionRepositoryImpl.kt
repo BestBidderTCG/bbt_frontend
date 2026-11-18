@@ -9,8 +9,30 @@ class AuctionRepositoryImpl(
     private val api: AuctionApi
 ) : AuctionRepository {
 
+    override suspend fun getAllAuctions(): List<Auction> {
+        return api.getAllAuctions().map { it.toDomain() }
+    }
+
     override suspend fun getActiveAuctions(): List<Auction> {
-        return api.getActiveAuctions().map{ it.toDomain() }
+        return api.getActiveAuctions().map { it.toDomain() }
+    }
+
+    override suspend fun searchAuctions(
+        query: String?,
+        active: Boolean?,
+        minPrice: Double?,
+        maxPrice: Double?,
+        page: Int,
+        size: Int
+    ): List<Auction> {
+        return api.searchAuctions(
+            query = query,
+            active = active,
+            minPrice = minPrice,
+            maxPrice = maxPrice,
+            page = page,
+            size = size
+        ).map { it.toDomain() }
     }
 
     override suspend fun createAuction(request: CreateAuction): Auction {

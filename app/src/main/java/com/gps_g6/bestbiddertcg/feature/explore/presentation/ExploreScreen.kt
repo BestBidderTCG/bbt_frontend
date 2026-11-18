@@ -1,6 +1,5 @@
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,7 +53,9 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
-import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionFilterOptions
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionFilterSheet
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionStatusFilter
 
 /**
  * Pantalla explore de la aplicacion. Agregado el AuctionRepository para pruebas.
@@ -63,17 +64,57 @@ import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionReposit
 fun ExploreScreen(
     viewModel: ExploreViewModel
 ) {
-
-    // Observa los estados del ViewModel.
     val auctions by viewModel.auctions.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
 
+    var searchQuery by remember { mutableStateOf("") }
+    var filterOptions by remember { mutableStateOf(AuctionFilterOptions()) }
+    var showFilterSheet by remember { mutableStateOf(false) }
+
     ExploreContent(
         auctions = auctions,
         isLoading = isLoading,
-        error = error
+        error = error,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { query ->
+            searchQuery = query
+            viewModel.applyFilters(
+                query = query,
+                active = filterOptions.status == AuctionStatusFilter.ACTIVE,
+                minPrice = filterOptions.minPrice.takeIf { it > 0.0 },
+                maxPrice = filterOptions.maxPrice
+            )
+        },
+        onFiltersClick = {
+            showFilterSheet = true
+        },
+        onClearFilters = {
+            searchQuery = ""
+            filterOptions = AuctionFilterOptions()
+            viewModel.loadAuctions()
+        }
     )
+
+    if (showFilterSheet) {
+        AuctionFilterSheet(
+            initialFilters = filterOptions,
+            onDismiss = {
+                showFilterSheet = false
+            },
+            onApply = { options ->
+                filterOptions = options
+                showFilterSheet = false
+
+                viewModel.applyFilters(
+                    query = searchQuery,
+                    active = options.status == AuctionStatusFilter.ACTIVE,
+                    minPrice = options.minPrice.takeIf { it > 0.0 },
+                    maxPrice = options.maxPrice
+                )
+            }
+        )
+    }
 }
 
 /**
@@ -325,10 +366,12 @@ private fun EmptyState(
 private fun ExploreContent(
     auctions: List<Auction>,
     isLoading: Boolean,
-    error: String?
+    error: String?,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onFiltersClick: () -> Unit,
+    onClearFilters: () -> Unit
 ) {
-    // Barra de busqueda
-    var searchQuery by remember { mutableStateOf("") }
 
     // Filtro seleccionado de colecciones de cartas
     var selectedCardCollection by remember { mutableStateOf("Todas") }
@@ -347,7 +390,7 @@ private fun ExploreContent(
         ) {
             SearchInput(
                 value = searchQuery,
-                onValueChange = { searchQuery = it }
+                onValueChange = onSearchQueryChange
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.m))
@@ -360,9 +403,7 @@ private fun ExploreContent(
             Spacer(modifier = Modifier.height(AppSpacing.l))
 
             SectionHeader(
-                onFiltersClick = {
-                    // TODO: Implementar filtros
-                }
+                onFiltersClick = onFiltersClick
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.xxl))
@@ -387,10 +428,7 @@ private fun ExploreContent(
                 // Muestra el estado vacio
                 auctions.isEmpty() -> {
                     EmptyState(
-                        onClearFilters = {
-                            searchQuery = ""
-                            selectedCardCollection = "Todas"
-                        }
+                        onClearFilters = onClearFilters
                     )
                 }
 
@@ -458,7 +496,11 @@ private fun ExploreScreenPreview() {
         ExploreContent(
             auctions = emptyList(),
             isLoading = false,
-            error = null
+            error = null,
+            searchQuery = "",
+            onSearchQueryChange = {},
+            onFiltersClick = {},
+            onClearFilters = {}
         )
     }
 }
