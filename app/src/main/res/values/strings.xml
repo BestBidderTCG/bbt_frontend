@@ -114,6 +114,28 @@
     <string name="settings_logout_confirm_title">¿Quieres cerrar sesión?</string>
     <string name="settings_logout_confirm_message">Tendrás que iniciar sesión de nuevo para acceder a tu cuenta.</string>
 
+    <!-- Delete account -->
+    <string name="delete_account_blocked_title">No puedes eliminar tu cuenta todavía</string>
+    <string name="delete_account_blocked_description">Hay operaciones pendientes que debes resolver antes de solicitar la eliminación.</string>
+    <string name="delete_account_active_auction_title">Tienes una subasta activa</string>
+    <string name="delete_account_active_auction_description">No puedes eliminar tu cuenta mientras tengas una subasta activa como titular.</string>
+    <string name="delete_account_winning_auction_title">Vas ganando una subasta</string>
+    <string name="delete_account_winning_auction_description">No puedes eliminar tu cuenta mientras seas quien tiene la puja más alta en una subasta.</string>
+    <string name="delete_account_back_settings">Volver a ajustes</string>
+    <string name="delete_account_confirm_title">¿Quieres eliminar tu cuenta?</string>
+    <string name="delete_account_confirm_description">Tu cuenta quedará pendiente de eliminación durante 15 días.</string>
+    <string name="delete_account_recovery_title">15 días para recuperarla</string>
+    <string name="delete_account_recovery_description">Si inicias sesión durante ese plazo, la solicitud de eliminación se cancelará automáticamente.</string>
+    <string name="delete_account_final_warning">Transcurridos los 15 días, la eliminación será definitiva.</string>
+    <string name="delete_account_request">Solicitar eliminación</string>
+    <string name="delete_account_dialog_title">¿Confirmas la eliminación de tu cuenta?</string>
+    <string name="delete_account_dialog_message">Tu cuenta quedará pendiente de eliminación durante 15 días. Si inicias sesión durante ese plazo, se cancelará la solicitud.</string>
+    <string name="delete_account_confirm_button">Eliminar</string>
+    <string name="delete_account_requested_title">Solicitud de eliminación registrada</string>
+    <string name="delete_account_requested_description">Tu cuenta está pendiente de eliminación. Dispones de 15 días para recuperarla.</string>
+    <string name="delete_account_requested_recovery">Si inicias sesión antes de que finalice ese plazo, la solicitud se cancelará automáticamente.</string>
+    <string name="common_understood">Entendido</string>
+
     <!-- Common strings -->
     <string name="common_cancel">Cancelar</string>
 

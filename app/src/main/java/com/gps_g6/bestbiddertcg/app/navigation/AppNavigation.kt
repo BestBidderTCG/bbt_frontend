@@ -17,6 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gps_g6.bestbiddertcg.app.BestBidderApp
+import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.feature.auth.data.AuthRepositoryImpl
 import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
@@ -26,6 +27,9 @@ import com.gps_g6.bestbiddertcg.feature.auth.presentation.*
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 import com.gps_g6.bestbiddertcg.feature.profile.domain.usecase.ProfileSetupUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
+import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountRequestedScreen
+import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountScreen
+import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountUiState
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.SettingsScreen
 
 /**
@@ -403,10 +407,56 @@ fun AppNavigation() {
                 },
 
                 onDeleteAccountClick = {
-                    showNotAvailable()
+                    navController.navigate(AppDestination.DELETE_ACCOUNT.route) {
+                        launchSingleTop = true
+                    }
                 },
 
                 onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(AppDestination.DELETE_ACCOUNT.route) {
+
+            // TODO: sustituir la simulación por una consulta real
+            // al backend que determine si la eliminación está permitida
+            val deleteAccountState =
+                if (BuildConfig.DEBUG) {
+                    DeleteAccountUiState.Allowed
+                } else {
+                    DeleteAccountUiState.Loading
+                }
+
+            DeleteAccountScreen(
+                uiState = deleteAccountState,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onDeleteRequestClick = {
+                    // TODO: solicitar realmente la eliminación de la cuenta.
+                    // La navegación siguiente es SOLO para probar la GUI
+                    if (BuildConfig.DEBUG) {
+                        navController.navigate(
+                            AppDestination.DELETE_ACCOUNT_REQUESTED.route
+                        ) {
+                            popUpTo(AppDestination.DELETE_ACCOUNT.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                }
+            )
+        }
+
+        composable(AppDestination.DELETE_ACCOUNT_REQUESTED.route) {
+            DeleteAccountRequestedScreen(
+                onUnderstoodClick = {
+                    // TODO: cuando la solicitud sea real,
+                    // gestionar el estado de autenticación.
+                    // Por ahora, regresar a Ajustes en la demo.
                     navController.popBackStack()
                 }
             )

@@ -1,4 +1,13 @@
 package com.gps_g6.bestbiddertcg.feature.settings.presentation
 
-class DeleteAccountUiState {
+sealed interface DeleteAccountUiState {
+
+    data object Loading : DeleteAccountUiState
+
+    data object Allowed : DeleteAccountUiState
+
+    data class Blocked(
+        val hasActiveAuction: Boolean,
+        val isWinningAuction: Boolean
+    ) : DeleteAccountUiState
 }

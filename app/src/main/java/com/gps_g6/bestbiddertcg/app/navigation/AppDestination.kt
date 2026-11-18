@@ -9,5 +9,7 @@ enum class AppDestination(val route: String) {
             "ar_selection"),
     PREFERENCES("preferences"),
     MAIN("main"),
-    SETTINGS("settings")
+    SETTINGS("settings"),
+    DELETE_ACCOUNT("delete_account"),
+    DELETE_ACCOUNT_REQUESTED("delete_account_requested")
 }
