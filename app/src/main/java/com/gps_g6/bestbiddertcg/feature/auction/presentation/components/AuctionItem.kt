@@ -60,7 +60,11 @@ fun AuctionItem(
         ) {
 
             AsyncImage(
-                model = cardImage,
+                model = if (cardImage.isBlank()) {
+                    R.drawable.sample_piplup
+                } else {
+                    cardImage
+                },
                 contentDescription = cardName,
                 modifier = Modifier
                     .fillMaxWidth()

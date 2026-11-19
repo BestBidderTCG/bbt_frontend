@@ -1,4 +1,3 @@
-
 package com.gps_g6.bestbiddertcg.app
 
 import androidx.compose.foundation.layout.Box
@@ -18,10 +17,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.activity.compose.BackHandler
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailViewModel
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailViewModelFactory
+import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailScreen
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailStatus
 import com.gps_g6.bestbiddertcg.core.ui.components.MainTopBar
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModel
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModelFactory
@@ -97,29 +99,30 @@ fun BestBidderApp(
 
             val auction = selectedAuction!!
 
+            val detailViewModel: AuctionDetailViewModel = viewModel(
+                key = "auction_detail_${auction.id}",
+                factory = AuctionDetailViewModelFactory(
+                    getAuctionDetailUseCase = AuctionModule.getAuctionDetailUseCase,
+                    profileManager = ProfileModule.profileManager
+                )
+            )
+
+            val detailUiState by detailViewModel.uiState.collectAsState()
+
+            LaunchedEffect(auction.id) {
+                detailViewModel.loadAuction(auction.id)
+            }
+
             AuctionDetailScreen(
-                uiState = AuctionDetailUiState(
-                    auctionId = auction.id,
-                    cardName = auction.cardName,
-                    cardImage = auction.cardImage,
-                    cardCategory = auction.cardCategory,
-                    cardCollection = auction.cardCollection.orEmpty(),
-                    cardNumber = auction.cardNumber?.toString().orEmpty(),
-                    status = if (auction.status.equals("ACTIVE", ignoreCase = true)) {
-                        AuctionDetailStatus.ACTIVE
-                    } else {
-                        AuctionDetailStatus.UPCOMING
-                    },
-                    currentBid = auction.currentBid,
-                    cardCondition = auction.cardState
-                ),
+                uiState = detailUiState,
                 onBackClick = {
                     selectedAuction = null
                 },
                 onFavoriteClick = {},
                 onEditClick = {},
                 onBidClick = {},
-                onHistoryClick = {}
+                onHistoryClick = {},
+                modifier = Modifier.padding(innerPadding)
             )
         } else if (isCreatingAuction) {
             Box(

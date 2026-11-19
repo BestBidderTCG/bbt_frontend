@@ -4,6 +4,7 @@ import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionDetail
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 
 // Implementa el repositorio y transforma los datos recibidos de la API.
@@ -21,6 +22,31 @@ class AuctionRepositoryImpl(
                 status = it.status,
             )
         }
+
+    override suspend fun getAuctionById(auctionId: String): AuctionDetail {
+        val response = api.getAuctionById(auctionId)
+
+        return AuctionDetail(
+            id = response.id,
+            status = response.status,
+            cardName = response.cardName,
+            cardImage = response.cardImage,
+            cardCollection = response.cardCollection,
+            cardNumber = response.cardNumber,
+            cardState = response.cardState,
+            minPrize = response.minPrize,
+            increment = response.increment,
+            lastBid = response.lastBid,
+            bidCount = response.bidCount,
+            startedAt = response.startedAt,
+            endsAt = response.endsAt,
+            description = response.description,
+            creatorId = response.creator?.id,
+            creatorUsername = response.creator?.username,
+            creatorAvatarNum = response.creator?.avatarNum,
+            isFavorite = response.isFavorite ?: false
+        )
+    }
 
     override suspend fun createAuction(request: CreateAuction): Auction {
         val response = api.createAuction(

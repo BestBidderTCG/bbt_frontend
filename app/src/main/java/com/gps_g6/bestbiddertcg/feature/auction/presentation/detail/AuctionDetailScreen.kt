@@ -1,8 +1,8 @@
-
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
@@ -75,39 +76,71 @@ fun AuctionDetailScreen(
             }
         }
 
-        // Scrollable auction content
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.l)
-        ) {
-            AuctionCardHeader(
-                uiState = uiState,
-                onFavoriteClick = onFavoriteClick,
-                onEditClick = onEditClick
-            )
+        Spacer(modifier = Modifier.height(AppSpacing.l))
 
-            AuctionBidSection(
-                uiState = uiState,
-                onBidClick = onBidClick,
-                onHistoryClick = onHistoryClick,
-                modifier = Modifier.padding(horizontal = AppSpacing.l)
-            )
-
-            AuctionInfoSection(
-                uiState = uiState,
-                modifier = Modifier.padding(horizontal = AppSpacing.l)
-            )
-
-            if (!uiState.isOwner) {
-                AuctionSellerSection(
-                    uiState = uiState,
-                    modifier = Modifier.padding(horizontal = AppSpacing.l)
-                )
+        when {
+            uiState.isLoading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = TextPrimary
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(AppSpacing.s))
+            uiState.errorMessage != null -> {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(AppSpacing.l),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = uiState.errorMessage,
+                        style = AppTypography.bodyLarge,
+                        color = TextPrimary
+                    )
+                }
+            }
+
+            else -> {
+                // Scrollable auction content
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(AppSpacing.l)
+                ) {
+                    AuctionCardHeader(
+                        uiState = uiState,
+                        onFavoriteClick = onFavoriteClick,
+                        onEditClick = onEditClick
+                    )
+
+                    AuctionBidSection(
+                        uiState = uiState,
+                        onBidClick = onBidClick,
+                        onHistoryClick = onHistoryClick,
+                        modifier = Modifier.padding(horizontal = AppSpacing.l)
+                    )
+
+                    AuctionInfoSection(
+                        uiState = uiState,
+                        modifier = Modifier.padding(horizontal = AppSpacing.l)
+                    )
+
+                    if (!uiState.isOwner) {
+                        AuctionSellerSection(
+                            uiState = uiState,
+                            modifier = Modifier.padding(horizontal = AppSpacing.l)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(AppSpacing.s))
+                }
+            }
         }
     }
 }

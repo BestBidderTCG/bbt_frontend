@@ -61,7 +61,11 @@ fun AuctionCardHeader(
         verticalAlignment = Alignment.Top
     ) {
         AsyncImage(
-            model = uiState.cardImage,
+            model = if (uiState.cardImage.isBlank()) {
+                R.drawable.sample_piplup
+            } else {
+                uiState.cardImage
+            },
             contentDescription = uiState.cardName,
             modifier = Modifier
                 .width(136.dp)

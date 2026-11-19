@@ -34,6 +34,7 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
+import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.AvatarResources
 
 @Composable
 fun AuctionSellerSection(
@@ -79,7 +80,9 @@ fun AuctionSellerSection(
             ) {
                 if (uiState.sellerAvatar > 0) {
                     Image(
-                        painter = painterResource(id = uiState.sellerAvatar),
+                        painter = painterResource(
+                            id = AvatarResources.getDrawable(uiState.sellerAvatar)
+                        ),
                         contentDescription = "Avatar del vendedor",
                         modifier = Modifier
                             .size(40.dp)
