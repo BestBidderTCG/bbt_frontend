@@ -1,5 +1,7 @@
 package com.gps_g6.bestbiddertcg.feature.profile.presentation
 
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
+
 data class ProfileUiState(
     val username: String = "",
     val email: String = "",
@@ -25,12 +27,6 @@ data class CollectionCardUiModel(
     val name: String,
     val imageUrl: String? = null
 )
-
-enum class AuctionStatus {
-    ACTIVE,
-    UPCOMING,
-    FINISHED
-}
 
 data class AuctionUiModel(
     val id: String,

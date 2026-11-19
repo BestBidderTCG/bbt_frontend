@@ -28,7 +28,7 @@ fun ProfileTabs(
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.s)
     ) {
         ProfileTabItem(
-            title = stringResource(R.string.profile_tab_collection),
+            title = stringResource(R.string.collection_string),
             iconRes = if (selectedTab == ProfileTab.COLLECTION) {
                 R.drawable.ic_collection_active
             } else {

@@ -1,5 +1,7 @@
 package com.gps_g6.bestbiddertcg.feature.profile.presentation
 
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
+
 object ProfileSampleData {
 
     val profile = ProfileUiState(
