@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.card.data
 
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule.resolveImageUrl
 import com.gps_g6.bestbiddertcg.feature.card.data.remote.CardApi
 import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
 import com.gps_g6.bestbiddertcg.feature.card.domain.repository.CardRepository
@@ -14,7 +15,7 @@ class CardRepositoryImpl(
                 id = dto.id,
                 ownerId = dto.ownerId,
                 name = dto.name,
-                image = dto.image,
+                image = resolveImageUrl(dto.image),
                 category = dto.category,
                 collection = dto.collection,
                 num = dto.num,

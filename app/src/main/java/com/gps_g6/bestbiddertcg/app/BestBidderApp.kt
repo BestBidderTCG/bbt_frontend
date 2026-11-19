@@ -1,4 +1,3 @@
-
 package com.gps_g6.bestbiddertcg.app
 
 import androidx.compose.foundation.layout.Box
@@ -16,6 +15,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailViewModel
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailViewModelFactory
+import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailScreen
 import com.gps_g6.bestbiddertcg.core.ui.components.MainTopBar
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModel
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModelFactory
@@ -46,6 +54,9 @@ fun BestBidderApp(
         mutableStateOf(false)
     }
 
+    var selectedAuction by remember {
+        mutableStateOf<AuctionSummary?>(null)
+    }
 
     val currentPage = AppPage.entries[pagerState.currentPage]
     val topBarTitle = stringResource(currentPage.titleRes)
@@ -57,7 +68,7 @@ fun BestBidderApp(
 
     Scaffold(
         topBar = {
-            if (!isCreatingAuction) {
+            if (!isCreatingAuction && selectedAuction == null) {
                 MainTopBar(
                     title = topBarTitle,
                     onNotificationsClick = onNotificationsClick,
@@ -66,7 +77,7 @@ fun BestBidderApp(
             }
         },
         bottomBar = {
-            if (!isCreatingAuction) {
+            if (!isCreatingAuction && selectedAuction == null) {
                 BottomNavigationBar(
                     selectedPage = AppPage.entries[pagerState.currentPage],
                     onPageSelected = { page ->
@@ -81,8 +92,39 @@ fun BestBidderApp(
             }
         }
     ) { innerPadding ->
+        if (selectedAuction != null) {
+            BackHandler {
+                selectedAuction = null
+            }
 
-        if (isCreatingAuction) {
+            val auction = selectedAuction!!
+
+            val detailViewModel: AuctionDetailViewModel = viewModel(
+                key = "auction_detail_${auction.id}",
+                factory = AuctionDetailViewModelFactory(
+                    getAuctionDetailUseCase = AuctionModule.getAuctionDetailUseCase,
+                    profileManager = ProfileModule.profileManager
+                )
+            )
+
+            val detailUiState by detailViewModel.uiState.collectAsState()
+
+            LaunchedEffect(auction.id) {
+                detailViewModel.loadAuction(auction.id)
+            }
+
+            AuctionDetailScreen(
+                uiState = detailUiState,
+                onBackClick = {
+                    selectedAuction = null
+                },
+                onFavoriteClick = {},
+                onEditClick = {},
+                onBidClick = {},
+                onHistoryClick = {},
+                modifier = Modifier.padding(innerPadding)
+            )
+        } else if (isCreatingAuction) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -107,8 +149,12 @@ fun BestBidderApp(
             ) { page ->
                 when (AppPage.entries[page]) {
                     AppPage.EXPLORE -> ExploreScreen(
-                        viewModel = exploreViewModel
+                        viewModel = exploreViewModel,
+                        onAuctionClick = { auction ->
+                            selectedAuction = auction
+                        }
                     )
+
                     AppPage.SOCIAL -> SocialScreen()
                     AppPage.FAVORITES -> FavoritesScreen()
                     AppPage.PROFILE -> ProfileRoute()

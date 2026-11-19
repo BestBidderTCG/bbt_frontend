@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.http.Query
+import retrofit2.http.Path
 
 interface AuctionApi {
 
@@ -22,4 +23,11 @@ interface AuctionApi {
     suspend fun createAuction(
         @Body request: CreateAuctionRequestDto
     ): AuctionResponseDto
+
+    // Obtener el detalle de una subasta.
+    @GET("api/auction/{id}")
+    suspend fun getAuctionById(
+        @Path("id") auctionId: String
+    ): AuctionDetailDto
+
 }

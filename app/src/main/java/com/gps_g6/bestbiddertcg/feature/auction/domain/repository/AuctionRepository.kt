@@ -4,6 +4,7 @@ import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionDetail
 
 interface AuctionRepository {
 
@@ -12,4 +13,7 @@ interface AuctionRepository {
 
     // Crear una nueva subasta.
     suspend fun createAuction(request: CreateAuction): Auction
+
+    // Obtener el detalle de una subasta.
+    suspend fun getAuctionById(auctionId: String): AuctionDetail
 }

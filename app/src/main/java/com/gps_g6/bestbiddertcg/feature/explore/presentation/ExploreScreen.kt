@@ -64,7 +64,8 @@ import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionS
  */
 @Composable
 fun ExploreScreen(
-    viewModel: ExploreViewModel
+    viewModel: ExploreViewModel,
+    onAuctionClick: (AuctionSummary) -> Unit = {}
 ) {
     val auctions by viewModel.auctions.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -132,7 +133,8 @@ fun ExploreScreen(
                 collection = collection,
                 category = selectedCategory
             )
-        }
+        },
+        onAuctionClick = onAuctionClick
     )
 
     if (showFilterSheet) {
@@ -509,7 +511,8 @@ private fun ExploreContent(
     onFiltersClick: () -> Unit,
     onClearFilters: () -> Unit,
     selectedCardCollection: String,
-    onCardCollectionSelected: (String) -> Unit
+    onCardCollectionSelected: (String) -> Unit,
+    onAuctionClick: (AuctionSummary) -> Unit
 ) {
 
     Column(
@@ -588,7 +591,8 @@ private fun ExploreContent(
                                 cardName = auction.cardName,
                                 cardImage = auction.cardImage,
                                 currentBid = auction.currentBid,
-                                remainingTime = formatRemainingDays(auction.remainingDays)
+                                remainingTime = formatRemainingDays(auction.remainingDays),
+                                onClick = { onAuctionClick(auction) }
                             )
                         }
                     }
@@ -624,7 +628,8 @@ private fun ExploreScreenPreview() {
             onFiltersClick = {},
             onClearFilters = {},
             selectedCardCollection = "Todas",
-            onCardCollectionSelected = {}
+            onCardCollectionSelected = {},
+            onAuctionClick = {}
         )
     }
 }
