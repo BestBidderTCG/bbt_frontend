@@ -119,11 +119,14 @@ object NetworkModule {
 
         if (!image.startsWith("/uploads/")) return null
 
-        // Only allow paths served by our backend
-        if (image.contains("..") ||
-            image.contains("?") ||
-            image.contains("#") ||
-            image.contains("\\")
+        val filename = image.removePrefix("/uploads/")
+
+        if (filename.isEmpty()) return null
+
+        // Only allow a single filename, not nested paths or encoded paths
+        if (!filename.matches(
+                Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9]+")
+            )
         ) return null
 
         return BASE_URL.trimEnd('/') + image
