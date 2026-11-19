@@ -1,6 +1,5 @@
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.runtime.collectAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,8 +18,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import java.time.Duration
-import java.time.Instant
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.components.AuctionItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -45,7 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.Background
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
@@ -54,7 +55,9 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
-import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionFilterOptions
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionFilterSheet
+import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionStatusFilter
 
 /**
  * Pantalla explore de la aplicacion. Agregado el AuctionRepository para pruebas.
@@ -63,17 +66,103 @@ import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionReposit
 fun ExploreScreen(
     viewModel: ExploreViewModel
 ) {
-
-    // Observa los estados del ViewModel.
     val auctions by viewModel.auctions.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val sort by viewModel.sort.collectAsState()
+
+    var searchQuery by remember { mutableStateOf("") }
+    var filterOptions by remember { mutableStateOf(AuctionFilterOptions()) }
+    var showFilterSheet by remember { mutableStateOf(false) }
+    var selectedCardCollection by remember { mutableStateOf("Todas") }
+    var selectedCategory by remember { mutableStateOf("Todas") }
 
     ExploreContent(
         auctions = auctions,
         isLoading = isLoading,
-        error = error
+        error = error,
+        sort = sort,
+        onSortSelected = { viewModel.changeSort(it) },
+        searchQuery = searchQuery,
+        onSearchQueryChange = { query ->
+            searchQuery = query
+            viewModel.applyFilters(
+                query = query,
+                active = when (filterOptions.status) {
+                    AuctionStatusFilter.ACTIVE -> true
+                    AuctionStatusFilter.UPCOMING -> false
+                    null -> null
+                },
+                endingWithinDays = filterOptions.endingWithinDays,
+                minPrice = filterOptions.minPrice.takeIf { it > 0.0 },
+                maxPrice = filterOptions.maxPrice,
+                condition = filterOptions.condition
+                    .takeIf { it != com.gps_g6.bestbiddertcg.feature.explore.presentation.components.CardConditionFilter.ANY }
+                    ?.name,
+                collection = selectedCardCollection,
+                category = selectedCategory
+            )
+        },
+        onFiltersClick = {
+            showFilterSheet = true
+        },
+        onClearFilters = {
+            searchQuery = ""
+            filterOptions = AuctionFilterOptions(endingWithinDays = null)
+            selectedCardCollection = "Todas"
+            selectedCategory = "Todas"
+            viewModel.clearFilters()
+        },
+        selectedCardCollection = selectedCardCollection,
+        onCardCollectionSelected = { collection ->
+            selectedCardCollection = collection
+            viewModel.applyFilters(
+                query = searchQuery,
+                active = when (filterOptions.status) {
+                    AuctionStatusFilter.ACTIVE -> true
+                    AuctionStatusFilter.UPCOMING -> false
+                    null -> null
+                },
+                endingWithinDays = filterOptions.endingWithinDays,
+                minPrice = filterOptions.minPrice.takeIf { it > 0.0 },
+                maxPrice = filterOptions.maxPrice,
+                condition = filterOptions.condition
+                    .takeIf { it != com.gps_g6.bestbiddertcg.feature.explore.presentation.components.CardConditionFilter.ANY }
+                    ?.name,
+                collection = collection,
+                category = selectedCategory
+            )
+        }
     )
+
+    if (showFilterSheet) {
+        AuctionFilterSheet(
+            initialFilters = filterOptions,
+            onDismiss = {
+                showFilterSheet = false
+            },
+            onApply = { options ->
+                filterOptions = options
+                showFilterSheet = false
+                viewModel.applyFilters(
+                    query = searchQuery,
+                    active = when (options.status) {
+                        AuctionStatusFilter.ACTIVE -> true
+                        AuctionStatusFilter.UPCOMING -> false
+                        null -> null
+                    },
+                    endingWithinDays = options.endingWithinDays,
+                    minPrice = options.minPrice.takeIf { it > 0.0 },
+                    maxPrice = options.maxPrice,
+                    condition = options.condition
+                        .takeIf { it != com.gps_g6.bestbiddertcg.feature.explore.presentation.components.CardConditionFilter.ANY }
+                        ?.name,
+                    collection = selectedCardCollection,
+                    category = selectedCategory
+                )
+            }
+        )
+    }
 }
 
 /**
@@ -141,7 +230,7 @@ private fun CardCollectionFilters(
     selectedCardCollection: String,
     onCardCollectionSelected: (String) -> Unit
 ) {
-    val cardCollections = listOf("Todas", "Pokémon", "Yu-Gi-Oh!")
+    val cardCollections = listOf("Todas", "Pokemon", "Riftbound", "Magic")
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -181,43 +270,172 @@ private fun CardCollectionFilters(
  */
 @Composable
 private fun SectionHeader(
+    sort: AuctionSort,
+    onSortSelected: (AuctionSort) -> Unit,
     onFiltersClick: () -> Unit
 ) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Subastas activas",
+            text = "Subastas",
             style = MaterialTheme.typography.headlineMedium,
             color = TextPrimary
         )
 
+        Spacer(modifier = Modifier.height(AppSpacing.m))
+
         Row(
-            modifier = Modifier
-                .clickable(
-                    interactionSource = remember {
-                        MutableInteractionSource()
-                    },
-                    indication = null
-                ) {
-                    onFiltersClick()
-                },
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_filters),
-                contentDescription = null,
-                modifier = Modifier.size(18.dp)
+            SortSelector(
+                selected = sort,
+                onSortSelected = onSortSelected
             )
 
+            Row(
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = remember {
+                            MutableInteractionSource()
+                        },
+                        indication = null
+                    ) {
+                        onFiltersClick()
+                    },
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_filters),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+
+                Text(
+                    text = "Filtros",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Primary
+                )
+            }
+        }
+    }
+}
+
+// Etiqueta de cada criterio de ordenación.
+private fun AuctionSort.label(): String = when (this) {
+    AuctionSort.POPULAR -> "Más populares"
+    AuctionSort.ENDING_SOON -> "Terminan antes"
+    AuctionSort.ENDING_LATE -> "Terminan después"
+    AuctionSort.PRICE_ASC -> "Precio: menor a mayor"
+    AuctionSort.PRICE_DESC -> "Precio: mayor a menor"
+    AuctionSort.NAME_ASC -> "Nombre: A-Z"
+    AuctionSort.NAME_DESC -> "Nombre: Z-A"
+    AuctionSort.NUMBER_ASC -> "Número: ascendente"
+    AuctionSort.NUMBER_DESC -> "Número: descendente"
+    AuctionSort.RECENT_FIRST -> "Comienzo: Más recientes"
+    AuctionSort.OLDEST_FIRST -> "Comienzo: Más antiguas"
+}
+
+// Grupos separados por una línea, como en el diseño.
+private val sortGroups = listOf(
+    listOf(AuctionSort.POPULAR),
+    listOf(AuctionSort.ENDING_SOON, AuctionSort.ENDING_LATE),
+    listOf(AuctionSort.PRICE_ASC, AuctionSort.PRICE_DESC),
+    listOf(AuctionSort.NAME_ASC, AuctionSort.NAME_DESC),
+    listOf(AuctionSort.NUMBER_ASC, AuctionSort.NUMBER_DESC),
+    listOf(AuctionSort.RECENT_FIRST, AuctionSort.OLDEST_FIRST)
+)
+/**
+ * Botón y menú "Ordenar por" de la pantalla explore.
+ */
+@Composable
+private fun SortSelector(
+    selected: AuctionSort,
+    onSortSelected: (AuctionSort) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        Surface(
+            onClick = { expanded = true },
+            shape = RoundedCornerShape(AppCornerRadius.small),
+            color = Surface,
+            border = BorderStroke(1.dp, Border)
+        ) {
+            Row(
+                modifier = Modifier.padding(
+                    horizontal = AppSpacing.m,
+                    vertical = AppSpacing.s
+                ),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.ic_sort),
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Text(
+                    text = selected.label(),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Primary
+                )
+            }
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Surface)
+        ) {
             Text(
-                text = "Filtros",
-                style = MaterialTheme.typography.labelMedium,
-                color = Primary
+                text = "ORDENAR POR",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                modifier = Modifier.padding(
+                    horizontal = AppSpacing.l,
+                    vertical = AppSpacing.s
+                )
             )
+
+            sortGroups.forEach { group ->
+                // Línea separadora entre grupos.
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(Border)
+                )
+
+                group.forEach { option ->
+                    val isSelected = option == selected
+
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = option.label(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = TextPrimary
+                            )
+                        },
+                        leadingIcon = {
+                            Text(
+                                text = if (isSelected) "✓" else "",
+                                color = Primary,
+                                modifier = Modifier.width(16.dp)
+                            )
+                        },
+                        onClick = {
+                            expanded = false
+                            onSortSelected(option)
+                        },
+                        modifier = Modifier.background(
+                            if (isSelected) PrimaryLight else Surface
+                        )
+                    )
+                }
+            }
         }
     }
 }
@@ -281,15 +499,18 @@ private fun EmptyState(
  */
 @Composable
 private fun ExploreContent(
-    auctions: List<Auction>,
+    auctions: List<AuctionSummary>,
     isLoading: Boolean,
-    error: String?
+    error: String?,
+    sort: AuctionSort,
+    onSortSelected: (AuctionSort) -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onFiltersClick: () -> Unit,
+    onClearFilters: () -> Unit,
+    selectedCardCollection: String,
+    onCardCollectionSelected: (String) -> Unit
 ) {
-    // Barra de busqueda
-    var searchQuery by remember { mutableStateOf("") }
-
-    // Filtro seleccionado de colecciones de cartas
-    var selectedCardCollection by remember { mutableStateOf("Todas") }
 
     Column(
         modifier = Modifier
@@ -304,22 +525,22 @@ private fun ExploreContent(
         ) {
             SearchInput(
                 value = searchQuery,
-                onValueChange = { searchQuery = it }
+                onValueChange = onSearchQueryChange
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.m))
 
             CardCollectionFilters(
                 selectedCardCollection = selectedCardCollection,
-                onCardCollectionSelected = { selectedCardCollection = it }
+                onCardCollectionSelected = onCardCollectionSelected
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.l))
 
             SectionHeader(
-                onFiltersClick = {
-                    // TODO: Implementar filtros
-                }
+                sort = sort,
+                onSortSelected = onSortSelected,
+                onFiltersClick = onFiltersClick
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.xxl))
@@ -344,10 +565,7 @@ private fun ExploreContent(
                 // Muestra el estado vacio
                 auctions.isEmpty() -> {
                     EmptyState(
-                        onClearFilters = {
-                            searchQuery = ""
-                            selectedCardCollection = "Todas"
-                        }
+                        onClearFilters = onClearFilters
                     )
                 }
 
@@ -367,10 +585,10 @@ private fun ExploreContent(
                             key = { auction -> auction.id }
                         ) { auction ->
                             AuctionItem(
-                                cardName = auction.card,
-                                initialPrice = auction.minPrize,
-                                currentBid = null,
-                                remainingTime = formatRemainingTime(auction.endsAt)
+                                cardName = auction.cardName,
+                                cardImage = auction.cardImage,
+                                currentBid = auction.currentBid,
+                                remainingTime = formatRemainingDays(auction.remainingDays)
                             )
                         }
                     }
@@ -381,28 +599,11 @@ private fun ExploreContent(
     }
 }
 
-// Calcula el tiempo restante hasta el final de la subasta.
-private fun formatRemainingTime(endsAt: String): String {
-    return try {
-        val endInstant = Instant.parse(endsAt)
-        val duration = Duration.between(Instant.now(), endInstant)
-
-        if (duration.isNegative || duration.isZero) {
-            "Finalizada"
-        } else {
-            val days = duration.toDays()
-            val hours = duration.toHours() % 24
-            val minutes = duration.toMinutes() % 60
-
-            when {
-                days > 0 -> "${days}d ${hours}h"
-                hours > 0 -> "${hours}h ${minutes}min"
-                else -> "${minutes}min"
-            }
-        }
-    } catch (exception: Exception) {
-        "Tiempo no disponible"
-    }
+// Da formato a los días que faltan para que termine la subasta.
+private fun formatRemainingDays(days: Int): String = when {
+    days <= 0 -> "Finalizada"
+    days == 1 -> "1 día"
+    else -> "$days días"
 }
 
 /**
@@ -415,7 +616,15 @@ private fun ExploreScreenPreview() {
         ExploreContent(
             auctions = emptyList(),
             isLoading = false,
-            error = null
+            error = null,
+            sort = AuctionSort.ENDING_SOON,
+            onSortSelected = {},
+            searchQuery = "",
+            onSearchQueryChange = {},
+            onFiltersClick = {},
+            onClearFilters = {},
+            selectedCardCollection = "Todas",
+            onCardCollectionSelected = {}
         )
     }
 }

@@ -1,4 +1,3 @@
-
 package com.gps_g6.bestbiddertcg.feature.auction.domain.model
 
 // Representa una subasta dentro de la aplicación.
@@ -13,5 +12,8 @@ data class Auction(
     val durationInDays: Int,
     val endsAt: String,
     val isCancelled: Boolean,
-    val status: String
+    val status: String,
+    val image: String = "",
+    val category: String = "",
+    val condition: String = ""
 )

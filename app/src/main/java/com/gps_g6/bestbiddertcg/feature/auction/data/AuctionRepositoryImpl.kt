@@ -1,6 +1,8 @@
 package com.gps_g6.bestbiddertcg.feature.auction.data
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 
@@ -9,9 +11,16 @@ class AuctionRepositoryImpl(
     private val api: AuctionApi
 ) : AuctionRepository {
 
-    override suspend fun getActiveAuctions(): List<Auction> {
-        return api.getActiveAuctions().map{ it.toDomain() }
-    }
+    override suspend fun getAllAuctions(sort: AuctionSort): List<AuctionSummary> =
+        api.getAllAuctions(sort.name).map {
+            AuctionSummary(
+                id = it.id, cardName = it.cardName, cardImage = it.cardImage,
+                currentBid = it.currentBid, remainingDays = it.remainingDays,
+                cardState = it.cardState, cardCategory = it.cardCategory,
+                cardCollection = it.cardCollection, cardNumber = it.cardNumber,
+                status = it.status,
+            )
+        }
 
     override suspend fun createAuction(request: CreateAuction): Auction {
         val response = api.createAuction(
@@ -40,5 +49,8 @@ private fun AuctionResponseDto.toDomain(): Auction = Auction(
     durationInDays = durationInDays,
     endsAt = endsAt,
     isCancelled = status == "CANCELLED",
-    status = status
+    status = status,
+    image = card.image,
+    category = card.category,
+    condition = card.state
 )

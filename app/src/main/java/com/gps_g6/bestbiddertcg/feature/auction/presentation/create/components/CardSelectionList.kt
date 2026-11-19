@@ -144,7 +144,7 @@ private fun cardStateLabel(state: String): String = when (state) {
     "GOOD" -> "Buen estado"
     "LIGHT_PLAYED" -> "Marcas ligeras"
     "POOR" -> "Deteriorada"
-    else -> state
+    else -> state.ifBlank { "Estado no disponible" }
 }
 
 /**

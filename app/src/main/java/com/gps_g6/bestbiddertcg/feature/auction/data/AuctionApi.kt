@@ -3,12 +3,16 @@ package com.gps_g6.bestbiddertcg.feature.auction.data
 import retrofit2.http.GET
 import retrofit2.http.Body
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface AuctionApi {
 
-    // Obtiene las subastas activas y próximas disponibles.
-    @GET("api/auction/active")
-    suspend fun getActiveAuctions(): List<AuctionResponseDto>
+    // Obtener todas las subastas.
+    @GET("api/auction/all")
+    suspend fun getAllAuctions(
+        @Query("sort") sort: String? = null
+    ): List<AuctionSummaryDto>
+
 
     // Crear una nueva subasta.
     @POST("api/auction/create")

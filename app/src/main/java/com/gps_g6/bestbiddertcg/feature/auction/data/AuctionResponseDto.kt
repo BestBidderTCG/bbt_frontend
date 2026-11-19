@@ -16,7 +16,9 @@ data class AuctionResponseDto(
     val startedAt: String,
     val endsAt: String,
     val durationInDays: Int,
-    val status: String
+    val status: String,
+    val current_bid: Double? = null,
+    val cardNumber: Int? = null
 )
 
 /**

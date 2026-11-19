@@ -24,6 +24,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import coil3.compose.AsyncImage
+import androidx.compose.ui.layout.ContentScale
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
@@ -32,14 +34,13 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.card.presentation.components.CardItem
 
 // Representa una subasta con la información de su carta.
 @Composable
 fun AuctionItem(
     cardName: String,
-    initialPrice: Double,
-    currentBid: Double?,
+    cardImage: String,
+    currentBid: Double,
     remainingTime: String,
     modifier: Modifier = Modifier
 ) {
@@ -53,7 +54,15 @@ fun AuctionItem(
             modifier = Modifier.padding(AppSpacing.s),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            CardItem()
+
+            AsyncImage(
+                model = cardImage,
+                contentDescription = cardName,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
+                contentScale = ContentScale.Fit
+            )
 
             Spacer(modifier = Modifier.height(AppSpacing.s))
 
@@ -71,14 +80,14 @@ fun AuctionItem(
 
             // Indica si se muestra el precio inicial o la puja actual.
             Text(
-                text = if (currentBid != null) "Puja" else "Precio inicial",
+                text = "Puja actual",
                 color = TextSecondary,
                 style = MaterialTheme.typography.bodySmall
             )
 
             // Muestra el importe correspondiente.
             Text(
-                text = String.format("%.2f €", currentBid ?: initialPrice),
+                text = String.format("%.2f €", currentBid),
                 color = Primary,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
@@ -115,8 +124,8 @@ private fun AuctionItemPreview() {
     BestBidderTCGTheme {
         AuctionItem(
             cardName = "Piplup",
-            initialPrice = 0.67,
-            currentBid = null,
+            cardImage = "",
+            currentBid = 0.67,
             remainingTime = "2 h 35 min",
             modifier = Modifier.padding(AppSpacing.s)
         )

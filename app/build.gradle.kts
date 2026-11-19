@@ -48,6 +48,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.firebase.crashlytics.buildtools)
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
     implementation(libs.material)
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.kotlinx.serialization)
