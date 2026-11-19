@@ -10,6 +10,8 @@ data class ProfileUiState(
     val auctionsCount: Int = 0,
     val bidsCount: Int = 0,
     val collection: List<CollectionCardUiModel> = emptyList(),
+    val isLoadingCards: Boolean = false,
+    val cardsError: String? = null,
     val auctions: List<AuctionUiModel> = emptyList(),
 
     val isLoading: Boolean = false,
@@ -20,7 +22,8 @@ data class ProfileUiState(
 
 data class CollectionCardUiModel(
     val id: String,
-    val name: String
+    val name: String,
+    val imageUrl: String? = null
 )
 
 enum class AuctionStatus {

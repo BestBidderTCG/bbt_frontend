@@ -2,6 +2,7 @@
 package com.gps_g6.bestbiddertcg.feature.auction.data
 
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
+import com.gps_g6.bestbiddertcg.feature.auction.data.remote.AuctionApi
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
 

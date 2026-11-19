@@ -1,4 +1,4 @@
-package com.gps_g6.bestbiddertcg.feature.card.data
+package com.gps_g6.bestbiddertcg.feature.card.data.remote.dto
 
 import kotlinx.serialization.Serializable
 

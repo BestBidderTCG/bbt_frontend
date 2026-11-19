@@ -2,6 +2,7 @@ package com.gps_g6.bestbiddertcg.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
 import kotlinx.coroutines.CancellationException
@@ -13,7 +14,8 @@ import retrofit2.HttpException
 import java.io.IOException
 
 class ProfileViewModel(
-    private val profileManager: ProfileManager
+    private val profileManager: ProfileManager,
+    private val getMyCardsUseCase: GetMyCardsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -27,6 +29,7 @@ class ProfileViewModel(
     init {
         observeProfile()
         loadProfile()
+        loadMyCards()
     }
 
     private fun observeProfile() {
@@ -121,6 +124,49 @@ class ProfileViewModel(
 
             } finally {
                 loadInProgress = false
+            }
+        }
+    }
+
+    fun loadMyCards() {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    isLoadingCards = true,
+                    cardsError = null
+                )
+            }
+
+            try {
+                val cards = getMyCardsUseCase()
+
+                val collection = cards.map { card ->
+                    CollectionCardUiModel(
+                        id = card.id,
+                        name = card.name,
+                        imageUrl = card.image
+                    )
+                }
+
+                _uiState.update {
+                    it.copy(
+                        collection = collection,
+                        cardsCount = collection.size,
+                        isLoadingCards = false,
+                        cardsError = null
+                    )
+                }
+
+            } catch (e: CancellationException) {
+                throw e
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isLoadingCards = false,
+                        cardsError = "No se han podido cargar tus cartas."
+                    )
+                }
             }
         }
     }

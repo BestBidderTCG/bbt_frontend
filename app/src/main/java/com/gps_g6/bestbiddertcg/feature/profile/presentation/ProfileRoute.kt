@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gps_g6.bestbiddertcg.feature.card.data.CardModule
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 
 @Composable
@@ -29,7 +30,8 @@ fun ProfileRoute(
                 )
 
                 return ProfileViewModel(
-                    profileManager = ProfileModule.profileManager
+                    profileManager = ProfileModule.profileManager,
+                    getMyCardsUseCase = CardModule.getMyCardsUseCase
                 ) as T
             }
         }
@@ -51,6 +53,9 @@ fun ProfileRoute(
         },
         onAuctionClick = { auction ->
             onAuctionClick(auction.id)
+        },
+        onRetryCardsClick = {
+            viewModel.loadMyCards()
         }
     )
 }

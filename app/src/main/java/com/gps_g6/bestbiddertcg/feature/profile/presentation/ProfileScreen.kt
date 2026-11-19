@@ -10,6 +10,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.Button
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
@@ -27,7 +28,8 @@ fun ProfileScreen(
     initialTab: ProfileTab = ProfileTab.COLLECTION,
     onRetryClick: () -> Unit = {},
     onCardClick: (CollectionCardUiModel) -> Unit = {},
-    onAuctionClick: (AuctionUiModel) -> Unit = {}
+    onAuctionClick: (AuctionUiModel) -> Unit = {},
+    onRetryCardsClick: () -> Unit = {}
 ) {
     var selectedTab by rememberSaveable {
         mutableStateOf(initialTab)
@@ -104,11 +106,42 @@ fun ProfileScreen(
         ) {
 
             when (selectedTab) {
+
                 ProfileTab.COLLECTION -> {
-                    ProfileCollection(
-                        cards = profile.collection,
-                        onCardClick = onCardClick
-                    )
+                    when {
+                        profile.isLoadingCards -> {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator(color = Primary)
+                            }
+                        }
+
+                        profile.cardsError != null -> {
+                            Column(
+                                modifier = Modifier.fillMaxSize(),
+                                verticalArrangement = Arrangement.Center,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = profile.cardsError,
+                                    color = TextSecondary
+                                )
+
+                                TextButton(onClick = onRetryCardsClick) {
+                                    Text("Reintentar")
+                                }
+                            }
+                        }
+
+                        else -> {
+                            ProfileCollection(
+                                cards = profile.collection,
+                                onCardClick = onCardClick
+                            )
+                        }
+                    }
                 }
 
                 ProfileTab.AUCTIONS -> {

@@ -1,5 +1,6 @@
-package com.gps_g6.bestbiddertcg.feature.card.data
+package com.gps_g6.bestbiddertcg.feature.card.data.remote
 
+import com.gps_g6.bestbiddertcg.feature.card.data.remote.dto.CardDto
 import retrofit2.http.GET
 
 interface CardApi {
