@@ -10,5 +10,7 @@ data class Card(
     val collection: String?,
     val num: Int?,
     val state: String,
-    val description: String?
+    val description: String?,
+    val createdAt: String? = null,
+    val auction: CardAuction? = null
 )

@@ -117,19 +117,25 @@ object NetworkModule {
     fun resolveImageUrl(image: String?): String? {
         if (image.isNullOrBlank()) return null
 
-        if (!image.startsWith("/uploads/")) return null
+        val baseUrl = BASE_URL.trimEnd('/')
 
-        val filename = image.removePrefix("/uploads/")
+        val path = when {
+            image.startsWith("/uploads/") -> image
 
-        if (filename.isEmpty()) return null
+            image.startsWith("$baseUrl/uploads/") ->
+                image.removePrefix(baseUrl)
 
-        // Only allow a single filename, not nested paths or encoded paths
-        if (!filename.matches(
-                Regex("[A-Za-z0-9_-]+\\.[A-Za-z0-9]+")
-            )
-        ) return null
+            else -> return null
+        }
 
-        return BASE_URL.trimEnd('/') + image
+        val filename = path.removePrefix("/uploads/")
+
+        // Only allow a single filename inside /uploads.
+        val validFilename = Regex("""[A-Za-z0-9_-]+\.[A-Za-z0-9]+""")
+
+        if (!validFilename.matches(filename)) return null
+
+        return baseUrl + path
     }
 
 }
