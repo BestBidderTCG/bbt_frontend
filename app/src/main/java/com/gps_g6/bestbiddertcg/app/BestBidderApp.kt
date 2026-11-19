@@ -1,4 +1,3 @@
-
 package com.gps_g6.bestbiddertcg.app
 
 import androidx.compose.foundation.layout.Box
@@ -33,6 +32,7 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun BestBidderApp(
+    onCardClick: (String) -> Unit,
     onNotificationsClick: () -> Unit = {},
     onSettingsClick: () -> Unit = {}
 ) {
@@ -111,7 +111,7 @@ fun BestBidderApp(
                     )
                     AppPage.SOCIAL -> SocialScreen()
                     AppPage.FAVORITES -> FavoritesScreen()
-                    AppPage.PROFILE -> ProfileRoute()
+                    AppPage.PROFILE -> ProfileRoute(onCardClick = onCardClick)
                 }
             }
         }
