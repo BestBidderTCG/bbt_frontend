@@ -134,10 +134,18 @@
     <string name="delete_account_requested_title">Solicitud de eliminación registrada</string>
     <string name="delete_account_requested_description">Tu cuenta está pendiente de eliminación. Dispones de 15 días para recuperarla.</string>
     <string name="delete_account_requested_recovery">Si inicias sesión antes de que finalice ese plazo, la solicitud se cancelará automáticamente.</string>
-    <string name="common_understood">Entendido</string>
+    <string name="delete_account_check_error">No se ha podido comprobar el estado de tu cuenta.</string>
+
+    <string name="delete_account_error_check">No se ha podido comprobar si puedes eliminar tu cuenta.</string>
+    <string name="delete_account_error_request">No se ha podido solicitar la eliminación de la cuenta.</string>
+    <string name="delete_account_error_uncertain">No se ha podido confirmar el resultado de la solicitud. Comprueba el estado de tu cuenta antes de volver a intentarlo.</string>
+    <string name="delete_account_error_conflict">La eliminación ha sido rechazada. Vuelve a comprobar el estado de tu cuenta.</string>
+    <string name="delete_account_error_conflict_check">La eliminación ha sido rechazada y no se han podido consultar los motivos.</string>
 
     <!-- Common strings -->
     <string name="common_cancel">Cancelar</string>
+    <string name="common_understood">Entendido</string>
+    <string name="common_retry">Reintentar</string>
 
     <!-- Accessibility -->
     <string name="profile_avatar_description">Avatar del usuario</string>

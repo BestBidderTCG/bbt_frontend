@@ -10,4 +10,6 @@ sealed interface DeleteAccountUiState {
         val hasActiveAuction: Boolean,
         val isWinningAuction: Boolean
     ) : DeleteAccountUiState
+
+    data object Error : DeleteAccountUiState
 }

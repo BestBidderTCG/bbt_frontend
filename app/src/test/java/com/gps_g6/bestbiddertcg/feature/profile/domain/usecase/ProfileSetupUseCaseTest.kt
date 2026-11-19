@@ -3,6 +3,8 @@ package com.gps_g6.bestbiddertcg.feature.profile.domain.usecase
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
 import com.gps_g6.bestbiddertcg.core.auth.SessionTokens
 import com.gps_g6.bestbiddertcg.core.auth.TokenStorage
+import com.gps_g6.bestbiddertcg.feature.profile.domain.model.AccountDeletionCheck
+import com.gps_g6.bestbiddertcg.feature.profile.domain.model.AccountDeletionStatus
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.domain.repository.ProfileRepository
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
@@ -54,6 +56,14 @@ class ProfileSetupUseCaseTest {
                 description = description,
                 avatarNum = avatarNum ?: 1
             )
+        }
+
+        override suspend fun checkAccountDeletion(): AccountDeletionCheck {
+            error("Not used in ProfileSetupUseCaseTest")
+        }
+
+        override suspend fun requestAccountDeletion(): AccountDeletionStatus {
+            error("Not used in ProfileSetupUseCaseTest")
         }
     }
 

@@ -2,7 +2,6 @@ package com.gps_g6.bestbiddertcg.feature.auth.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
 import com.gps_g6.bestbiddertcg.core.model.CardCategory
 import com.gps_g6.bestbiddertcg.feature.auth.domain.repository.AuthRepository

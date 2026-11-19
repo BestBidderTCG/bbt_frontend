@@ -6,6 +6,7 @@ import android.util.Log
 import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.auth.EncryptedTokenStorage
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
+import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -44,10 +45,34 @@ object NetworkModule {
         }
     }
 
+    // Independent client: no bearer interceptor or authenticator.
+    private val refreshClient: OkHttpClient by lazy {
+        OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .build()
+    }
+
+    private val refreshApi: AuthApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(refreshClient)
+            .addConverterFactory(
+                json.asConverterFactory(
+                    "application/json".toMediaType()
+                )
+            )
+            .build()
+            .create(AuthApi::class.java)
+    }
+
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
-            .addInterceptor(
-                AuthInterceptor(sessionManager)
+            .addInterceptor(AuthInterceptor(sessionManager))
+            .authenticator(
+                TokenAuthenticator(
+                    sessionManager = sessionManager,
+                    refreshApi = refreshApi
+                )
             )
             .addInterceptor(loggingInterceptor)
             .build()
