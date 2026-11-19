@@ -3,6 +3,8 @@ package com.gps_g6.bestbiddertcg.core.network
 
 import android.content.Context
 import android.util.Log
+import coil3.ImageLoader
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.auth.EncryptedTokenStorage
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
@@ -89,4 +91,42 @@ object NetworkModule {
             )
             .build()
     }
+
+    private var cachedImageLoader: ImageLoader? = null
+
+    @Synchronized
+    fun imageLoader(context: Context): ImageLoader {
+        return cachedImageLoader
+            ?: createImageLoader(context).also {
+                cachedImageLoader = it
+            }
+    }
+
+    fun createImageLoader(context: Context): ImageLoader {
+        return ImageLoader.Builder(context.applicationContext)
+            .components {
+                add(
+                    OkHttpNetworkFetcherFactory(
+                        callFactory = { okHttpClient }
+                    )
+                )
+            }
+            .build()
+    }
+
+    fun resolveImageUrl(image: String?): String? {
+        if (image.isNullOrBlank()) return null
+
+        if (!image.startsWith("/uploads/")) return null
+
+        // Only allow paths served by our backend
+        if (image.contains("..") ||
+            image.contains("?") ||
+            image.contains("#") ||
+            image.contains("\\")
+        ) return null
+
+        return BASE_URL.trimEnd('/') + image
+    }
+
 }

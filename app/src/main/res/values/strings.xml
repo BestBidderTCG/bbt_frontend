@@ -77,6 +77,10 @@
     <string name="profile_cards">Cartas</string>
     <string name="profile_auctions">Subastas</string>
     <string name="profile_bids">Pujas</string>
+    <string name="profile_wallet_title">Mi cartera</string>
+    <string name="profile_wallet_sample_balance">125,50 €</string>
+
+    <string name="profile_collection_load_error">No se han podido cargar tus cartas.</string>
 
     <!-- Profile tabs -->
     <string name="profile_tab_collection">Colección</string>

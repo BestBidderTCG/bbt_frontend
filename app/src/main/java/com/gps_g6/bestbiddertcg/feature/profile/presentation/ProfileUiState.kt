@@ -11,7 +11,7 @@ data class ProfileUiState(
     val bidsCount: Int = 0,
     val collection: List<CollectionCardUiModel> = emptyList(),
     val isLoadingCards: Boolean = false,
-    val cardsError: String? = null,
+    val cardsError: ProfileCardsError? = null,
     val auctions: List<AuctionUiModel> = emptyList(),
 
     val isLoading: Boolean = false,

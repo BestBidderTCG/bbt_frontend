@@ -14,11 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.CollectionCardUiModel
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.ProfileSampleData
 import com.gps_g6.bestbiddertcg.R
@@ -85,12 +89,27 @@ private fun CollectionCard(
         color = PrimaryLight,
         border = BorderStroke(1.dp, Border)
     ) {
-        Image(
-            painter = painterResource(R.drawable.sample_piplup),
-            contentDescription = card.name,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Fit
-        )
+        if (LocalInspectionMode.current) {
+            Image(
+                painter = painterResource(R.drawable.sample_piplup),
+                contentDescription = card.name,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit
+            )
+        } else {
+            val context = LocalContext.current
+
+            AsyncImage(
+                model = card.imageUrl,
+                imageLoader = NetworkModule.imageLoader(context),
+                contentDescription = card.name,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Fit,
+                placeholder = painterResource(R.drawable.sample_piplup),
+                error = painterResource(R.drawable.sample_piplup),
+                fallback = painterResource(R.drawable.sample_piplup)
+            )
+        }
     }
 }
 

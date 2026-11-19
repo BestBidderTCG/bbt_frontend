@@ -2,6 +2,7 @@ package com.gps_g6.bestbiddertcg.feature.profile.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
@@ -144,7 +145,7 @@ class ProfileViewModel(
                     CollectionCardUiModel(
                         id = card.id,
                         name = card.name,
-                        imageUrl = card.image
+                        imageUrl = NetworkModule.resolveImageUrl(card.image)
                     )
                 }
 
@@ -164,7 +165,7 @@ class ProfileViewModel(
                 _uiState.update {
                     it.copy(
                         isLoadingCards = false,
-                        cardsError = "No se han podido cargar tus cartas."
+                        cardsError = ProfileCardsError.LOAD_FAILED
                     )
                 }
             }
