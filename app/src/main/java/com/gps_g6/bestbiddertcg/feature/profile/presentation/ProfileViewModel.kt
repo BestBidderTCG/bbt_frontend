@@ -26,6 +26,7 @@ class ProfileViewModel(
     val uiState = _uiState.asStateFlow()
 
     private var loadInProgress = false
+    private var cardsLoadInProgress = false
 
     init {
         observeProfile()
@@ -130,6 +131,10 @@ class ProfileViewModel(
     }
 
     fun loadMyCards() {
+        if (cardsLoadInProgress) return
+
+        cardsLoadInProgress = true
+
         viewModelScope.launch {
             _uiState.update {
                 it.copy(
@@ -168,6 +173,8 @@ class ProfileViewModel(
                         cardsError = ProfileCardsError.LOAD_FAILED
                     )
                 }
+            } finally {
+                cardsLoadInProgress = false
             }
         }
     }
