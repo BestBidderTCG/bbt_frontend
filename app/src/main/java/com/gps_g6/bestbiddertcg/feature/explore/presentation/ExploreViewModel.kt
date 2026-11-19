@@ -78,10 +78,7 @@ class ExploreViewModel(
         if (newSort == _sort.value) return
 
         _sort.value = newSort
-
-        if (newSort != AuctionSort.POPULAR) {
-            loadAuctions()
-        }
+        loadAuctions()
     }
 
     fun applyFilters(
