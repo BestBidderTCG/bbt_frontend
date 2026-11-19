@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
 import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RestoreSessionUseCase
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +19,8 @@ import java.io.IOException
  */
 class StartupViewModel(
     private val restoreSession: RestoreSessionUseCase,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<StartupUiState>(
@@ -81,7 +83,7 @@ class StartupViewModel(
             _uiState.value = StartupUiState.Checking
 
             try {
-                withContext(Dispatchers.IO) {
+                withContext(ioDispatcher) {
                     sessionManager.clearSession()
                 }
 
