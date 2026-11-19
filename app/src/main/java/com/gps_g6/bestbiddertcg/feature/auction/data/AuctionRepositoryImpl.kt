@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.auction.data
 
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule.resolveImageUrl
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
@@ -15,7 +16,7 @@ class AuctionRepositoryImpl(
     override suspend fun getAllAuctions(sort: AuctionSort): List<AuctionSummary> =
         api.getAllAuctions(sort.name).map {
             AuctionSummary(
-                id = it.id, cardName = it.cardName, cardImage = it.cardImage,
+                id = it.id, cardName = it.cardName, resolveImageUrl(it.cardImage),
                 currentBid = it.currentBid, remainingDays = it.remainingDays,
                 cardState = it.cardState, cardCategory = it.cardCategory,
                 cardCollection = it.cardCollection, cardNumber = it.cardNumber,
@@ -30,7 +31,7 @@ class AuctionRepositoryImpl(
             id = response.id,
             status = response.status,
             cardName = response.cardName,
-            cardImage = response.cardImage,
+            cardImage = resolveImageUrl(response.cardImage),
             cardCollection = response.cardCollection,
             cardNumber = response.cardNumber,
             cardState = response.cardState,
@@ -76,7 +77,7 @@ private fun AuctionResponseDto.toDomain(): Auction = Auction(
     endsAt = endsAt,
     isCancelled = status == "CANCELLED",
     status = status,
-    image = card.image,
+    image = resolveImageUrl(card.image),
     category = card.category,
     condition = card.state
 )

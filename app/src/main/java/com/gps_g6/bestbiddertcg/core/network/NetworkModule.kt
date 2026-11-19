@@ -15,7 +15,7 @@ import retrofit2.Retrofit
 
 object NetworkModule {
 
-    private const val BASE_URL = "http://10.0.2.2:8080/"
+    const val BASE_URL = "http://10.0.2.2:8080/"
 
     lateinit var sessionManager: SessionManager
         private set
@@ -63,5 +63,13 @@ object NetworkModule {
                 )
             )
             .build()
+    }
+
+    /** Convierte la ruta que devuelve el backend (/uploads/xxx.png) en una URL completa. */
+    fun resolveImageUrl(path: String?): String = when {
+        path.isNullOrBlank() -> ""
+        path.startsWith("http://") || path.startsWith("https://") -> path
+        path.startsWith("/") -> NetworkModule.BASE_URL.trimEnd('/') + path
+        else -> ""   // p. ej. "black_lotus.png" del DataInitializer: no existe en el servidor
     }
 }
