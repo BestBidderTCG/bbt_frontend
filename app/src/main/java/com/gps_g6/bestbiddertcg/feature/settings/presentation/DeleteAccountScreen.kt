@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.settings.presentation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -24,11 +25,32 @@ import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
 import com.gps_g6.bestbiddertcg.core.ui.components.ConfirmationDialog
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
 
+@StringRes
+private fun DeleteAccountError.toStringRes(): Int = when (this) {
+    DeleteAccountError.CHECK_FAILED ->
+        R.string.delete_account_error_check
+
+    DeleteAccountError.REQUEST_FAILED ->
+        R.string.delete_account_error_request
+
+    DeleteAccountError.REQUEST_UNCERTAIN ->
+        R.string.delete_account_error_uncertain
+
+    DeleteAccountError.CONFLICT ->
+        R.string.delete_account_error_conflict
+
+    DeleteAccountError.CONFLICT_CHECK_FAILED ->
+        R.string.delete_account_error_conflict_check
+}
+
 @Composable
 fun DeleteAccountScreen(
     uiState: DeleteAccountUiState,
+    isSubmitting: Boolean,
+    error: DeleteAccountError?,
     onBackClick: () -> Unit,
-    onDeleteRequestClick: () -> Unit
+    onDeleteRequestClick: () -> Unit,
+    onRetryClick: () -> Unit
 ) {
     var showDeleteConfirmation by rememberSaveable {
         mutableStateOf(false)
@@ -44,7 +66,9 @@ fun DeleteAccountScreen(
             title = stringResource(R.string.settings_delete_account),
             navigationIcon = R.drawable.ic_arrow_back,
             navigationDescription = stringResource(R.string.common_back),
-            onNavigationClick = onBackClick
+            onNavigationClick = {
+                if (!isSubmitting) onBackClick()
+            }
         )
 
         Column(
@@ -56,6 +80,17 @@ fun DeleteAccountScreen(
                     vertical = AppSpacing.xl
                 )
         ) {
+
+            if (error != null) {
+                Text(
+                    text = stringResource(error.toStringRes()),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Error
+                )
+
+                Spacer(modifier = Modifier.height(AppSpacing.l))
+            }
+
             when (uiState) {
                 DeleteAccountUiState.Loading -> {
                     Box(
@@ -68,6 +103,7 @@ fun DeleteAccountScreen(
 
                 DeleteAccountUiState.Allowed -> {
                     DeleteAccountAllowedContent(
+                        isSubmitting = isSubmitting,
                         onDeleteRequestClick = {
                             showDeleteConfirmation = true
                         },
@@ -81,13 +117,43 @@ fun DeleteAccountScreen(
                         onBackClick = onBackClick
                     )
                 }
+
+                DeleteAccountUiState.Error -> {
+                    Button(
+                        onClick = onRetryClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(AppCornerRadius.medium),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Primary
+                        )
+                    ) {
+                        Text(
+                            text = stringResource(R.string.common_retry)
+                        )
+                    }
+                }
+
+            }
+
+            if (isSubmitting) {
+                Spacer(modifier = Modifier.height(AppSpacing.l))
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(color = Primary)
+                }
             }
         }
     }
 
     if (
         uiState == DeleteAccountUiState.Allowed &&
-        showDeleteConfirmation
+        showDeleteConfirmation &&
+        !isSubmitting
     ) {
         ConfirmationDialog(
             title = stringResource(R.string.delete_account_dialog_title),
@@ -211,6 +277,7 @@ private fun DeleteAccountBlockedContent(
 
 @Composable
 private fun DeleteAccountAllowedContent(
+    isSubmitting: Boolean,
     onDeleteRequestClick: () -> Unit,
     onCancelClick: () -> Unit
 ) {
@@ -282,6 +349,7 @@ private fun DeleteAccountAllowedContent(
 
     Button(
         onClick = onDeleteRequestClick,
+        enabled = !isSubmitting,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -301,6 +369,7 @@ private fun DeleteAccountAllowedContent(
 
     OutlinedButton(
         onClick = onCancelClick,
+        enabled = !isSubmitting,
         modifier = Modifier
             .fillMaxWidth()
             .height(48.dp),
@@ -384,6 +453,9 @@ private fun DeleteAccountBlockedPreview() {
                 hasActiveAuction = true,
                 isWinningAuction = true
             ),
+            isSubmitting = false,
+            error = null,
+            onRetryClick = {},
             onBackClick = {},
             onDeleteRequestClick = {}
         )
@@ -396,6 +468,9 @@ private fun DeleteAccountAllowedPreview() {
     BestBidderTCGTheme {
         DeleteAccountScreen(
             uiState = DeleteAccountUiState.Allowed,
+            isSubmitting = false,
+            error = null,
+            onRetryClick = {},
             onBackClick = {},
             onDeleteRequestClick = {}
         )

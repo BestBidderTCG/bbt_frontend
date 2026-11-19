@@ -21,16 +21,20 @@ class TokenAuthenticator(
         response: Response
     ): Request? {
 
-        // Never refresh authentication endpoints.
+        // Never refresh authentication endpoints
         if (response.request.url.encodedPath.startsWith("/api/auth/")) {
             return null
         }
 
-        // Only authenticated requests may be retried.
+        // Only authenticated requests may be retried
         val previousAuthorization =
             response.request.header("Authorization") ?: return null
 
-        // Avoid repeated authentication attempts.
+        if (!previousAuthorization.startsWith("Bearer ")) {
+            return null
+        }
+
+        // Avoid repeated authentication attempts
         if (response.priorResponse != null) {
             return null
         }
@@ -43,7 +47,7 @@ class TokenAuthenticator(
             val currentRefreshToken =
                 sessionManager.getRefreshToken() ?: return null
 
-            // Another request may have already refreshed the tokens.
+            // Another request may have already refreshed the tokens
             if (previousAuthorization != "Bearer $currentAccessToken") {
                 return response.request.newBuilder()
                     .header(
@@ -53,7 +57,7 @@ class TokenAuthenticator(
                     .build()
             }
 
-            // Refresh synchronously using a separate HTTP client.
+            // Refresh synchronously using a separate HTTP client
             val refreshedSession = try {
                 runBlocking {
                     refreshApi.refresh(
@@ -66,7 +70,7 @@ class TokenAuthenticator(
                 return null
             }
 
-            // Do not restore a session removed by logout.
+            // Do not restore a session removed by logout
             val saved = sessionManager.saveSessionIfRefreshTokenMatches(
                 expectedRefreshToken = currentRefreshToken,
                 accessToken = refreshedSession.accessToken,

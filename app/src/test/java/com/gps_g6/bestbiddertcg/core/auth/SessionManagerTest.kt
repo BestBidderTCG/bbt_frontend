@@ -133,4 +133,58 @@ class SessionManagerTest {
         assertFalse(newManager.isAuthenticated())
     }
 
+    @Test
+    fun `matching refresh token allows session update`() {
+        val manager = SessionManager(FakeTokenStorage())
+
+        manager.saveSession("old-access", "old-refresh")
+
+        val updated = manager.saveSessionIfRefreshTokenMatches(
+            expectedRefreshToken = "old-refresh",
+            accessToken = "new-access",
+            refreshToken = "new-refresh"
+        )
+
+        assertTrue(updated)
+        assertEquals("new-access", manager.getAccessToken())
+        assertEquals("new-refresh", manager.getRefreshToken())
+    }
+
+    @Test
+    fun `refresh cannot restore a logged out session`() {
+        val storage = FakeTokenStorage()
+        val manager = SessionManager(storage)
+
+        manager.saveSession("old-access", "old-refresh")
+        manager.clearSession()
+
+        val updated = manager.saveSessionIfRefreshTokenMatches(
+            expectedRefreshToken = "old-refresh",
+            accessToken = "new-access",
+            refreshToken = "new-refresh"
+        )
+
+        assertFalse(updated)
+        assertFalse(manager.isAuthenticated())
+        assertNull(storage.getTokens())
+    }
+
+    @Test
+    fun `old refresh token cannot overwrite another session`() {
+        val manager = SessionManager(FakeTokenStorage())
+
+        manager.saveSession("access-1", "refresh-1")
+        manager.saveSession("access-2", "refresh-2")
+
+        val updated = manager.saveSessionIfRefreshTokenMatches(
+            expectedRefreshToken = "refresh-1",
+            accessToken = "stale-access",
+            refreshToken = "stale-refresh"
+        )
+
+        assertFalse(updated)
+        assertEquals("access-2", manager.getAccessToken())
+        assertEquals("refresh-2", manager.getRefreshToken())
+    }
+
 }

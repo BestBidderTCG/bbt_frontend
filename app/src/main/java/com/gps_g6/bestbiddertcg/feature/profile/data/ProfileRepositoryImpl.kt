@@ -3,6 +3,8 @@ package com.gps_g6.bestbiddertcg.feature.profile.data
 import com.gps_g6.bestbiddertcg.feature.profile.data.remote.ProfileApi
 import com.gps_g6.bestbiddertcg.feature.profile.data.remote.dto.ProfileDto
 import com.gps_g6.bestbiddertcg.feature.profile.data.remote.dto.UpdateProfileRequestDto
+import com.gps_g6.bestbiddertcg.feature.profile.domain.model.AccountDeletionCheck
+import com.gps_g6.bestbiddertcg.feature.profile.domain.model.AccountDeletionStatus
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.domain.repository.ProfileRepository
 
@@ -26,6 +28,25 @@ class ProfileRepositoryImpl(
                 avatarNum = avatarNum
             )
         ).toDomain()
+    }
+
+    override suspend fun checkAccountDeletion(): AccountDeletionCheck {
+        val response = api.checkAccountDeletion()
+
+        return AccountDeletionCheck(
+            hasActiveAuction = response.hasActiveAuction,
+            isWinningAuction = response.isWinningAuction
+        )
+    }
+
+    override suspend fun requestAccountDeletion(): AccountDeletionStatus {
+        val response = api.requestAccountDeletion()
+
+        return AccountDeletionStatus(
+            status = response.status,
+            deletionRequestedAt = response.deletionRequestedAt,
+            scheduledPurgeAt = response.scheduledPurgeAt
+        )
     }
 
     private fun ProfileDto.toDomain(): Profile {
