@@ -16,6 +16,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.activity.compose.BackHandler
+import androidx.compose.runtime.remember
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailScreen
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailStatus
 import com.gps_g6.bestbiddertcg.core.ui.components.MainTopBar
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModel
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.ExploreViewModelFactory
@@ -46,6 +52,9 @@ fun BestBidderApp(
         mutableStateOf(false)
     }
 
+    var selectedAuction by remember {
+        mutableStateOf<AuctionSummary?>(null)
+    }
 
     val currentPage = AppPage.entries[pagerState.currentPage]
     val topBarTitle = stringResource(currentPage.titleRes)
@@ -57,7 +66,7 @@ fun BestBidderApp(
 
     Scaffold(
         topBar = {
-            if (!isCreatingAuction) {
+            if (!isCreatingAuction && selectedAuction == null) {
                 MainTopBar(
                     title = topBarTitle,
                     onNotificationsClick = onNotificationsClick,
@@ -66,7 +75,7 @@ fun BestBidderApp(
             }
         },
         bottomBar = {
-            if (!isCreatingAuction) {
+            if (!isCreatingAuction && selectedAuction == null) {
                 BottomNavigationBar(
                     selectedPage = AppPage.entries[pagerState.currentPage],
                     onPageSelected = { page ->
@@ -81,8 +90,38 @@ fun BestBidderApp(
             }
         }
     ) { innerPadding ->
+        if (selectedAuction != null) {
+            BackHandler {
+                selectedAuction = null
+            }
 
-        if (isCreatingAuction) {
+            val auction = selectedAuction!!
+
+            AuctionDetailScreen(
+                uiState = AuctionDetailUiState(
+                    auctionId = auction.id,
+                    cardName = auction.cardName,
+                    cardImage = auction.cardImage,
+                    cardCategory = auction.cardCategory,
+                    cardCollection = auction.cardCollection.orEmpty(),
+                    cardNumber = auction.cardNumber?.toString().orEmpty(),
+                    status = if (auction.status.equals("ACTIVE", ignoreCase = true)) {
+                        AuctionDetailStatus.ACTIVE
+                    } else {
+                        AuctionDetailStatus.UPCOMING
+                    },
+                    currentBid = auction.currentBid,
+                    cardCondition = auction.cardState
+                ),
+                onBackClick = {
+                    selectedAuction = null
+                },
+                onFavoriteClick = {},
+                onEditClick = {},
+                onBidClick = {},
+                onHistoryClick = {}
+            )
+        } else if (isCreatingAuction) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -107,8 +146,12 @@ fun BestBidderApp(
             ) { page ->
                 when (AppPage.entries[page]) {
                     AppPage.EXPLORE -> ExploreScreen(
-                        viewModel = exploreViewModel
+                        viewModel = exploreViewModel,
+                        onAuctionClick = { auction ->
+                            selectedAuction = auction
+                        }
                     )
+
                     AppPage.SOCIAL -> SocialScreen()
                     AppPage.FAVORITES -> FavoritesScreen()
                     AppPage.PROFILE -> ProfileRoute()
