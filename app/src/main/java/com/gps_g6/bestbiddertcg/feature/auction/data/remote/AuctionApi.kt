@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.auction.data.remote
 
+import com.gps_g6.bestbiddertcg.feature.auction.data.remote.dto.AuctionDetailDto
 import com.gps_g6.bestbiddertcg.feature.auction.data.remote.dto.AuctionResponseDto
 import com.gps_g6.bestbiddertcg.feature.auction.data.remote.dto.AuctionSummaryDto
 import com.gps_g6.bestbiddertcg.feature.auction.data.remote.dto.CreateAuctionRequestDto
