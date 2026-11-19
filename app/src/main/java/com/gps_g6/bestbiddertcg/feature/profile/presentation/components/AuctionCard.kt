@@ -27,9 +27,11 @@ import com.gps_g6.bestbiddertcg.R
 @Composable
 fun AuctionCard(
     auction: AuctionUiModel,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
+        onClick = onClick,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(AppCornerRadius.medium),
         colors = CardDefaults.cardColors(

@@ -6,7 +6,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -26,7 +25,9 @@ fun ProfileScreen(
     profile: ProfileUiState = ProfileSampleData.profile,
     onEditProfile: () -> Unit = {},
     initialTab: ProfileTab = ProfileTab.COLLECTION,
-    onRetryClick: () -> Unit = {}
+    onRetryClick: () -> Unit = {},
+    onCardClick: (CollectionCardUiModel) -> Unit = {},
+    onAuctionClick: (AuctionUiModel) -> Unit = {}
 ) {
     var selectedTab by rememberSaveable {
         mutableStateOf(initialTab)
@@ -101,16 +102,19 @@ fun ProfileScreen(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
+
             when (selectedTab) {
                 ProfileTab.COLLECTION -> {
                     ProfileCollection(
-                        cards = profile.collection
+                        cards = profile.collection,
+                        onCardClick = onCardClick
                     )
                 }
 
                 ProfileTab.AUCTIONS -> {
                     ProfileAuctions(
-                        auctions = profile.auctions
+                        auctions = profile.auctions,
+                        onAuctionClick = onAuctionClick
                     )
                 }
             }

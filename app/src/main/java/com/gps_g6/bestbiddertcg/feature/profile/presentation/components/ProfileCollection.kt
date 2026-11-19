@@ -23,10 +23,12 @@ import com.gps_g6.bestbiddertcg.feature.profile.presentation.CollectionCardUiMod
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.ProfileSampleData
 import com.gps_g6.bestbiddertcg.R
 
+
 @Composable
 fun ProfileCollection(
     cards: List<CollectionCardUiModel>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardClick: (CollectionCardUiModel) -> Unit = {}
 ) {
     if (cards.isEmpty()) {
         Box(
@@ -34,7 +36,9 @@ fun ProfileCollection(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.profile_empty_collection),
+                text = stringResource(
+                    R.string.profile_empty_collection
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary
             )
@@ -57,9 +61,11 @@ fun ProfileCollection(
             items(
                 items = cards,
                 key = { it.id }
-            ) {
-                card ->
-                CollectionCard(card = card)
+            ) { card ->
+                CollectionCard(
+                    card = card,
+                    onClick = { onCardClick(card) }
+                )
             }
         }
     }
@@ -67,9 +73,11 @@ fun ProfileCollection(
 
 @Composable
 private fun CollectionCard(
-    card: CollectionCardUiModel
+    card: CollectionCardUiModel,
+    onClick: () -> Unit
 ) {
     Surface(
+        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(0.72f),
@@ -77,22 +85,12 @@ private fun CollectionCard(
         color = PrimaryLight,
         border = BorderStroke(1.dp, Border)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(AppSpacing.s),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Image(
-                painter = painterResource(R.drawable.sample_piplup),
-                contentDescription = card.name,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(0.72f),
-                contentScale = ContentScale.Fit
-            )
-        }
+        Image(
+            painter = painterResource(R.drawable.sample_piplup),
+            contentDescription = card.name,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit
+        )
     }
 }
 

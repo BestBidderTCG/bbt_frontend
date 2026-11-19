@@ -10,7 +10,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 
 @Composable
-fun ProfileRoute() {
+fun ProfileRoute(
+    onCardClick: (String) -> Unit = {},
+    onAuctionClick: (String) -> Unit = {}
+) {
 
     val factory = remember {
         object : ViewModelProvider.Factory {
@@ -42,6 +45,12 @@ fun ProfileRoute() {
         profile = uiState,
         onRetryClick = {
             viewModel.loadProfile(forceRefresh = true)
+        },
+        onCardClick = { card ->
+            onCardClick(card.id)
+        },
+        onAuctionClick = { auction ->
+            onAuctionClick(auction.id)
         }
     )
 }

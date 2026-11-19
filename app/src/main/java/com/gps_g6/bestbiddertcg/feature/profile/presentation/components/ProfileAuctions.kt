@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.profile.presentation.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -17,7 +18,8 @@ import com.gps_g6.bestbiddertcg.R
 @Composable
 fun ProfileAuctions(
     auctions: List<AuctionUiModel>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAuctionClick: (AuctionUiModel) -> Unit = {}
 ) {
     if (auctions.isEmpty()) {
         Box(
@@ -25,7 +27,9 @@ fun ProfileAuctions(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(R.string.profile_empty_auctions),
+                text = stringResource(
+                    R.string.profile_empty_auctions
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextSecondary
             )
@@ -42,7 +46,10 @@ fun ProfileAuctions(
                 items = auctions,
                 key = { it.id }
             ) { auction ->
-                AuctionCard(auction = auction)
+                AuctionCard(
+                    auction = auction,
+                    onClick = { onAuctionClick(auction) }
+                )
             }
         }
     }
