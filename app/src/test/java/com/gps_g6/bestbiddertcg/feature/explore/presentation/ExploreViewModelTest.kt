@@ -1,7 +1,8 @@
-
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
@@ -78,6 +79,20 @@ class ExploreViewModelTest {
                 status = "ACTIVE"
             )
 
+            // Resumen con el que aparece esa subasta en el listado.
+            val createdSummary = AuctionSummary(
+                id = "auction-1",
+                cardName = "Pikachu",
+                cardImage = "",
+                currentBid = 10.0,
+                remainingDays = 3,
+                cardState = "NEW",
+                status = "IN_PROGRESS",
+                cardCategory = "Electrico",
+                cardCollection = "Pokemon",
+                cardNumber = null
+            )
+
             // Prepara los datos de la nueva subasta.
             val request = CreateAuction(
                 creatorId = "user-1",
@@ -91,8 +106,8 @@ class ExploreViewModelTest {
 
             // Configura las respuestas del repositorio para simular la carga inicial y posterior.
             coEvery {
-                repository.getActiveAuctions()
-            } returns emptyList() andThen listOf(createdAuction)
+                repository.getAllAuctions(AuctionSort.ENDING_SOON)
+            } returns emptyList() andThen listOf(createdSummary)
 
             // Configura la respuesta del repositorio al crear la subasta.
             coEvery {
@@ -114,7 +129,7 @@ class ExploreViewModelTest {
 
             // Comprueba que la subasta creada aparece en el listado.
             assertEquals(
-                listOf(createdAuction),
+                listOf(createdSummary),
                 viewModel.auctions.value
             )
 
@@ -128,7 +143,7 @@ class ExploreViewModelTest {
             }
 
             coVerify(exactly = 2) {
-                repository.getActiveAuctions()
+                repository.getAllAuctions(AuctionSort.ENDING_SOON)
             }
         }
 
@@ -140,7 +155,7 @@ class ExploreViewModelTest {
     @Test
     fun `empty auction list is handled correctly`() = runTest(testDispatcher) {
         // Simula una respuesta del repositorio sin subastas.
-        coEvery { repository.getActiveAuctions() } returns emptyList()
+        coEvery { repository.getAllAuctions(AuctionSort.ENDING_SOON) } returns emptyList()
 
         // Crea el ViewModel después de configurar el repositorio simulado.
         viewModel = ExploreViewModel(repository)
@@ -154,7 +169,7 @@ class ExploreViewModelTest {
         assertNull(viewModel.error.value)
 
         // Verifica que se ha consultado el repositorio una vez.
-        coVerify(exactly = 1) { repository.getActiveAuctions() }
+        coVerify(exactly = 1) { repository.getAllAuctions(AuctionSort.ENDING_SOON) }
     }
 
     /**
@@ -166,7 +181,7 @@ class ExploreViewModelTest {
     fun `auction loading error is handled correctly`() = runTest(testDispatcher) {
         // Simula un error al consultar el repositorio.
         coEvery {
-            repository.getActiveAuctions()
+            repository.getAllAuctions(AuctionSort.ENDING_SOON)
         } throws RuntimeException("Connection error")
 
         // Crea el ViewModel después de configurar el repositorio simulado.
@@ -186,6 +201,42 @@ class ExploreViewModelTest {
         )
 
         // Verifica que se ha consultado el repositorio una vez.
-        coVerify(exactly = 1) { repository.getActiveAuctions() }
+        coVerify(exactly = 1) { repository.getAllAuctions(AuctionSort.ENDING_SOON) }
+    }
+
+    /**
+     * Comprueba que al cambiar la ordenación se mantienen los filtros activos.
+     *
+     * Aplica un filtro de colección, cambia el orden y verifica que la lista
+     * sigue filtrada con el orden nuevo.
+     */
+    @Test
+    fun `changing sort keeps active filters`() = runTest(testDispatcher) {
+        val pokemon = AuctionSummary(
+            id = "1",
+            cardName = "Pikachu",
+            cardImage = "",
+            currentBid = 10.0,
+            remainingDays = 3,
+            cardState = "NEW",
+            cardCategory = "Electrico",
+            status = "IN_PROGRESS",
+            cardCollection = "Pokemon",
+            cardNumber = null
+        )
+        val magic = pokemon.copy(id = "2", cardName = "Bolt", cardCollection = "Magic")
+
+        coEvery { repository.getAllAuctions(AuctionSort.ENDING_SOON) } returns listOf(pokemon, magic)
+        coEvery { repository.getAllAuctions(AuctionSort.PRICE_ASC) } returns listOf(magic, pokemon)
+
+        viewModel = ExploreViewModel(repository)
+        advanceUntilIdle()
+
+        viewModel.applyFilters(collection = "Pokemon")
+        viewModel.changeSort(AuctionSort.PRICE_ASC)
+        advanceUntilIdle()
+
+        assertEquals(listOf(pokemon), viewModel.auctions.value)
+        coVerify(exactly = 1) { repository.getAllAuctions(AuctionSort.PRICE_ASC) }
     }
 }

@@ -80,7 +80,7 @@ private const val MAX_PRICE_SLIDER_VALUE = 250f
  * Opciones de filtros en la pantalla explore.
  */
 data class AuctionFilterOptions(
-    val status: AuctionStatusFilter = AuctionStatusFilter.ACTIVE,
+    val status: AuctionStatusFilter? = null,
     val minPrice: Double = 0.0,
     val maxPrice: Double? = null,
     val condition: CardConditionFilter = CardConditionFilter.ANY,
@@ -218,7 +218,11 @@ fun AuctionFilterSheet(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(AppCornerRadius.small)
                     ) {
-                        status = AuctionStatusFilter.ACTIVE
+                        status = if (status == AuctionStatusFilter.ACTIVE) {
+                            null
+                        } else {
+                            AuctionStatusFilter.ACTIVE
+                        }
                     }
 
                     FilterOption(
@@ -227,7 +231,11 @@ fun AuctionFilterSheet(
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(AppCornerRadius.small)
                     ) {
-                        status = AuctionStatusFilter.UPCOMING
+                        status = if (status == AuctionStatusFilter.UPCOMING) {
+                            null
+                        } else {
+                            AuctionStatusFilter.UPCOMING
+                        }
                     }
                 }
 
@@ -505,11 +513,11 @@ fun AuctionFilterSheet(
             ) {
                 OutlinedButton(
                     onClick = {
-                        status = AuctionStatusFilter.ACTIVE
+                        status = null
                         minPrice = 0f
                         maxPrice = MAX_PRICE_SLIDER_VALUE
                         condition = CardConditionFilter.ANY
-                        endingWithinDays = 3
+                        endingWithinDays = null
                     },
                     modifier = Modifier
                         .weight(1f)
