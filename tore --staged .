@@ -1,0 +1,113 @@
+[33mbfeb473[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32m7-consultar-cartas-de-la-coleccion[m[33m)[m test(card): cubrir consulta de colección y estados del perfil (#24)
+[33mc31acbf[m fix(network): validar rutas de imágenes del backend
+[33m8ecf290[m feat(profile): integrar colección propia y estadísticas de cartas (#77)
+[33m56cb204[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;31morigin/7-consultar-cartas-de-la-coleccion[m[33m, [m[1;31morigin/3-pbi-7---consultar-cartas-de-la-colección[m[33m, [m[1;32mmain[m[33m)[m refactor: organizar API y DTOs en data.remote
+[33ma2b3664[m feat(profile): preparar GUI de colección y subastas propias (#25, #3)
+[33mc52120c[m Merge branch '1-autenticación-de-cuenta'
+[33m9112e07[m[33m ([m[1;31morigin/1-autenticación-de-cuenta[m[33m, [m[1;32m1-autenticación-de-cuenta[m[33m)[m test(auth): completar cobertura de login, logout y restauración (Closes #85, Closes #1)
+[33m3d1da5d[m test(auth): cubrir comprobación y eliminación de cuenta (#85)
+[33m90bbe79[m Merge branch '1-autenticación-de-cuenta'
+[33me811384[m feat(account): integrar eliminación de cuenta con backend (Closes #96, Closes #84)
+[33m33625bd[m[33m ([m[1;31morigin/4-ver-detalles-de-una-subasta[m[33m)[m svgs
+[33m43f9a9d[m Merge branch '3-descubrir-subastas' (Closes #10)
+[33m7deb46b[m[33m ([m[1;31morigin/3-descubrir-subastas[m[33m)[m Tests filtros, búsqueda y ordenación de subastas (Closes #32)
+[33md8178c7[m Implementa filtros, búsqueda y ordenación de subastas (Closes #80)
+[33mde39f8e[m test(auth): cubrir restauración y renovación automática de sesión (#85)
+[33m78f5a22[m feat(auth): implementar renovación automática del access token (Closes #62, Closes #26, #84)
+[33m2dcc339[m feat(auth): integrar cierre de sesión real desde ajustes (Closes #14, #84)
+[33m2d493ea[m feat(settings): completar interfaz del flujo de eliminación de cuenta (Closes #86, Closes #17)
+[33m9152691[m feat(settings): completar interfaz del flujo de eliminación de cuenta (Closes #86, Closes #17)
+[33mb98237c[m feat(settings): añadir diálogo reutilizable de confirmación de logout (#86, #17)
+[33m369c88d[m feat(settings): integrar la pantalla settings en la navegación (#86, #17)
+[33m39ae07c[m feat(settings): implementar interfaz de settings (#86, #17)
+[33m961719c[m refactor(ui): unificar las barras superiores y mejorar navegación secundaria
+[33m7ca8362[m Cambios
+[33m83bca26[m Merge branch '5-crear-subasta' (Closes #2) # Conflicts: #	app/build.gradle.kts #	gradle/libs.versions.toml
+[33m8999b33[m test(auction): añadir pruebas unitarias de creación de subastas (Closes #29)
+[33mc242cd0[m FIX + inicio de tests
+[33m9e528f6[m Modularizacion de CrearSubasta y fixes en la GUI
+[33m006a4ca[m Tests de descubrir subastas (#Closes 32)
+[33m1dedb92[m Merge branch '5-crear-subasta'
+[33m9914afe[m Merge branch 'main' of github.com:BestBidderTCG/bbt_frontend
+[33mb04ec5c[m[33m ([m[1;31morigin/5-crear-subasta[m[33m)[m Fix get al iniciar la app
+[33m5c88c26[m Merge branch '2-creación-de-perfil'
+[33mf305a44[m[33m ([m[1;31morigin/2-creación-de-perfil[m[33m, [m[1;32m2-creación-de-perfil[m[33m)[m test(profile): completar pruebas de registro y creación de perfil
+[33m70e8a9d[m fix(profile): corregir errores y navegación durante la creación de perfil
+[33ma57f990[m Merge remote-tracking branch 'origin/main'
+[33m0033326[m test(profile): ampliar pruebas de creación y gestión del perfil
+[33mb68b8b7[m Conexion con backend de crear subastas(Closes #33)
+[33m5276908[m Merge branch '2-creación-de-perfil'
+[33m53aeb6c[m feat(profile): mostrar datos y avatares del perfil
+[33m49f1f03[m feat(profile): mostrar datos y avatares del perfil
+[33mb608371[m Merge remote-tracking branch 'origin/2-creación-de-perfil'
+[33m94e4ed1[m fix(profile): corregir integración entre ProfileRoute y ProfileScreen
+[33m256e229[m test(profile): añadir pruebas de gestión del perfil
+[33m2e12f8c[m feat(profile): integrar creación de perfil con el registro
+[33mc21d58c[m feat(profile): implementar gestión y caché del perfil
+[33m2cf845a[m feat(profile): implementar API y repositorio de perfil
+[33m768ca0f[m Merge branch 'main' into 5-crear-subasta
+[33mfd50276[m Merge branch 'main' into 1-autenticación-de-cuenta
+[33mdbf7c68[m ci: configurar integración continua de Android para todas las ramas
+[33mdddb1e4[m test(auth): añadir pruebas de autenticación y sesiones
+[33ma6b2550[m feat(auth): implementar registro e inicio de sesión automático
+[33ma0cec90[m feat(auth): implementar lógica de cierre de sesión
+[33m56251c8[m feat(auth): implementar renovación y recuperación de sesión
+[33m33c2a49[m feat(auth): implementar almacenamiento seguro de tokens
+[33m77b049b[m feat(auth): implementar inicio de sesión con el backend
+[33m028b261[m feat(auth): añadir API y repositorio de autenticación
+[33m13f931e[m Cambios al iniciar la app
+[33mb604ef5[m Implementar formulario de creacion de subastas (Closes #28)
+[33mca778be[m integrar consulta de cartas con backend
+[33m0340c80[m implementar gestion de craecion de subastas (Closes #58)
+[33mf9b18b2[m Integrar API de subastas con backend (Closes #57)
+[33m9164991[m fix(auth): espaciado de las pantallas auth corregido
+[33m3c6ef20[m Merge branch '1-autenticación-de-cuenta'
+[33m7800caf[m Merge remote-tracking branch 'origin/1-autenticación-de-cuenta' into 1-autenticación-de-cuenta
+[33m56e9b2f[m[33m ([m[1;32mbackup-auth-antes-de-merge[m[33m)[m fix(build): ajustar versiones de AndroidX al SDK del proyecto (refs #56)
+[33m413da1d[m nuevos iconos añadidos
+[33me7d4b4f[m Comentario AndroidManifest.xml
+[33mb11ec06[m feat(navigation): conectar autenticación y creación de perfil (closes #56)
+[33m915066e[m feat(profile): implementar creación de perfil, avatares y preferencias (closes #51)
+[33ma60243c[m feat(auth): implementar pantallas de bienvenida, login y registro (closes #52, closes #53, closes #54)
+[33mb3ce41d[m feat(auth): añadir componentes y recursos de autenticación (closes #55)
+[33m2f68cc9[m Descubrir subastas semi-acabado
+[33m8982ff4[m Avances notorios en explore con subastas de prueba
+[33m7cd8f23[m Conecta Explore con el backend mediante MVVM
+[33mabcffbc[m Paquete de network realizado para subastas + avanzar en explore
+[33m525aa73[m Centralizados spacing, corner radius y tipografía de Explore
+[33mdb6b46a[m Interfaz de pantalla explorar (vacía, Closes #46)
+[33mcefcdfd[m Merge branch '5-crear-subasta'
+[33m4cf6ceb[m Modularizacion de Crear Subasta
+[33m7fc6a73[m Primera aproximacion a CrearSubasta
+[33m5f7ddf2[m Merge branch 'main' into 2-creación-de-perfil
+[33m27018e5[m Merge branch 'main' into 2-creación-de-perfil
+[33m58db26f[m[33m ([m[1;31morigin/10-descubrir-subastas[m[33m)[m Descubrir subastas semi-acabado
+[33m91401d5[m Avances notorios en explore con subastas de prueba
+[33ma63f2f1[m Conecta Explore con el backend mediante MVVM
+[33m605547d[m Paquete de network realizado para subastas + avanzar en explore
+[33m121e6fb[m feat(profile): integrar pantalla de perfil (refs #19)
+[33m1bcd680[m feat(profile): implementar vistas de colección y subastas (closes #23)
+[33mb1b0b35[m feat(profile): implementar profile header y tabs (closes #22)
+[33mb38a1cc[m feat(ui): añadir top bar reutilizable y recursos (closes #21)
+[33m9af4345[m Centralizados spacing, corner radius y tipografía de Explore
+[33m88da0de[m Interfaz de pantalla explorar (vacía, Closes #46)
+[33mf292b23[m Añadida la tipografía establecida
+[33mcb8266d[m sync
+[33m0217450[m Fusionar barra de navegación e iconos en main (Closes #45)
+[33m23a5edb[m sync
+[33mf7cbc1b[m Cerrar issue de la barra de navegación (Closes #45)
+[33mea0aac6[m Añadir barra de navegación, iconos y pantallas básicas de Social y Favoritos
+[33mfd9adc5[m limpieza
+[33m8e64031[m Merge branch 'main' into jorge
+[33m6296f2e[m Corrección nombre package
+[33m6d22a48[m Paleta Colores, dependencias para visualizar una vista previa de los Composables
+[33m0ac157b[m Correción packages
+[33mf53e9b3[m Reestructuración proyecto
+[33m737980c[m[33m ([m[1;31morigin/jorge[m[33m)[m Activity principal en pantalla completa + Gesto Horizontal para navegar entre Home y Profile
+[33m1d5c68d[m Estructura inicial (sin acabar)
+[33m1989c18[m Cambios en gradle para añadir Jetpack Compose
+[33mc66023b[m Cambios en estructura inicial
+[33me0e2e66[m setup + cambio en estructura menor
+[33m39730f8[m SetuUp de verdad
+[33m9389b38[m SetUp frontend en Android studio
+[33m8681fee[m Initial commit

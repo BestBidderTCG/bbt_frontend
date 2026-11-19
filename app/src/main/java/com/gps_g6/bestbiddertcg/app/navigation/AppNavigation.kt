@@ -12,9 +12,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import com.gps_g6.bestbiddertcg.app.BestBidderApp
-import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.feature.auth.data.AuthRepositoryImpl
 import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
@@ -22,6 +23,7 @@ import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RefreshSessionUseCas
 import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RestoreSessionUseCase
 import com.gps_g6.bestbiddertcg.feature.auth.presentation.*
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
+import com.gps_g6.bestbiddertcg.feature.card.presentation.details.MyCardDetailsRoute
 import com.gps_g6.bestbiddertcg.feature.profile.domain.usecase.ProfileSetupUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountRequestedScreen
@@ -356,6 +358,11 @@ fun AppNavigation() {
         // Main application
         composable(AppDestination.MAIN.route) {
             BestBidderApp(
+                onCardClick = { cardId ->
+                    navController.navigate("card_details/$cardId") {
+                        launchSingleTop = true
+                    }
+                },
                 onSettingsClick = {
                     navController.navigate(AppDestination.SETTINGS.route) {
                         launchSingleTop = true
@@ -364,6 +371,29 @@ fun AppNavigation() {
             )
         }
 
+
+        // Own card details
+        composable(
+            route = "card_details/{cardId}",
+            arguments = listOf(
+                navArgument("cardId") { type = NavType.StringType }
+            )
+        ) { backStackEntry ->
+            val cardId = requireNotNull(
+                backStackEntry.arguments?.getString("cardId")
+            )
+
+            MyCardDetailsRoute(
+                cardId = cardId,
+                onBackClick = { navController.popBackStack() },
+                // Auction, edit, create and delete destinations will be wired
+                // when those flows have real navigation/actions.
+                onAuctionClick = {},
+                onEditCardClick = {},
+                onCreateAuctionClick = {},
+                onDeleteCardClick = {}
+            )
+        }
 
         // Settings
         composable(AppDestination.SETTINGS.route) {

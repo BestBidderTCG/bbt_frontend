@@ -48,7 +48,7 @@
     <string name="create_profile_username">Nombre de usuario *</string>
     <string name="create_profile_username_hint">Ej. best.bidder_tcg</string>
     <string name="create_profile_username_help">Debe ser único.</string>
-    <string name="create_profile_bio">Descripción</string>
+    <string name="description_string">Descripción</string>
     <string name="create_profile_bio_hint">Cuéntanos algo sobre ti...</string>
     <string name="step_progress">Paso %1$d de %2$d</string>
 
@@ -77,9 +77,13 @@
     <string name="profile_cards">Cartas</string>
     <string name="profile_auctions">Subastas</string>
     <string name="profile_bids">Pujas</string>
+    <string name="profile_wallet_title">Mi cartera</string>
+    <string name="profile_wallet_sample_balance">125,50 €</string>
+
+    <string name="profile_collection_load_error">No se han podido cargar tus cartas.</string>
 
     <!-- Profile tabs -->
-    <string name="profile_tab_collection">Colección</string>
+    <string name="collection_string">Colección</string>
     <string name="profile_tab_auctions">Mis subastas</string>
 
     <!-- Empty states -->
@@ -97,6 +101,27 @@
     <string name="auction_winning_bid">Puja ganadora</string>
     <string name="auction_best_bidder">Best Bidder: %1$s</string>
     <string name="auction_start_date">Inicio: %1$s</string>
+
+    <!-- Card Details -->
+    <string name="card_details_title">Detalle de carta</string>
+    <string name="card_details_load_error">No se han podido cargar los detalles de la carta.</string>
+    <string name="card_details_delete">Eliminar carta</string>
+    <string name="card_details_own_collection">Carta de mi colección</string>
+
+    <string name="card_details_auction_active">En subasta activa</string>
+    <string name="card_details_auction_scheduled">En subasta programada</string>
+    <string name="card_details_unavailable">Carta no disponible</string>
+    <string name="card_details_active_explanation">Esta carta está asociada a una subasta activa. No puedes editarla ni crear otra subasta con ella.</string>
+    <string name="card_details_scheduled_explanation">Esta carta está asociada a una subasta programada. No puedes editarla ni crear otra subasta con ella.</string>
+    <string name="card_details_view_active_auction">Ver subasta activa</string>
+    <string name="card_details_view_scheduled_auction">Ver subasta programada</string>
+
+    <string name="card_details_category">Categoría</string>
+    <string name="card_details_number">Número</string>
+    <string name="card_details_condition">Estado de conservación</string>
+    <string name="card_details_published">Publicada</string>
+
+    <string name="card_details_edit">Editar carta</string>
 
     <!-- Settings -->
     <string name="settings_title">Ajustes</string>

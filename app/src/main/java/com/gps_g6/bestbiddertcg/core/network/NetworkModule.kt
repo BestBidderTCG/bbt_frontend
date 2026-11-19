@@ -3,6 +3,8 @@ package com.gps_g6.bestbiddertcg.core.network
 
 import android.content.Context
 import android.util.Log
+import coil3.ImageLoader
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.gps_g6.bestbiddertcg.BuildConfig
 import com.gps_g6.bestbiddertcg.core.auth.EncryptedTokenStorage
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
@@ -16,7 +18,7 @@ import retrofit2.Retrofit
 
 object NetworkModule {
 
-    const val BASE_URL = "http://10.0.2.2:8080/"
+    private const val BASE_URL = "http://10.0.2.2:8080/"
 
     lateinit var sessionManager: SessionManager
         private set
@@ -90,11 +92,50 @@ object NetworkModule {
             .build()
     }
 
-    /** Convierte la ruta que devuelve el backend (/uploads/xxx.png) en una URL completa. */
-    fun resolveImageUrl(path: String?): String = when {
-        path.isNullOrBlank() -> ""
-        path.startsWith("http://") || path.startsWith("https://") -> path
-        path.startsWith("/") -> NetworkModule.BASE_URL.trimEnd('/') + path
-        else -> ""   // p. ej. "black_lotus.png" del DataInitializer: no existe en el servidor
+    private var cachedImageLoader: ImageLoader? = null
+
+    @Synchronized
+    fun imageLoader(context: Context): ImageLoader {
+        return cachedImageLoader
+            ?: createImageLoader(context).also {
+                cachedImageLoader = it
+            }
     }
+
+    fun createImageLoader(context: Context): ImageLoader {
+        return ImageLoader.Builder(context.applicationContext)
+            .components {
+                add(
+                    OkHttpNetworkFetcherFactory(
+                        callFactory = { okHttpClient }
+                    )
+                )
+            }
+            .build()
+    }
+
+    fun resolveImageUrl(image: String?): String? {
+        if (image.isNullOrBlank()) return null
+
+        val baseUrl = BASE_URL.trimEnd('/')
+
+        val path = when {
+            image.startsWith("/uploads/") -> image
+
+            image.startsWith("$baseUrl/uploads/") ->
+                image.removePrefix(baseUrl)
+
+            else -> return null
+        }
+
+        val filename = path.removePrefix("/uploads/")
+
+        // Only allow a single filename inside /uploads.
+        val validFilename = Regex("""[A-Za-z0-9_-]+\.[A-Za-z0-9]+""")
+
+        if (!validFilename.matches(filename)) return null
+
+        return baseUrl + path
+    }
+
 }

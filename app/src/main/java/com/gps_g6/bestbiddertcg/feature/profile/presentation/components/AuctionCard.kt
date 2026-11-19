@@ -19,10 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
-import com.gps_g6.bestbiddertcg.feature.profile.presentation.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.AuctionUiModel
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.ProfileSampleData
 import com.gps_g6.bestbiddertcg.R
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 
 @Composable
 fun AuctionCard(
