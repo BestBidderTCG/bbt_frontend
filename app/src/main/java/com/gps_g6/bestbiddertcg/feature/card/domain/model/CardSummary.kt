@@ -4,5 +4,6 @@ data class CardSummary(
     val id: String,
     val name: String,
     val image: String,
-    val category: CardCategory?
+    val category: CardCategory?,
+    val inAuction: Boolean
 )

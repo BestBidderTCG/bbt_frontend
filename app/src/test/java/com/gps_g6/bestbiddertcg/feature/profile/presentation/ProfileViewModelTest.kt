@@ -49,12 +49,14 @@ class ProfileViewModelTest {
         id: String,
         image: String =
             "https://res.cloudinary.com/ee6azugw/image/upload/bestbidder/$id.jpg",
-        category: CardCategory = CardCategory.POKEMON
+        category: CardCategory = CardCategory.POKEMON,
+        inAuction: Boolean = false
     ) = CardSummary(
         id = id,
         name = "Carta $id",
         image = image,
-        category = category
+        category = category,
+        inAuction = inAuction
     )
 
     @Before

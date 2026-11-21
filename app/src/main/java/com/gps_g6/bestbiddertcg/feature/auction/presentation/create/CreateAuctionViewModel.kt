@@ -61,7 +61,14 @@ class CreateAuctionViewModel(
     }
 
     fun selectCard(card: CardSummary) {
-        _uiState.update { it.copy(selectedCard = card, errorMessage = null) }
+        if (card.inAuction) return
+
+        _uiState.update {
+            it.copy(
+                selectedCard = card,
+                errorMessage = null
+            )
+        }
     }
 
     fun updateStartingPrice(value: String) {
@@ -110,6 +117,16 @@ class CreateAuctionViewModel(
             showError("Selecciona una carta.")
             return
         }
+
+        // Comprobación extra por si se ha actualizado el listado de cartas
+        // (mediante sse) y la carta deja de estar disponible
+        val latestCard = state.cards.firstOrNull { it.id == card.id }
+
+        if (latestCard == null || latestCard.inAuction) {
+            showError("La carta seleccionada ya no está disponible para subastar.")
+            return
+        }
+
         if (price == null || price <= 0.0) {
             showError("Introduce un precio inicial válido.")
             return

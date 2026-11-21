@@ -7,5 +7,6 @@ data class CardSummaryDto(
     val id: String,
     val name: String,
     val image: String,
-    val category: String
+    val category: String,
+    val inAuction: Boolean = false
 )

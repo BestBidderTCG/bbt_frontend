@@ -23,13 +23,15 @@ class CardRepositoryImplTest {
                 id = "card-1",
                 name = "Piplup",
                 image = "/uploads/piplup.jpg",
-                category = "Pokémon"
+                category = "Pokémon",
+                inAuction = false
             ),
             CardSummaryDto(
                 id = "card-2",
                 name = "Mox Diamond",
                 image = "/uploads/mox.jpg",
-                category = "Magic"
+                category = "Magic",
+                inAuction = true
             )
         )
 
@@ -41,10 +43,12 @@ class CardRepositoryImplTest {
         assertEquals("Piplup", result[0].name)
         assertEquals("/uploads/piplup.jpg", result[0].image)
         assertEquals(CardCategory.POKEMON, result[0].category)
+        assertFalse(result[0].inAuction)
 
         assertEquals("card-2", result[1].id)
         assertEquals("Mox Diamond", result[1].name)
         assertEquals(CardCategory.MAGIC, result[1].category)
+        assertTrue(result[1].inAuction)
 
         coVerify(exactly = 1) {
             api.getMyCards()

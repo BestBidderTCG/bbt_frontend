@@ -20,7 +20,8 @@ class GetMyCardsUseCaseTest {
         id = "card-1",
         name = "Piplup",
         image = "/uploads/piplup.jpg",
-        category = CardCategory.POKEMON
+        category = CardCategory.POKEMON,
+        inAuction = false
     )
 
     @Test

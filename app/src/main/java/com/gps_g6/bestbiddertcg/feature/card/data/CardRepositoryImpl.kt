@@ -31,7 +31,8 @@ class CardRepositoryImpl(
             image = image,
             category = category
                 .takeIf { it.isNotBlank() }
-                ?.let(CardCategory::fromApi)
+                ?.let(CardCategory::fromApi),
+            inAuction = inAuction
         )
 
     private fun CardDto.toDomain(): Card =
