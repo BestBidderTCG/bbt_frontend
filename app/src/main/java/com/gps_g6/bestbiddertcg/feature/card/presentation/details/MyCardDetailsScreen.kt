@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
@@ -151,8 +152,8 @@ private fun CardDetailsImage(card: MyCardDetailsUiModel) {
                 painter = painterResource(R.drawable.sample_piplup),
                 contentDescription = card.name,
                 modifier = Modifier
-                    .width(170.dp)
-                    .height(230.dp),
+                    .width(190.dp)
+                    .height(255.dp),
                 contentScale = ContentScale.Fit
             )
         } else {
@@ -161,8 +162,8 @@ private fun CardDetailsImage(card: MyCardDetailsUiModel) {
                 imageLoader = NetworkModule.imageLoader(context),
                 contentDescription = card.name,
                 modifier = Modifier
-                    .width(170.dp)
-                    .height(230.dp),
+                    .width(190.dp)
+                    .height(255.dp),
                 contentScale = ContentScale.Fit,
                 placeholder = painterResource(R.drawable.sample_piplup),
                 error = painterResource(R.drawable.sample_piplup),
@@ -202,7 +203,8 @@ private fun CardDetailsHeader(
                         contentDescription = stringResource(
                             R.string.card_details_delete
                         ),
-                        tint = Error
+                        tint = Color.Unspecified,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
             }
@@ -219,23 +221,37 @@ private fun CardDetailsHeader(
                 shape = RoundedCornerShape(50),
                 color = PrimaryLight
             ) {
-                Text(
-                    text = when (auction.status) {
-                        AuctionStatus.ACTIVE ->
-                            stringResource(R.string.card_details_auction_active)
-                        AuctionStatus.UPCOMING ->
-                            stringResource(R.string.card_details_auction_scheduled)
-                        AuctionStatus.FINISHED ->
-                            stringResource(R.string.auction_status_finished)
-                    },
+                Row(
                     modifier = Modifier.padding(
                         horizontal = AppSpacing.m,
                         vertical = AppSpacing.s
                     ),
-                    color = Primary,
-                    style = MaterialTheme.typography.bodySmall,
-                    fontWeight = FontWeight.SemiBold
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(
+                        AppSpacing.s
+                    )
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_lock),
+                        contentDescription = null,
+                        tint = Primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+
+                    Text(
+                        text = when (auction.status) {
+                            AuctionStatus.ACTIVE ->
+                                stringResource(R.string.card_details_auction_active)
+                            AuctionStatus.UPCOMING ->
+                                stringResource(R.string.card_details_auction_scheduled)
+                            AuctionStatus.FINISHED ->
+                                stringResource(R.string.auction_status_finished)
+                        },
+                        color = Primary,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
             }
         }
     }
@@ -254,30 +270,62 @@ private fun AuctionUnavailableNotice(
         shape = RoundedCornerShape(AppCornerRadius.large)
     ) {
         Column(
-            modifier = Modifier.padding(AppSpacing.m),
+            modifier = Modifier.padding(
+                horizontal = AppSpacing.l,
+                vertical = AppSpacing.m
+            ),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.s)
         ) {
-            Text(
-                text = stringResource(R.string.card_details_unavailable),
-                style = MaterialTheme.typography.labelMedium,
-                color = TextPrimary
-            )
+            Row(
+                verticalAlignment = Alignment.Top,
+                horizontalArrangement = Arrangement.spacedBy(
+                    AppSpacing.m
+                )
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_info),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size(20.dp)
+                )
 
-            Text(
-                text = stringResource(
-                    if (isActive) {
-                        R.string.card_details_active_explanation
-                    } else {
-                        R.string.card_details_scheduled_explanation
-                    }
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextPrimary
-            )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(
+                        AppSpacing.xs
+                    )
+                ) {
+                    Text(
+                        text = stringResource(
+                            R.string.card_details_unavailable
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = TextPrimary
+                    )
+
+                    Text(
+                        text = stringResource(
+                            if (isActive) {
+                                R.string.card_details_active_explanation
+                            } else {
+                                R.string.card_details_scheduled_explanation
+                            }
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = TextPrimary
+                    )
+                }
+            }
 
             TextButton(
-                onClick = { onAuctionClick(auction.auctionId) },
-                contentPadding = PaddingValues(0.dp)
+                onClick = {
+                    onAuctionClick(auction.auctionId)
+                },
+                contentPadding = PaddingValues(
+                    horizontal = 0.dp,
+                    vertical = 0.dp),
+                modifier = Modifier.height(24.dp)
             ) {
                 Text(
                     text = stringResource(
@@ -287,11 +335,24 @@ private fun AuctionUnavailableNotice(
                             R.string.card_details_view_scheduled_auction
                         }
                     ),
-                    color = Primary,
-                    fontWeight = FontWeight.SemiBold
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Primary
                 )
-                Spacer(Modifier.width(AppSpacing.s))
-                Text(text = "→", color = Primary)
+
+                Spacer(
+                    modifier = Modifier.width(AppSpacing.s)
+                )
+
+                Icon(
+                    painter = painterResource(
+                        R.drawable.ic_arrow_forward
+                    ),
+                    contentDescription = null,
+                    tint = Color.Unspecified,
+                    modifier = Modifier
+                        .size(16.dp)
+                )
             }
         }
     }
@@ -413,16 +474,40 @@ private fun CardDetailsActions(
             modifier = Modifier
                 .weight(1f)
                 .height(48.dp),
-            shape = RoundedCornerShape(AppCornerRadius.medium),
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = Primary
+            shape = RoundedCornerShape(
+                AppCornerRadius.medium
             ),
-            border = BorderStroke(
-                1.dp,
-                if (enabled) Primary else Border
-            )
+            contentPadding = PaddingValues(
+                horizontal = AppSpacing.s
+            ),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = Primary,
+                disabledContainerColor = Border,
+                disabledContentColor = TextSecondary
+            ),
+            border = if (enabled) {
+                BorderStroke(1.dp, Primary)
+            } else {
+                BorderStroke(1.dp, Border)
+            }
         ) {
-            Text(stringResource(R.string.card_details_edit))
+            Icon(
+                painter = painterResource(R.drawable.ic_edit),
+                contentDescription = null,
+                tint = if (enabled) Primary else TextSecondary,
+                modifier = Modifier.size(18.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.width(AppSpacing.s)
+            )
+
+            Text(
+                text = stringResource(R.string.card_details_edit),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
+            )
         }
 
         Button(
@@ -431,12 +516,40 @@ private fun CardDetailsActions(
             modifier = Modifier
                 .weight(1f)
                 .height(48.dp),
-            shape = RoundedCornerShape(AppCornerRadius.medium),
+            shape = RoundedCornerShape(
+                AppCornerRadius.medium
+            ),
+            contentPadding = PaddingValues(
+                horizontal = AppSpacing.s
+            ),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Primary
+                containerColor = Primary,
+                contentColor = AppSurface,
+                disabledContainerColor = Border,
+                disabledContentColor = TextSecondary
             )
         ) {
-            Text(stringResource(R.string.create_auction_title))
+            Icon(
+                painter = painterResource(
+                    R.drawable.ic_auction_inactive
+                ),
+                contentDescription = null,
+                tint = if (enabled) AppSurface else TextSecondary,
+                modifier = Modifier.size(18.dp)
+            )
+
+            Spacer(
+                modifier = Modifier.width(AppSpacing.s)
+            )
+
+            Text(
+                text = stringResource(
+                    R.string.create_auction_title
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
+            )
         }
     }
 }
