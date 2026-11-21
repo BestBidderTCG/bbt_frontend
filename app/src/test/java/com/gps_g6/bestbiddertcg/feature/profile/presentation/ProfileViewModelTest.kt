@@ -299,4 +299,47 @@ class ProfileViewModelTest {
             )
             assertNull(state.cardsError)
         }
+
+    @Test
+    fun `cards in auction are still displayed in profile`() =
+        runTest(testDispatcher) {
+            val availableCard = card(
+                id = "card-1",
+                inAuction = false
+            )
+
+            val cardInAuction = card(
+                id = "card-2",
+                inAuction = true
+            )
+
+            coEvery {
+                getMyCardsUseCase.invoke()
+            } returns listOf(
+                availableCard,
+                cardInAuction
+            )
+
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+
+            assertEquals(2, state.cardsCount)
+            assertEquals(2, state.collection.size)
+
+            assertEquals(
+                "card-1",
+                state.collection[0].id
+            )
+
+            assertEquals(
+                "card-2",
+                state.collection[1].id
+            )
+
+            assertNull(state.cardsError)
+            assertFalse(state.isLoadingCards)
+        }
+
 }
