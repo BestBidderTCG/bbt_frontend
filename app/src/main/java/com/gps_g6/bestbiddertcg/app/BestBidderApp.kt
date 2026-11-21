@@ -41,9 +41,9 @@ import kotlinx.coroutines.launch
  */
 @Composable
 fun BestBidderApp(
-    onCardClick: (String) -> Unit,
     onNotificationsClick: () -> Unit = {},
-    onSettingsClick: () -> Unit = {}
+    onSettingsClick: () -> Unit = {},
+    onCardClick: (String) -> Unit = {}
 ) {
     val pagerState = rememberPagerState(
         initialPage = AppPage.EXPLORE.ordinal,
@@ -158,7 +158,9 @@ fun BestBidderApp(
 
                     AppPage.SOCIAL -> SocialScreen()
                     AppPage.FAVORITES -> FavoritesScreen()
-                    AppPage.PROFILE -> ProfileRoute(onCardClick = onCardClick)
+                    AppPage.PROFILE -> ProfileRoute(
+                        onCardClick = onCardClick
+                    )
                 }
             }
         }

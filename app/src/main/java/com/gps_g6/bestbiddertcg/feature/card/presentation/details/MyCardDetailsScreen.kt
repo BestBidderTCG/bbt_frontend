@@ -29,6 +29,7 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 @Composable
@@ -444,7 +445,9 @@ private fun formatCardDate(value: String): String {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH'h'mm")
 
     return runCatching {
-        OffsetDateTime.parse(value).format(formatter)
+        OffsetDateTime.parse(value)
+            .atZoneSameInstant(ZoneId.systemDefault())
+            .format(formatter)
     }.recoverCatching {
         LocalDateTime.parse(value).format(formatter)
     }.getOrDefault(value)
