@@ -1,8 +1,12 @@
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -53,9 +57,9 @@ class ExploreSearchTest {
     @Test
     fun `search filters auctions by card name`() = runTest(testDispatcher) {
         val auctions = listOf(
-            createAuction("1", "Charizard", 50.0, 3, "IN_PROGRESS"),
-            createAuction("2", "Pikachu", 20.0, 2, "UPCOMING"),
-            createAuction("3", "Black Lotus", 100.0, 1, "IN_PROGRESS")
+            createAuction("1", "Charizard", 50.0, 3, AuctionStatus.ACTIVE),
+            createAuction("2", "Pikachu", 20.0, 2, AuctionStatus.UPCOMING),
+            createAuction("3", "Black Lotus", 100.0, 1, AuctionStatus.ACTIVE)
         )
 
         coEvery {
@@ -79,7 +83,7 @@ class ExploreSearchTest {
     @Test
     fun `search ignores uppercase and lowercase`() = runTest(testDispatcher) {
         val auctions = listOf(
-            createAuction("1", "Charizard", 50.0, 3, "IN_PROGRESS")
+            createAuction("1", "Charizard", 50.0, 3, AuctionStatus.ACTIVE)
         )
 
         coEvery {
@@ -100,8 +104,8 @@ class ExploreSearchTest {
     @Test
     fun `clearing search restores all auctions`() = runTest(testDispatcher) {
         val auctions = listOf(
-            createAuction("1", "Charizard", 50.0, 3, "IN_PROGRESS"),
-            createAuction("2", "Pikachu", 20.0, 2, "UPCOMING")
+            createAuction("1", "Charizard", 50.0, 3, AuctionStatus.ACTIVE),
+            createAuction("2", "Pikachu", 20.0, 2, AuctionStatus.UPCOMING)
         )
 
         coEvery {
@@ -125,7 +129,7 @@ class ExploreSearchTest {
         name: String,
         price: Double,
         days: Int,
-        status: String
+        status: AuctionStatus
     ): AuctionSummary {
         return AuctionSummary(
             id = id,
@@ -133,9 +137,9 @@ class ExploreSearchTest {
             cardImage = "",
             currentBid = price,
             remainingDays = days,
-            cardState = "NEW",
-            cardCategory = "Electric",
-            cardCollection = "Pokemon",
+            cardState = CardCondition.NEW,
+            cardCategory = CardCategory.POKEMON,
+            cardCollection = CardCollection.POKEMON_151,
             cardNumber = null,
             status = status
         )

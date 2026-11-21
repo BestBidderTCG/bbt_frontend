@@ -2,10 +2,14 @@ package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -70,13 +74,14 @@ class ExploreViewModelTest {
                 creatorId = "user-1",
                 creatorUsername = "testuser",
                 card = "Pikachu",
-                collection = "Pokemon",
+                category = CardCategory.POKEMON.apiValue,
+                collection = CardCollection.POKEMON_151.apiValue,
+                condition = CardCondition.NEW,
                 minPrize = 10.0,
                 startedAt = "2026-11-06T12:00:00Z",
                 durationInDays = 3,
                 endsAt = "2026-11-09T12:00:00Z",
-                isCancelled = false,
-                status = "ACTIVE"
+                status = AuctionStatus.ACTIVE
             )
 
             // Resumen con el que aparece esa subasta en el listado.
@@ -86,10 +91,10 @@ class ExploreViewModelTest {
                 cardImage = "",
                 currentBid = 10.0,
                 remainingDays = 3,
-                cardState = "NEW",
-                status = "IN_PROGRESS",
-                cardCategory = "Electrico",
-                cardCollection = "Pokemon",
+                cardState = CardCondition.NEW,
+                status = AuctionStatus.ACTIVE,
+                cardCategory = CardCategory.POKEMON,
+                cardCollection = CardCollection.POKEMON_151,
                 cardNumber = null
             )
 
@@ -117,7 +122,8 @@ class ExploreViewModelTest {
             // Crea el ViewModel después de configurar el repositorio.
             viewModel = ExploreViewModel(repository)
 
-            // Comprueba que inicialmente no hay subastas en el listado.
+            // Completa la carga inicial para comprobar la primera respuesta vacía.
+            advanceUntilIdle()
             assertTrue(viewModel.auctions.value.isEmpty())
 
             // Ejecuta el caso de uso para crear la subasta.
@@ -218,13 +224,18 @@ class ExploreViewModelTest {
             cardImage = "",
             currentBid = 10.0,
             remainingDays = 3,
-            cardState = "NEW",
-            cardCategory = "Electrico",
-            status = "IN_PROGRESS",
-            cardCollection = "Pokemon",
+            cardState = CardCondition.NEW,
+            cardCategory = CardCategory.POKEMON,
+            cardCollection = CardCollection.POKEMON_151,
+            status = AuctionStatus.ACTIVE,
             cardNumber = null
         )
-        val magic = pokemon.copy(id = "2", cardName = "Bolt", cardCollection = "Magic")
+        val magic = pokemon.copy(
+            id = "2",
+            cardName = "Bolt",
+            cardCategory = CardCategory.MAGIC,
+            cardCollection = CardCollection.CICLO_DE_URZA
+        )
 
         coEvery { repository.getAllAuctions(AuctionSort.ENDING_SOON) } returns listOf(pokemon, magic)
         coEvery { repository.getAllAuctions(AuctionSort.PRICE_ASC) } returns listOf(magic, pokemon)
@@ -232,7 +243,7 @@ class ExploreViewModelTest {
         viewModel = ExploreViewModel(repository)
         advanceUntilIdle()
 
-        viewModel.applyFilters(collection = "Pokemon")
+        viewModel.applyFilters(collection = CardCollection.POKEMON_151.apiValue)
         viewModel.changeSort(AuctionSort.PRICE_ASC)
         advanceUntilIdle()
 

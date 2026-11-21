@@ -3,9 +3,9 @@ package com.gps_g6.bestbiddertcg.feature.auth.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.core.auth.SessionManager
-import com.gps_g6.bestbiddertcg.core.model.CardCategory
 import com.gps_g6.bestbiddertcg.feature.auth.domain.repository.AuthRepository
 import com.gps_g6.bestbiddertcg.feature.auth.domain.validation.AuthValidator
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher

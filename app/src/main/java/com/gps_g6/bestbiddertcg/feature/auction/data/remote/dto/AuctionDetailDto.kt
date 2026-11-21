@@ -8,6 +8,7 @@ data class AuctionDetailDto(
     val status: String,
     val cardName: String,
     val cardImage: String,
+    val cardCategory: String? = null,
     val cardCollection: String? = null,
     val cardNumber: Int? = null,
     val cardState: String,

@@ -1,9 +1,13 @@
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.create
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
@@ -42,16 +46,11 @@ class CreateAuctionViewModelTest {
     private lateinit var profileManager: ProfileManager
     private lateinit var viewModel: CreateAuctionViewModel
 
-    private val testCard = Card(
+    private val testCard = CardSummary(
         id = "card-1",
-        ownerId = "user-1",
         name = "Pikachu",
         image = "",
-        category = "Pokemon",
-        collection = "Base Set",
-        num = 25,
-        state = "NM",
-        description = null
+        category = CardCategory.POKEMON
     )
 
     private val testProfile = Profile(
@@ -68,13 +67,14 @@ class CreateAuctionViewModelTest {
         creatorId = "user-1",
         creatorUsername = "testuser",
         card = "Pikachu",
-        collection = "Base Set",
+        category = CardCategory.POKEMON.apiValue,
+        collection = CardCollection.POKEMON_151.apiValue,
+        condition = CardCondition.NEAR_MINT,
         minPrize = 10.0,
         startedAt = "2026-11-16T10:15:00Z",
         durationInDays = 3,
         endsAt = "2026-11-19T10:15:00Z",
-        isCancelled = false,
-        status = "UPCOMING"
+        status = AuctionStatus.UPCOMING,
     )
 
     /**

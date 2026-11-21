@@ -1,4 +1,3 @@
-
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort

@@ -5,11 +5,15 @@ import com.gps_g6.bestbiddertcg.feature.auction.data.remote.AuctionApi
 import com.gps_g6.bestbiddertcg.feature.auction.data.remote.dto.AuctionResponseDto
 import com.gps_g6.bestbiddertcg.feature.auction.data.remote.dto.CreateAuctionRequestDto
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionDetail
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
-import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionDetail
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 
 // Implementa el repositorio y transforma los datos recibidos de la API.
 class AuctionRepositoryImpl(
@@ -17,13 +21,22 @@ class AuctionRepositoryImpl(
 ) : AuctionRepository {
 
     override suspend fun getAllAuctions(sort: AuctionSort): List<AuctionSummary> =
-        api.getAllAuctions(sort.name).map {
+        api.getAllAuctions(sort.name).map { dto ->
             AuctionSummary(
-                id = it.id, cardName = it.cardName, resolveImageUrl(it.cardImage),
-                currentBid = it.currentBid, remainingDays = it.remainingDays,
-                cardState = it.cardState, cardCategory = it.cardCategory,
-                cardCollection = it.cardCollection, cardNumber = it.cardNumber,
-                status = it.status,
+                id = dto.id,
+                cardName = dto.cardName,
+                cardImage = resolveImageUrl(dto.cardImage),
+                currentBid = dto.currentBid,
+                remainingDays = dto.remainingDays,
+                cardState = CardCondition.fromApi(dto.cardState),
+                cardCategory = dto.cardCategory
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let(CardCategory::fromApi),
+                cardCollection = dto.cardCollection
+                    ?.takeIf { it.isNotBlank() }
+                    ?.let(CardCollection::fromApi),
+                cardNumber = dto.cardNumber,
+                status = AuctionStatus.fromBackend(dto.status)
             )
         }
 
@@ -32,12 +45,17 @@ class AuctionRepositoryImpl(
 
         return AuctionDetail(
             id = response.id,
-            status = response.status,
+            status = AuctionStatus.fromBackend(response.status),
             cardName = response.cardName,
             cardImage = resolveImageUrl(response.cardImage),
-            cardCollection = response.cardCollection,
+            cardCategory = response.cardCategory
+                ?.takeIf { it.isNotBlank() }
+                ?.let(CardCategory::fromApi),
+            cardCollection = response.cardCollection
+                ?.takeIf { it.isNotBlank() }
+                ?.let(CardCollection::fromApi),
             cardNumber = response.cardNumber,
-            cardState = response.cardState,
+            cardState = CardCondition.fromApi(response.cardState),
             minPrize = response.minPrize,
             increment = response.increment,
             lastBid = response.lastBid,
@@ -68,6 +86,7 @@ class AuctionRepositoryImpl(
     }
 }
 
+
 private fun AuctionResponseDto.toDomain(): Auction = Auction(
     id = id,
     creatorId = creator_id,
@@ -78,9 +97,8 @@ private fun AuctionResponseDto.toDomain(): Auction = Auction(
     startedAt = startedAt,
     durationInDays = durationInDays,
     endsAt = endsAt,
-    isCancelled = status == "CANCELLED",
-    status = status,
-    image = resolveImageUrl(card.image),
+    status = AuctionStatus.fromBackend(status),
+    image = resolveImageUrl(card.image).orEmpty(),
     category = card.category,
-    condition = card.state
+    condition = CardCondition.fromApi(card.state)
 )

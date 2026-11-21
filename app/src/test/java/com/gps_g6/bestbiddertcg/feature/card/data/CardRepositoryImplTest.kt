@@ -1,7 +1,8 @@
 package com.gps_g6.bestbiddertcg.feature.card.data
 
 import com.gps_g6.bestbiddertcg.feature.card.data.remote.CardApi
-import com.gps_g6.bestbiddertcg.feature.card.data.remote.dto.CardDto
+import com.gps_g6.bestbiddertcg.feature.card.data.remote.dto.CardSummaryDto
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -16,30 +17,34 @@ class CardRepositoryImplTest {
     private val repository = CardRepositoryImpl(api)
 
     @Test
-    fun `getMyCards maps API response to domain cards`() = runBlocking {
+    fun `getMyCards maps API response to card summaries`() = runBlocking {
         coEvery { api.getMyCards() } returns listOf(
-            CardDto(
+            CardSummaryDto(
                 id = "card-1",
                 name = "Piplup",
                 image = "/uploads/piplup.jpg",
-                category = "Pokemon"
+                category = "Pokémon"
             ),
-            CardDto(
+            CardSummaryDto(
                 id = "card-2",
-                name = "Charizard",
-                image = "/uploads/charizard.jpg",
-                category = "Pokemon"
+                name = "Mox Diamond",
+                image = "/uploads/mox.jpg",
+                category = "Magic"
             )
         )
 
         val result = repository.getMyCards()
 
         assertEquals(2, result.size)
+
         assertEquals("card-1", result[0].id)
         assertEquals("Piplup", result[0].name)
         assertEquals("/uploads/piplup.jpg", result[0].image)
-        assertEquals("Pokemon", result[0].category)
-        assertEquals("Charizard", result[1].name)
+        assertEquals(CardCategory.POKEMON, result[0].category)
+
+        assertEquals("card-2", result[1].id)
+        assertEquals("Mox Diamond", result[1].name)
+        assertEquals(CardCategory.MAGIC, result[1].category)
 
         coVerify(exactly = 1) {
             api.getMyCards()
@@ -69,7 +74,7 @@ class CardRepositoryImplTest {
             repository.getMyCards()
             fail("Expected IOException")
         } catch (_: IOException) {
-            // Network errors are handled by the ViewModel
+            // El ViewModel gestiona los errores de red.
         }
 
         coVerify(exactly = 1) {

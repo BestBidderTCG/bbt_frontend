@@ -1,6 +1,5 @@
 package com.gps_g6.bestbiddertcg.feature.card.presentation.details
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
@@ -33,12 +32,6 @@ class MyCardDetailsViewModel(
 
             try {
                 val card = getCardDetailsUseCase(cardId)
-                Log.d("CardDetails", "Imagen backend: ${card.image}")
-
-                Log.d(
-                    "CardDetails",
-                    "URL resuelta: ${NetworkModule.resolveImageUrl(card.image)}"
-                )
 
                 val availability = when (card.auction?.status) {
                     AuctionStatus.ACTIVE,

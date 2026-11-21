@@ -36,7 +36,7 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailStatus
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
 import java.util.Locale
 
@@ -47,7 +47,7 @@ fun AuctionBidSection(
     onHistoryClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isActive = uiState.status == AuctionDetailStatus.ACTIVE
+    val isActive = uiState.status == AuctionStatus.ACTIVE
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -79,7 +79,7 @@ fun AuctionBidSection(
 
                 Text(
                     text = String.format(
-                        Locale("es", "ES"),
+                        Locale.forLanguageTag("es-ES"),
                         "%.2f €",
                         if (isActive) uiState.currentBid else uiState.startingPrice
                     ),
@@ -212,7 +212,7 @@ fun AuctionBidSection(
 
 @Composable
 private fun AuctionBidSectionPreviewContent(
-    status: AuctionDetailStatus,
+    status: AuctionStatus,
     isOwner: Boolean
 ) {
     BestBidderTCGTheme {
@@ -248,7 +248,7 @@ private fun AuctionBidSectionPreviewContent(
 @Composable
 private fun ActiveOtherUserBidPreview() {
     AuctionBidSectionPreviewContent(
-        status = AuctionDetailStatus.ACTIVE,
+        status = AuctionStatus.ACTIVE,
         isOwner = false
     )
 }
@@ -264,7 +264,7 @@ private fun ActiveOtherUserBidPreview() {
 @Composable
 private fun UpcomingOtherUserBidPreview() {
     AuctionBidSectionPreviewContent(
-        status = AuctionDetailStatus.UPCOMING,
+        status = AuctionStatus.UPCOMING,
         isOwner = false
     )
 }
@@ -280,7 +280,7 @@ private fun UpcomingOtherUserBidPreview() {
 @Composable
 private fun ActiveOwnerBidPreview() {
     AuctionBidSectionPreviewContent(
-        status = AuctionDetailStatus.ACTIVE,
+        status = AuctionStatus.ACTIVE,
         isOwner = true
     )
 }
@@ -296,7 +296,7 @@ private fun ActiveOwnerBidPreview() {
 @Composable
 private fun UpcomingOwnerBidPreview() {
     AuctionBidSectionPreviewContent(
-        status = AuctionDetailStatus.UPCOMING,
+        status = AuctionStatus.UPCOMING,
         isOwner = true
     )
 }

@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
@@ -33,18 +34,21 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 
 /**
  * Lista de cartas de la colección del usuario para elegir cuál subastar.
  */
 @Composable
 fun CardSelectionList(
-    cards: List<Card>,
+    cards: List<CardSummary>,
     selectedCardId: String?,
     isLoading: Boolean,
     errorMessage: String?,
-    onCardSelected: (Card) -> Unit,
+    onCardSelected: (CardSummary) -> Unit,
     onRetry: () -> Unit
 ) {
     when {
@@ -100,7 +104,7 @@ fun CardSelectionList(
 
 @Composable
 fun CardOptionRow(
-    card: Card,
+    card: CardSummary,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -125,26 +129,15 @@ fun CardOptionRow(
             Spacer(modifier = Modifier.height(AppSpacing.xs))
 
             Text(
-                text = listOfNotNull(
-                    card.category,
-                    card.collection,
-                    card.num?.let { "#$it" },
-                    cardStateLabel(card.state)
-                ).joinToString(" · "),
+                text = card.category?.let {
+                    stringResource(it.labelRes)
+                } ?: stringResource(R.string.card_no_category),
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
+
         }
     }
-}
-
-private fun cardStateLabel(state: String): String = when (state) {
-    "NEW" -> "Nueva"
-    "NEAR_MINT" -> "Casi nueva"
-    "GOOD" -> "Buen estado"
-    "LIGHT_PLAYED" -> "Marcas ligeras"
-    "POOR" -> "Deteriorada"
-    else -> state.ifBlank { "Estado no disponible" }
 }
 
 /**
@@ -152,11 +145,11 @@ private fun cardStateLabel(state: String): String = when (state) {
  */
 @Composable
 fun CardPickerDialog(
-    cards: List<Card>,
+    cards: List<CardSummary>,
     selectedCardId: String?,
     isLoading: Boolean,
     errorMessage: String?,
-    onCardSelected: (Card) -> Unit,
+    onCardSelected: (CardSummary) -> Unit,
     onRetry: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -201,27 +194,17 @@ private fun CardSelectionListPreview() {
 @Composable
 private fun CardSelectionList2Preview() {
     val cards = listOf(
-        Card(
+        CardSummary(
             id = "card-1",
-            ownerId = "user-1",
             name = "Pikachu",
             image = "",
-            category = "Pokémon",
-            collection = "Base Set",
-            num = 25,
-            state = "NEAR_MINT",
-            description = null
+            category = CardCategory.POKEMON
         ),
-        Card(
+        CardSummary(
             id = "card-2",
-            ownerId = "user-1",
             name = "Charizard",
             image = "",
-            category = "Pokémon",
-            collection = "Base Set",
-            num = 4,
-            state = "NEW",
-            description = null
+            category = CardCategory.POKEMON
         )
     )
 

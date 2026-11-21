@@ -1,6 +1,7 @@
 package com.gps_g6.bestbiddertcg.feature.card.domain.usecase
 
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 import com.gps_g6.bestbiddertcg.feature.card.domain.repository.CardRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -15,16 +16,11 @@ class GetMyCardsUseCaseTest {
     private val repository = mockk<CardRepository>()
     private val useCase = GetMyCardsUseCase(repository)
 
-    private val card = Card(
+    private val card = CardSummary(
         id = "card-1",
-        ownerId = "user-1",
         name = "Piplup",
         image = "/uploads/piplup.jpg",
-        category = "Pokemon",
-        collection = null,
-        num = null,
-        state = "NEW",
-        description = null
+        category = CardCategory.POKEMON
     )
 
     @Test
@@ -61,7 +57,7 @@ class GetMyCardsUseCaseTest {
             useCase()
             fail("Expected IOException")
         } catch (_: IOException) {
-            // The caller handles the error
+            // El llamador gestiona el error.
         }
 
         coVerify(exactly = 1) {

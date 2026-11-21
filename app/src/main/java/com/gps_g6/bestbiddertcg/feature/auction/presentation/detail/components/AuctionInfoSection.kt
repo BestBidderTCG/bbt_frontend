@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,8 +27,9 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailStatus
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import java.util.Locale
 
 @Composable
@@ -35,18 +37,18 @@ fun AuctionInfoSection(
     uiState: AuctionDetailUiState,
     modifier: Modifier = Modifier
 ) {
-    val isActive = uiState.status == AuctionDetailStatus.ACTIVE
+    val isActive = uiState.status == AuctionStatus.ACTIVE
 
     val infoItems = if (isActive) {
         listOf(
-            "Estado de conservación" to uiState.cardCondition,
+            "Estado de conservación" to stringResource(uiState.cardCondition.labelRes),
             "Precio de salida" to String.format(
-                Locale("es", "ES"),
+                Locale.forLanguageTag("es-ES"),
                 "%.2f €",
                 uiState.startingPrice
             ),
             "Incremento mínimo" to String.format(
-                Locale("es", "ES"),
+                Locale.forLanguageTag("es-ES"),
                 "%.2f €",
                 uiState.minimumIncrement
             ),
@@ -54,9 +56,9 @@ fun AuctionInfoSection(
         )
     } else {
         listOf(
-            "Estado de conservación" to uiState.cardCondition,
+            "Estado de conservación" to stringResource(uiState.cardCondition.labelRes),
             "Incremento mínimo" to String.format(
-                Locale("es", "ES"),
+                Locale.forLanguageTag("es-ES"),
                 "%.2f €",
                 uiState.minimumIncrement
             ),
@@ -161,8 +163,8 @@ private fun ActiveAuctionInfoPreview() {
         ) {
             AuctionInfoSection(
                 uiState = AuctionDetailUiState(
-                    status = AuctionDetailStatus.ACTIVE,
-                    cardCondition = "Buen estado",
+                    status = AuctionStatus.ACTIVE,
+                    cardCondition = CardCondition.GOOD,
                     startingPrice = 10.0,
                     minimumIncrement = 1.0,
                     publishedAt = "12/10/2026, 14h20",
@@ -191,8 +193,8 @@ private fun UpcomingAuctionInfoPreview() {
         ) {
             AuctionInfoSection(
                 uiState = AuctionDetailUiState(
-                    status = AuctionDetailStatus.UPCOMING,
-                    cardCondition = "Buen estado",
+                    status = AuctionStatus.UPCOMING,
+                    cardCondition = CardCondition.GOOD,
                     minimumIncrement = 1.0,
                     scheduledStart = "18/11/2026, 18h00",
                     duration = "3 días",

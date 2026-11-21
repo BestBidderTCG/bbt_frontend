@@ -48,7 +48,7 @@ import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.S
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SelectionPlaceholder
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartDatePickerDialog
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartTimePickerDialog
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 import java.time.LocalTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -63,7 +63,7 @@ fun CreateAuctionScreen(
     uiState: CreateAuctionUiState,
     onBackClick: () -> Unit,
     onLoadCards: () -> Unit,
-    onCardSelected: (Card) -> Unit,
+    onCardSelected: (CardSummary) -> Unit,
     onStartingPriceChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onDurationSelected: (Int) -> Unit,

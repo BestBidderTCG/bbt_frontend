@@ -1,12 +1,9 @@
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.detail
 
-/**
- * Representa el estado de la subasta.
- */
-enum class AuctionDetailStatus {
-    ACTIVE,
-    UPCOMING
-}
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 
 /**
  * Contiene los datos de la subasta.
@@ -14,12 +11,12 @@ enum class AuctionDetailStatus {
 data class AuctionDetailUiState(
     val auctionId: String = "",
     val cardName: String = "",
-    val cardImage: String = "",
-    val cardCategory: String = "",
-    val cardCollection: String = "",
+    val cardImage: String? = null,
+    val cardCategory: CardCategory? = null,
+    val cardCollection: CardCollection? = null,
     val cardNumber: String = "",
 
-    val status: AuctionDetailStatus = AuctionDetailStatus.ACTIVE,
+    val status: AuctionStatus = AuctionStatus.ACTIVE,
     val isOwner: Boolean = false,
 
     val currentBid: Double = 0.0,
@@ -27,7 +24,7 @@ data class AuctionDetailUiState(
     val bidCount: Int = 0,
     val remainingTime: String = "",
 
-    val cardCondition: String = "",
+    val cardCondition: CardCondition = CardCondition.NEW,
     val minimumIncrement: Double = 0.0,
     val publishedAt: String = "",
     val scheduledStart: String = "",

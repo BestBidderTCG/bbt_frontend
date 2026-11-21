@@ -101,6 +101,7 @@
     <string name="auction_winning_bid">Puja ganadora</string>
     <string name="auction_best_bidder">Best Bidder: %1$s</string>
     <string name="auction_start_date">Inicio: %1$s</string>
+    <string name="auction_edit">Editar subasta</string>
 
     <!-- Card Details -->
     <string name="card_details_title">Detalle de carta</string>
@@ -116,12 +117,43 @@
     <string name="card_details_view_active_auction">Ver subasta activa</string>
     <string name="card_details_view_scheduled_auction">Ver subasta programada</string>
 
-    <string name="card_details_category">Categoría</string>
+    <string name="category_string">Categoría</string>
     <string name="card_details_number">Número</string>
     <string name="card_details_condition">Estado de conservación</string>
     <string name="card_details_published">Publicada</string>
 
     <string name="card_details_edit">Editar carta</string>
+
+    <string name="card_condition_any">Cualquiera</string>
+    <string name="card_condition_new">Nueva</string>
+    <string name="card_condition_near_mint">Como nueva</string>
+    <string name="card_condition_good">Buen estado</string>
+    <string name="card_condition_light_played">Con marcas de uso</string>
+    <string name="card_condition_poor">Deteriorada</string>
+
+
+    <!-- Categorías -->
+    <string name="card_no_category">Sin categoría</string>
+    <string name="card_category_pokemon">Pokémon</string>
+    <string name="card_category_riftbound">Riftbound</string>
+    <string name="card_category_magic">Magic</string>
+
+    <!-- Colecciones Pokémon -->
+    <string name="card_collection_destinos_de_paldea">Destinos de Paldea</string>
+    <string name="card_collection_brecha_paradojica">Brecha Paradójica</string>
+    <string name="card_collection_pokemon_151">Pokémon 151</string>
+    <string name="card_collection_evoluciones_de_paldea">Evoluciones de Paldea</string>
+    <string name="card_collection_surging_sparks">Surging Sparks</string>
+
+    <!-- Colecciones Riftbound -->
+    <string name="card_collection_riftbound_origins">Riftbound: Origins</string>
+    <string name="card_collection_spiritforged">Spiritforged</string>
+    <string name="card_collection_unleashed">Unleashed</string>
+
+    <!-- Colecciones Magic -->
+    <string name="card_collection_alpha_beta_unlimited">Alpha / Beta / Unlimited (1993)</string>
+    <string name="card_collection_ciclo_de_urza">Ciclo de Urza (1998-1999)</string>
+    <string name="card_collection_wilds_of_eldraine">Wilds of Eldraine</string>
 
     <!-- Settings -->
     <string name="settings_title">Ajustes</string>
@@ -166,6 +198,9 @@
     <string name="delete_account_error_uncertain">No se ha podido confirmar el resultado de la solicitud. Comprueba el estado de tu cuenta antes de volver a intentarlo.</string>
     <string name="delete_account_error_conflict">La eliminación ha sido rechazada. Vuelve a comprobar el estado de tu cuenta.</string>
     <string name="delete_account_error_conflict_check">La eliminación ha sido rechazada y no se han podido consultar los motivos.</string>
+
+    <!-- Favorites -->
+    <string name="favorites_add">Añadir a favoritos</string>
 
     <!-- Common strings -->
     <string name="common_cancel">Cancelar</string>

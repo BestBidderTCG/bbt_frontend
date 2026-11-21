@@ -1,6 +1,6 @@
 package com.gps_g6.bestbiddertcg.feature.auth.presentation
 
-import com.gps_g6.bestbiddertcg.core.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
 
 data class RegisterUiState(
     val email: String = "",

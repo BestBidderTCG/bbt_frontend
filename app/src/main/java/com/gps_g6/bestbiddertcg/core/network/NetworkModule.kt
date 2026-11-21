@@ -119,6 +119,15 @@ object NetworkModule {
 
         val baseUrl = BASE_URL.trimEnd('/')
 
+        // Imágenes almacenadas en Cloudinary
+        val cloudinaryPrefix =
+            "https://res.cloudinary.com/ee6azugw/image/upload/"
+
+        if (image.startsWith(cloudinaryPrefix)) {
+            return image
+        }
+
+        // Compatibilidad con imágenes locales del backend
         val path = when {
             image.startsWith("/uploads/") -> image
 
@@ -130,7 +139,7 @@ object NetworkModule {
 
         val filename = path.removePrefix("/uploads/")
 
-        // Only allow a single filename inside /uploads.
+        // Solo se permite un nombre de archivo dentro de /uploads
         val validFilename = Regex("""[A-Za-z0-9_-]+\.[A-Za-z0-9]+""")
 
         if (!validFilename.matches(filename)) return null

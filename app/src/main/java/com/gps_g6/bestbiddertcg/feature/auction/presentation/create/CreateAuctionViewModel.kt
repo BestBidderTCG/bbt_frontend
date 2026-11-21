@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,7 +60,7 @@ class CreateAuctionViewModel(
         }
     }
 
-    fun selectCard(card: Card) {
+    fun selectCard(card: CardSummary) {
         _uiState.update { it.copy(selectedCard = card, errorMessage = null) }
     }
 

@@ -11,7 +11,7 @@ data class CardDto(
     val category: String,
     val collection: String? = null,
     val num: Int? = null,
-    val state: String = "",
+    val state: String = "NEW",
     val description: String? = null,
     val createdAt: String? = null,
     val auction: CardAuctionDto? = null

@@ -53,6 +53,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
+import com.gps_g6.bestbiddertcg.R
+import androidx.compose.ui.res.stringResource
 
 /**
  * Filtros de estado de subastas en la pantalla explore (Activo o Próximas).
@@ -60,18 +63,6 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.*
 enum class AuctionStatusFilter {
     ACTIVE,
     UPCOMING
-}
-
-/**
- * Filtros de estado de conservación en la pantalla explore (Cualquiera, Nueva, Casi nueva, Buen estado, Con desgaste, Mala).
- */
-enum class CardConditionFilter {
-    ANY,
-    NEW,
-    NEAR_MINT,
-    GOOD,
-    LIGHT_PLAYED,
-    POOR
 }
 
 private const val MAX_PRICE_SLIDER_VALUE = 250f
@@ -83,7 +74,7 @@ data class AuctionFilterOptions(
     val status: AuctionStatusFilter? = null,
     val minPrice: Double = 0.0,
     val maxPrice: Double? = null,
-    val condition: CardConditionFilter = CardConditionFilter.ANY,
+    val condition: CardCondition? = null,
     val endingWithinDays: Int? = 3
 )
 
@@ -352,44 +343,24 @@ fun AuctionFilterSheet(
                     horizontalArrangement = Arrangement.spacedBy(AppSpacing.s)
                 ) {
                     FilterOption(
-                        text = "Cualquiera",
-                        selected = condition == CardConditionFilter.ANY
+                        text = stringResource(R.string.card_condition_any),
+                        selected = condition == null
                     ) {
-                        condition = CardConditionFilter.ANY
+                        condition = null
                     }
 
                     FilterOption(
-                        text = "Nueva",
-                        selected = condition == CardConditionFilter.NEW
+                        text = stringResource(CardCondition.NEW.labelRes),
+                        selected = condition == CardCondition.NEW
                     ) {
-                        condition = CardConditionFilter.NEW
+                        condition = CardCondition.NEW
                     }
 
                     FilterOption(
-                        text = "Como nueva",
-                        selected = condition == CardConditionFilter.NEAR_MINT
+                        text = stringResource(CardCondition.NEAR_MINT.labelRes),
+                        selected = condition == CardCondition.NEAR_MINT
                     ) {
-                        condition = CardConditionFilter.NEAR_MINT
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(AppSpacing.s))
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.s)
-                ) {
-                    FilterOption(
-                        text = "Buen estado",
-                        selected = condition == CardConditionFilter.GOOD
-                    ) {
-                        condition = CardConditionFilter.GOOD
-                    }
-
-                    FilterOption(
-                        text = "Con marcas de uso",
-                        selected = condition == CardConditionFilter.LIGHT_PLAYED
-                    ) {
-                        condition = CardConditionFilter.LIGHT_PLAYED
+                        condition = CardCondition.NEAR_MINT
                     }
                 }
 
@@ -399,10 +370,30 @@ fun AuctionFilterSheet(
                     horizontalArrangement = Arrangement.spacedBy(AppSpacing.s)
                 ) {
                     FilterOption(
-                        text = "Deteriorada",
-                        selected = condition == CardConditionFilter.POOR
+                        text = stringResource(CardCondition.GOOD.labelRes),
+                        selected = condition == CardCondition.GOOD
                     ) {
-                        condition = CardConditionFilter.POOR
+                        condition = CardCondition.GOOD
+                    }
+
+                    FilterOption(
+                        text = stringResource(CardCondition.LIGHT_PLAYED.labelRes),
+                        selected = condition == CardCondition.LIGHT_PLAYED
+                    ) {
+                        condition = CardCondition.LIGHT_PLAYED
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(AppSpacing.s))
+
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.s)
+                ) {
+                    FilterOption(
+                        text = stringResource(CardCondition.POOR.labelRes),
+                        selected = condition == CardCondition.POOR
+                    ) {
+                        condition = CardCondition.POOR
                     }
                 }
 
@@ -516,7 +507,7 @@ fun AuctionFilterSheet(
                         status = null
                         minPrice = 0f
                         maxPrice = MAX_PRICE_SLIDER_VALUE
-                        condition = CardConditionFilter.ANY
+                        condition = null
                         endingWithinDays = null
                     },
                     modifier = Modifier

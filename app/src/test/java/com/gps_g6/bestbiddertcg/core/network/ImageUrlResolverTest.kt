@@ -1,3 +1,4 @@
+
 package com.gps_g6.bestbiddertcg.core.network
 
 import org.junit.Assert.*
@@ -15,6 +16,29 @@ class ImageUrlResolverTest {
             "http://10.0.2.2:8080/uploads/piplup.jpg",
             result
         )
+    }
+
+    @Test
+    fun `absolute backend upload URL is accepted`() {
+        val url = "http://10.0.2.2:8080/uploads/piplup.jpg"
+
+        assertEquals(url, NetworkModule.resolveImageUrl(url))
+    }
+
+    @Test
+    fun `valid Cloudinary URL is accepted`() {
+        val url =
+            "https://res.cloudinary.com/ee6azugw/image/upload/bestbidder/card-1.jpg"
+
+        assertEquals(url, NetworkModule.resolveImageUrl(url))
+    }
+
+    @Test
+    fun `Cloudinary URL with another account is rejected`() {
+        val url =
+            "https://res.cloudinary.com/another-cloud/image/upload/bestbidder/card-1.jpg"
+
+        assertNull(NetworkModule.resolveImageUrl(url))
     }
 
     @Test

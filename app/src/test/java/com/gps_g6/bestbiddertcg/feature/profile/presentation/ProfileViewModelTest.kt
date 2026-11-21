@@ -1,6 +1,8 @@
+
 package com.gps_g6.bestbiddertcg.feature.profile.presentation
 
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
@@ -45,17 +47,14 @@ class ProfileViewModelTest {
 
     private fun card(
         id: String,
-        image: String = "/uploads/$id.jpg"
-    ) = Card(
+        image: String =
+            "https://res.cloudinary.com/ee6azugw/image/upload/bestbidder/$id.jpg",
+        category: CardCategory = CardCategory.POKEMON
+    ) = CardSummary(
         id = id,
-        ownerId = "user-1",
         name = "Carta $id",
         image = image,
-        category = "Pokemon",
-        collection = null,
-        num = null,
-        state = "NEW",
-        description = null
+        category = category
     )
 
     @Before
@@ -92,7 +91,6 @@ class ProfileViewModelTest {
     @Test
     fun `initial load displays collection and updates card count`() =
         runTest(testDispatcher) {
-
             coEvery {
                 getMyCardsUseCase.invoke()
             } returns listOf(
@@ -110,7 +108,7 @@ class ProfileViewModelTest {
             assertEquals("card-1", state.collection[0].id)
             assertEquals("Carta card-1", state.collection[0].name)
             assertEquals(
-                "http://10.0.2.2:8080/uploads/card-1.jpg",
+                "https://res.cloudinary.com/ee6azugw/image/upload/bestbidder/card-1.jpg",
                 state.collection[0].imageUrl
             )
 
@@ -125,7 +123,6 @@ class ProfileViewModelTest {
     @Test
     fun `empty collection has zero cards`() =
         runTest(testDispatcher) {
-
             val viewModel = createViewModel()
             advanceUntilIdle()
 
@@ -140,7 +137,6 @@ class ProfileViewModelTest {
     @Test
     fun `collection error does not remove profile information`() =
         runTest(testDispatcher) {
-
             coEvery {
                 getMyCardsUseCase.invoke()
             } throws IOException("Network unavailable")
@@ -165,7 +161,6 @@ class ProfileViewModelTest {
     @Test
     fun `retry after failure loads cards successfully`() =
         runTest(testDispatcher) {
-
             coEvery {
                 getMyCardsUseCase.invoke()
             } throws IOException("Network unavailable") andThen
@@ -197,7 +192,6 @@ class ProfileViewModelTest {
     @Test
     fun `simultaneous collection loads only call use case once`() =
         runTest(testDispatcher) {
-
             val gate = CompletableDeferred<Unit>()
 
             coEvery {
@@ -209,12 +203,10 @@ class ProfileViewModelTest {
 
             val viewModel = createViewModel()
 
-            // Start the initial loading coroutine.
             runCurrent()
 
             assertTrue(viewModel.uiState.value.isLoadingCards)
 
-            // Try another load while the first is suspended.
             viewModel.loadMyCards()
             runCurrent()
 
@@ -236,7 +228,6 @@ class ProfileViewModelTest {
     @Test
     fun `profile updates do not overwrite collection`() =
         runTest(testDispatcher) {
-
             coEvery {
                 getMyCardsUseCase.invoke()
             } returns listOf(card("card-1"))
@@ -260,7 +251,6 @@ class ProfileViewModelTest {
     @Test
     fun `invalid image reference maps to null URL`() =
         runTest(testDispatcher) {
-
             coEvery {
                 getMyCardsUseCase.invoke()
             } returns listOf(
@@ -273,5 +263,38 @@ class ProfileViewModelTest {
             assertNull(
                 viewModel.uiState.value.collection.first().imageUrl
             )
+        }
+
+    @Test
+    fun `magic card with Cloudinary image is displayed correctly`() =
+        runTest(testDispatcher) {
+            val magicCard = card(
+                id = "eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee",
+                category = CardCategory.MAGIC
+            )
+
+            coEvery {
+                getMyCardsUseCase.invoke()
+            } returns listOf(magicCard)
+
+            val viewModel = createViewModel()
+            advanceUntilIdle()
+
+            val state = viewModel.uiState.value
+
+            assertEquals(1, state.cardsCount)
+            assertEquals(
+                magicCard.id,
+                state.collection.first().id
+            )
+            assertEquals(
+                magicCard.name,
+                state.collection.first().name
+            )
+            assertEquals(
+                magicCard.image,
+                state.collection.first().imageUrl
+            )
+            assertNull(state.cardsError)
         }
 }

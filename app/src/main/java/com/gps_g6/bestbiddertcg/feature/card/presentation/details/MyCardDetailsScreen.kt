@@ -3,7 +3,6 @@ package com.gps_g6.bestbiddertcg.feature.card.presentation.details
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -306,14 +305,15 @@ private fun CardDetailsInformation(card: MyCardDetailsUiModel) {
     ) {
         Column(modifier = Modifier.padding(horizontal = AppSpacing.l)) {
             CardDetailRow(
-                stringResource(R.string.card_details_category),
-                card.category
+                label = stringResource(R.string.category_string),
+                value = card.category?.let { stringResource(it.labelRes) } ?: "—"
             )
+
             HorizontalDivider(color = Border)
 
             CardDetailRow(
-                stringResource(R.string.collection_string),
-                card.collection ?: "—"
+                label = stringResource(R.string.collection_string),
+                value = card.collection?.let { stringResource(it.labelRes) } ?: "—"
             )
             HorizontalDivider(color = Border)
 
@@ -325,7 +325,7 @@ private fun CardDetailsInformation(card: MyCardDetailsUiModel) {
 
             CardDetailRow(
                 stringResource(R.string.card_details_condition),
-                conditionLabel(card.condition)
+                stringResource(card.condition.labelRes)
             )
 
             if (card.publishedAt != null) {
@@ -439,16 +439,6 @@ private fun CardDetailsActions(
         }
     }
 }
-
-private fun conditionLabel(condition: String): String =
-    when (condition.uppercase()) {
-        "NEW" -> "Nuevo"
-        "NEAR_MINT" -> "Casi perfecto"
-        "GOOD" -> "Buen estado"
-        "LIGHT_PLAYED" -> "Ligeramente usado"
-        "POOR" -> "Muy usado"
-        else -> condition
-    }
 
 private fun formatCardDate(value: String): String {
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy, HH'h'mm")

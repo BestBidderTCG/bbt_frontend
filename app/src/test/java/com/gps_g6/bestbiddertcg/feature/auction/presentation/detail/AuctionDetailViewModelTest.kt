@@ -1,8 +1,11 @@
-
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.detail
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionDetail
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.GetAuctionDetailUseCase
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
 import io.mockk.coEvery
@@ -46,7 +49,7 @@ class AuctionDetailViewModelTest {
     )
 
     private fun createAuctionDetail(
-        status: String = "UPCOMING",
+        status: AuctionStatus = AuctionStatus.UPCOMING,
         creatorId: String? = "user-2"
     ): AuctionDetail {
         val now = Instant.now()
@@ -56,9 +59,10 @@ class AuctionDetailViewModelTest {
             status = status,
             cardName = "Pikachu",
             cardImage = "uploads/pikachu.jpg",
-            cardCollection = "Base Set",
+            cardCategory = CardCategory.POKEMON,
+            cardCollection = CardCollection.POKEMON_151,
             cardNumber = 25,
-            cardState = "NEAR_MINT",
+            cardState = CardCondition.NEAR_MINT,
             minPrize = 10.0,
             increment = 0.5,
             lastBid = 12.0,
@@ -120,7 +124,9 @@ class AuctionDetailViewModelTest {
         assertEquals("auction-1", state.auctionId)
         assertEquals("Pikachu", state.cardName)
         assertEquals("uploads/pikachu.jpg", state.cardImage)
-        assertEquals("Base Set", state.cardCollection)
+        assertEquals(CardCollection.POKEMON_151, state.cardCollection)
+        assertEquals(CardCategory.POKEMON, state.cardCategory)
+        assertEquals(CardCondition.NEAR_MINT, state.cardCondition)
         assertEquals("25", state.cardNumber)
         assertEquals(12.0, state.currentBid, 0.0)
         assertEquals(10.0, state.startingPrice, 0.0)
@@ -190,7 +196,7 @@ class AuctionDetailViewModelTest {
      */
     @Test
     fun `own auction is identified correctly`() = runTest(testDispatcher) {
-        val auctionDetail = createAuctionDetail(creatorId = null)
+        val auctionDetail = createAuctionDetail(creatorId = "user-1")
 
         coEvery {
             getAuctionDetailUseCase("auction-1")
@@ -204,6 +210,21 @@ class AuctionDetailViewModelTest {
         advanceUntilIdle()
 
         assertTrue(viewModel.uiState.value.isOwner)
+    }
+
+    /**
+     * Un creador no identificado no se considera propietario.
+     */
+    @Test
+    fun `auction with unknown creator is not identified as own`() = runTest(testDispatcher) {
+        coEvery { getAuctionDetailUseCase("auction-1") } returns
+                createAuctionDetail(creatorId = null)
+        coEvery { profileManager.loadProfile() } returns testProfile
+
+        viewModel.loadAuction("auction-1")
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isOwner)
     }
 
     /**
@@ -242,7 +263,7 @@ class AuctionDetailViewModelTest {
         runTest(testDispatcher) {
 
             val auctionDetail = createAuctionDetail(
-                status = "UPCOMING"
+                status = AuctionStatus.UPCOMING
             )
 
             coEvery {
@@ -259,7 +280,7 @@ class AuctionDetailViewModelTest {
             val state = viewModel.uiState.value
 
             assertEquals(
-                AuctionDetailStatus.UPCOMING,
+                AuctionStatus.UPCOMING,
                 state.status
             )
             assertTrue(state.remainingTime.isNotBlank())
@@ -274,7 +295,7 @@ class AuctionDetailViewModelTest {
         runTest(testDispatcher) {
 
             val auctionDetail = createAuctionDetail(
-                status = "IN_PROGRESS"
+                status = AuctionStatus.ACTIVE
             )
 
             coEvery {
@@ -291,7 +312,7 @@ class AuctionDetailViewModelTest {
             val state = viewModel.uiState.value
 
             assertEquals(
-                AuctionDetailStatus.ACTIVE,
+                AuctionStatus.ACTIVE,
                 state.status
             )
             assertTrue(state.remainingTime.isNotBlank())
