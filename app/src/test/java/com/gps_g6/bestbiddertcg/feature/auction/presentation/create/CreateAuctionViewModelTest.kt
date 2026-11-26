@@ -1,9 +1,13 @@
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.create
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.Auction
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.domain.model.Profile
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
@@ -13,6 +17,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -42,16 +47,12 @@ class CreateAuctionViewModelTest {
     private lateinit var profileManager: ProfileManager
     private lateinit var viewModel: CreateAuctionViewModel
 
-    private val testCard = Card(
+    private val testCard = CardSummary(
         id = "card-1",
-        ownerId = "user-1",
         name = "Pikachu",
         image = "",
-        category = "Pokemon",
-        collection = "Base Set",
-        num = 25,
-        state = "NM",
-        description = null
+        category = CardCategory.POKEMON,
+        inAuction = false
     )
 
     private val testProfile = Profile(
@@ -68,13 +69,14 @@ class CreateAuctionViewModelTest {
         creatorId = "user-1",
         creatorUsername = "testuser",
         card = "Pikachu",
-        collection = "Base Set",
+        category = CardCategory.POKEMON.apiValue,
+        collection = CardCollection.POKEMON_151.apiValue,
+        condition = CardCondition.NEAR_MINT,
         minPrize = 10.0,
         startedAt = "2026-11-16T10:15:00Z",
         durationInDays = 3,
         endsAt = "2026-11-19T10:15:00Z",
-        isCancelled = false,
-        status = "UPCOMING"
+        status = AuctionStatus.UPCOMING,
     )
 
     /**
@@ -102,6 +104,19 @@ class CreateAuctionViewModelTest {
     fun tearDown() {
         Dispatchers.resetMain()
     }
+
+    /**
+     * Carga las cartas del usuario.
+     */
+    private fun TestScope.loadAvailableCard() {
+        coEvery {
+            getMyCardsUseCase()
+        } returns listOf(testCard)
+
+        viewModel.loadCards()
+        advanceUntilIdle()
+    }
+
 
     /**
      * Comprueba que los campos del formulario se actualizan correctamente.
@@ -146,7 +161,9 @@ class CreateAuctionViewModelTest {
      * Comprueba que no se permite crear una subasta con un precio inválido.
      */
     @Test
-    fun `auction creation with invalid price is rejected`() {
+    fun `auction creation with invalid price is rejected`() = runTest(testDispatcher) {
+        loadAvailableCard()
+
         viewModel.selectCard(testCard)
         viewModel.updateStartingPrice("0")
 
@@ -156,15 +173,17 @@ class CreateAuctionViewModelTest {
             "Introduce un precio inicial válido.",
             viewModel.uiState.value.errorMessage
         )
-
         assertFalse(viewModel.uiState.value.isCreating)
     }
+
 
     /**
      * Comprueba que no se permite crear una subasta con una fecha pasada.
      */
     @Test
-    fun `auction creation with past date is rejected`() {
+    fun `auction creation with past date is rejected`() = runTest(testDispatcher) {
+        loadAvailableCard()
+
         viewModel.selectCard(testCard)
         viewModel.updateStartingPrice("10")
         viewModel.updateStartDateTime(
@@ -178,7 +197,6 @@ class CreateAuctionViewModelTest {
             "La fecha de inicio ya ha pasado. Elige otra.",
             viewModel.uiState.value.errorMessage
         )
-
         assertFalse(viewModel.uiState.value.isCreating)
     }
 
@@ -210,6 +228,13 @@ class CreateAuctionViewModelTest {
             createAuctionUseCase(expectedRequest)
         } returns testAuction
 
+        coEvery {
+            getMyCardsUseCase()
+        } returns listOf(testCard.copy(inAuction = false))
+
+        viewModel.loadCards()
+        advanceUntilIdle()
+
         viewModel.selectCard(testCard)
         viewModel.updateStartingPrice("12,50")
         viewModel.updateDescription(" Test auction ")
@@ -236,6 +261,10 @@ class CreateAuctionViewModelTest {
         coVerify(exactly = 1) {
             createAuctionUseCase(expectedRequest)
         }
+
+        coVerify(exactly = 1) {
+            getMyCardsUseCase()
+        }
     }
 
     /**
@@ -250,6 +279,8 @@ class CreateAuctionViewModelTest {
         coEvery {
             createAuctionUseCase(any())
         } throws RuntimeException("Connection error")
+
+        loadAvailableCard()
 
         viewModel.selectCard(testCard)
         viewModel.updateStartingPrice("10")
@@ -274,7 +305,9 @@ class CreateAuctionViewModelTest {
      * Comprueba que se rechaza un precio con formato decimal incorrecto.
      */
     @Test
-    fun `auction creation with malformed price is rejected`() {
+    fun `auction creation with malformed price is rejected`() = runTest(testDispatcher) {
+        loadAvailableCard()
+
         viewModel.selectCard(testCard)
         viewModel.updateStartingPrice("10,50,30")
 
@@ -286,6 +319,7 @@ class CreateAuctionViewModelTest {
         )
         assertFalse(viewModel.uiState.value.isCreating)
     }
+
 
 
     /**
@@ -305,7 +339,9 @@ class CreateAuctionViewModelTest {
      * Comprueba que no se permite crear una subasta sin precio inicial.
      */
     @Test
-    fun `auction creation without price is rejected`() {
+    fun `auction creation without price is rejected`() = runTest(testDispatcher) {
+        loadAvailableCard()
+
         viewModel.selectCard(testCard)
         viewModel.updateStartingPrice("")
 
@@ -317,5 +353,59 @@ class CreateAuctionViewModelTest {
         )
         assertFalse(viewModel.uiState.value.isCreating)
     }
+
+    @Test
+    fun `card already in auction cannot be selected`() {
+        val unavailableCard = testCard.copy(inAuction = true)
+
+        viewModel.selectCard(unavailableCard)
+
+        assertNull(viewModel.uiState.value.selectedCard)
+    }
+
+    @Test
+    fun `auction creation is rejected when selected card becomes unavailable`() =
+        runTest(testDispatcher) {
+            val availableCard = testCard.copy(inAuction = false)
+            val unavailableCard = testCard.copy(inAuction = true)
+
+            coEvery {
+                getMyCardsUseCase()
+            } returns listOf(availableCard) andThen listOf(unavailableCard)
+
+            // Primera carga: la carta está disponible
+            viewModel.loadCards()
+            advanceUntilIdle()
+
+            viewModel.selectCard(availableCard)
+            assertEquals(
+                availableCard,
+                viewModel.uiState.value.selectedCard
+            )
+
+            // El listado se actualiza y la carta pasa a estar ocupada
+            viewModel.loadCards()
+            advanceUntilIdle()
+
+            viewModel.updateStartingPrice("10")
+
+            viewModel.createAuction()
+            advanceUntilIdle()
+
+            assertEquals(
+                "La carta seleccionada ya no está disponible para subastar.",
+                viewModel.uiState.value.errorMessage
+            )
+
+            assertNull(viewModel.uiState.value.createdAuction)
+
+            coVerify(exactly = 0) {
+                createAuctionUseCase(any())
+            }
+
+            coVerify(exactly = 2) {
+                getMyCardsUseCase()
+            }
+        }
 
 }

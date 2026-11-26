@@ -4,6 +4,7 @@ package com.gps_g6.bestbiddertcg.feature.auction.presentation.detail
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionDetail
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.GetAuctionDetailUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -66,9 +67,10 @@ class AuctionDetailViewModel(
         val endInstant = Instant.ofEpochMilli(endsAt)
         val now = Instant.now()
 
-        val isUpcoming = status == "UPCOMING"
-        val isOwner = creatorId == null ||
-                (currentUserId != null && creatorId == currentUserId)
+        val isUpcoming = status == AuctionStatus.UPCOMING
+        val isOwner = creatorId != null &&
+                currentUserId != null &&
+                creatorId == currentUserId
 
         val remainingTime = if (isUpcoming) {
             formatDuration(startInstant.toEpochMilli() - now.toEpochMilli())
@@ -80,14 +82,10 @@ class AuctionDetailViewModel(
             auctionId = id,
             cardName = cardName,
             cardImage = cardImage,
-            cardCategory = cardCollection.orEmpty(),
-            cardCollection = cardCollection.orEmpty(),
+            cardCategory = cardCategory,
+            cardCollection = cardCollection,
             cardNumber = cardNumber?.toString().orEmpty(),
-            status = if (isUpcoming) {
-                AuctionDetailStatus.UPCOMING
-            } else {
-                AuctionDetailStatus.ACTIVE
-            },
+            status = status,
             isOwner = isOwner,
             currentBid = lastBid ?: minPrize,
             startingPrice = minPrize,

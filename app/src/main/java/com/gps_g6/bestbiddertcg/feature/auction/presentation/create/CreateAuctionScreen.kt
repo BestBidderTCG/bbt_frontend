@@ -36,8 +36,7 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardOptionRow
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardPickerDialog
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.CardPickerBottomSheet
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DropdownField
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.DurationSelector
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.EstimatedEndDate
@@ -45,10 +44,11 @@ import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.F
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.FormInput
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SearchDropdownField
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SectionTitle
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SelectedAuctionCard
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.SelectionPlaceholder
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartDatePickerDialog
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.create.components.StartTimePickerDialog
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 import java.time.LocalTime
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -63,7 +63,7 @@ fun CreateAuctionScreen(
     uiState: CreateAuctionUiState,
     onBackClick: () -> Unit,
     onLoadCards: () -> Unit,
-    onCardSelected: (Card) -> Unit,
+    onCardSelected: (CardSummary) -> Unit,
     onStartingPriceChange: (String) -> Unit,
     onDescriptionChange: (String) -> Unit,
     onDurationSelected: (Int) -> Unit,
@@ -170,9 +170,8 @@ fun CreateAuctionScreen(
                             )
                         }
                     } else {
-                        CardOptionRow(
+                        SelectedAuctionCard(
                             card = selectedCard,
-                            selected = true,
                             onClick = {
                                 onLoadCards()
                                 showCardPicker = true
@@ -378,19 +377,22 @@ fun CreateAuctionScreen(
     }
 
     if (showCardPicker) {
-        CardPickerDialog(
+        CardPickerBottomSheet(
             cards = uiState.cards,
             selectedCardId = uiState.selectedCard?.id,
             isLoading = uiState.isLoadingCards,
             errorMessage = uiState.cardsError,
-            onCardSelected = { card ->
+            onConfirm = { card ->
                 onCardSelected(card)
                 showCardPicker = false
             },
             onRetry = onLoadCards,
-            onDismiss = { showCardPicker = false }
+            onDismiss = {
+                showCardPicker = false
+            }
         )
     }
+
 }
 
 /**

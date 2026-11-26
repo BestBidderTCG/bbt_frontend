@@ -42,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
@@ -49,12 +50,13 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.Background
-import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
+import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionFilterOptions
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionFilterSheet
 import com.gps_g6.bestbiddertcg.feature.explore.presentation.components.AuctionStatusFilter
@@ -75,8 +77,9 @@ fun ExploreScreen(
     var searchQuery by remember { mutableStateOf("") }
     var filterOptions by remember { mutableStateOf(AuctionFilterOptions()) }
     var showFilterSheet by remember { mutableStateOf(false) }
-    var selectedCardCollection by remember { mutableStateOf("Todas") }
-    var selectedCategory by remember { mutableStateOf("Todas") }
+    var selectedCategory by remember {
+        mutableStateOf<CardCategory?>(null)
+    }
 
     ExploreContent(
         auctions = auctions,
@@ -97,11 +100,9 @@ fun ExploreScreen(
                 endingWithinDays = filterOptions.endingWithinDays,
                 minPrice = filterOptions.minPrice.takeIf { it > 0.0 },
                 maxPrice = filterOptions.maxPrice,
-                condition = filterOptions.condition
-                    .takeIf { it != com.gps_g6.bestbiddertcg.feature.explore.presentation.components.CardConditionFilter.ANY }
-                    ?.name,
-                collection = selectedCardCollection,
-                category = selectedCategory
+                condition = filterOptions.condition?.apiValue,
+                collection = null,
+                category = selectedCategory?.apiValue
             )
         },
         onFiltersClick = {
@@ -110,13 +111,12 @@ fun ExploreScreen(
         onClearFilters = {
             searchQuery = ""
             filterOptions = AuctionFilterOptions(endingWithinDays = null)
-            selectedCardCollection = "Todas"
-            selectedCategory = "Todas"
+            selectedCategory = null
             viewModel.clearFilters()
         },
-        selectedCardCollection = selectedCardCollection,
-        onCardCollectionSelected = { collection ->
-            selectedCardCollection = collection
+        selectedCategory = selectedCategory,
+        onCategorySelected = { category ->
+            selectedCategory = category
             viewModel.applyFilters(
                 query = searchQuery,
                 active = when (filterOptions.status) {
@@ -127,11 +127,9 @@ fun ExploreScreen(
                 endingWithinDays = filterOptions.endingWithinDays,
                 minPrice = filterOptions.minPrice.takeIf { it > 0.0 },
                 maxPrice = filterOptions.maxPrice,
-                condition = filterOptions.condition
-                    .takeIf { it != com.gps_g6.bestbiddertcg.feature.explore.presentation.components.CardConditionFilter.ANY }
-                    ?.name,
-                collection = collection,
-                category = selectedCategory
+                condition = filterOptions.condition?.apiValue,
+                collection = null,
+                category = category?.apiValue
             )
         },
         onAuctionClick = onAuctionClick
@@ -156,11 +154,9 @@ fun ExploreScreen(
                     endingWithinDays = options.endingWithinDays,
                     minPrice = options.minPrice.takeIf { it > 0.0 },
                     maxPrice = options.maxPrice,
-                    condition = options.condition
-                        .takeIf { it != com.gps_g6.bestbiddertcg.feature.explore.presentation.components.CardConditionFilter.ANY }
-                        ?.name,
-                    collection = selectedCardCollection,
-                    category = selectedCategory
+                    condition = options.condition?.apiValue,
+                    collection = null,
+                    category = selectedCategory?.apiValue
                 )
             }
         )
@@ -181,7 +177,7 @@ private fun SearchInput(
             .padding(top = AppSpacing.m)
             .height(40.dp),
         shape = RoundedCornerShape(AppCornerRadius.small),
-        color = Surface,
+        color = AppSurface,
         border = BorderStroke(1.dp, Border)
     ) {
         Row(
@@ -228,33 +224,32 @@ private fun SearchInput(
  * Filtros de colecciones de cartas en la pantalla explore.
  */
 @Composable
-private fun CardCollectionFilters(
-    selectedCardCollection: String,
-    onCardCollectionSelected: (String) -> Unit
+private fun CardCategoryFilters(
+    selectedCategory: CardCategory?,
+    onCategorySelected: (CardCategory?) -> Unit
 ) {
-    val cardCollections = listOf("Todas", "Pokemon", "Riftbound", "Magic")
-
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.s),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        cardCollections.forEach { cardCollection ->
-            val isSelected = cardCollection == selectedCardCollection
+        val categories = listOf<CardCategory?>(null) +
+                CardCategory.entries
+
+        categories.forEach { category ->
+            val isSelected = category == selectedCategory
 
             Surface(
-                onClick = {
-                    onCardCollectionSelected(cardCollection)
-                },
+                onClick = { onCategorySelected(category) },
                 shape = RoundedCornerShape(50),
-                color = if (isSelected) PrimaryLight else Surface,
+                color = if (isSelected) PrimaryLight else AppSurface,
                 border = BorderStroke(
                     1.dp,
                     if (isSelected) PrimaryLight else Border
                 )
             ) {
                 Text(
-                    text = cardCollection,
+                    text = category?.let { stringResource(it.labelRes) } ?: "Todas",
                     modifier = Modifier.padding(
                         horizontal = AppSpacing.m,
                         vertical = AppSpacing.s
@@ -362,7 +357,7 @@ private fun SortSelector(
         Surface(
             onClick = { expanded = true },
             shape = RoundedCornerShape(AppCornerRadius.small),
-            color = Surface,
+            color = AppSurface,
             border = BorderStroke(1.dp, Border)
         ) {
             Row(
@@ -389,7 +384,7 @@ private fun SortSelector(
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.background(Surface)
+            modifier = Modifier.background(AppSurface)
         ) {
             Text(
                 text = "ORDENAR POR",
@@ -433,7 +428,7 @@ private fun SortSelector(
                             onSortSelected(option)
                         },
                         modifier = Modifier.background(
-                            if (isSelected) PrimaryLight else Surface
+                            if (isSelected) PrimaryLight else AppSurface
                         )
                     )
                 }
@@ -489,7 +484,7 @@ private fun EmptyState(
             Text(
                 text = "Limpiar filtros",
                 style = MaterialTheme.typography.labelMedium,
-                color = Surface
+                color = AppSurface
             )
         }
     }
@@ -510,8 +505,8 @@ private fun ExploreContent(
     onSearchQueryChange: (String) -> Unit,
     onFiltersClick: () -> Unit,
     onClearFilters: () -> Unit,
-    selectedCardCollection: String,
-    onCardCollectionSelected: (String) -> Unit,
+    selectedCategory: CardCategory?,
+    onCategorySelected: (CardCategory?) -> Unit,
     onAuctionClick: (AuctionSummary) -> Unit
 ) {
 
@@ -533,9 +528,9 @@ private fun ExploreContent(
 
             Spacer(modifier = Modifier.height(AppSpacing.m))
 
-            CardCollectionFilters(
-                selectedCardCollection = selectedCardCollection,
-                onCardCollectionSelected = onCardCollectionSelected
+            CardCategoryFilters(
+                selectedCategory = selectedCategory,
+                onCategorySelected = onCategorySelected
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.l))
@@ -627,8 +622,8 @@ private fun ExploreScreenPreview() {
             onSearchQueryChange = {},
             onFiltersClick = {},
             onClearFilters = {},
-            selectedCardCollection = "Todas",
-            onCardCollectionSelected = {},
+            selectedCategory = null,
+            onCategorySelected = {},
             onAuctionClick = {}
         )
     }

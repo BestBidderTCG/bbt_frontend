@@ -11,9 +11,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.R
-import com.gps_g6.bestbiddertcg.core.model.CardCategory
 import com.gps_g6.bestbiddertcg.core.ui.components.AppTopBar
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.AppStepProgress
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.PreferenceItem
 
@@ -81,7 +81,7 @@ fun PreferencesScreen(
             ) {
                 CardCategory.entries.forEach { category ->
                     PreferenceItem(
-                        title = stringResource(category.displayNameRes),
+                        title = stringResource(category.labelRes),
                         selected = category in selectedPreferences,
                         onClick = {
                             onPreferenceToggle(category)
@@ -160,7 +160,7 @@ private fun PreferencesScreenPreview() {
         PreferencesScreen(
             selectedPreferences = setOf(
                 CardCategory.POKEMON,
-                CardCategory.DRAGON_BALL
+                CardCategory.MAGIC
             ),
             onPreferenceToggle = {},
             onFinishClick = {},

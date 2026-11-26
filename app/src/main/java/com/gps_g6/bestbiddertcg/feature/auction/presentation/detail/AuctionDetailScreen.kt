@@ -29,10 +29,14 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.Background
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.components.AuctionBidSection
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.components.AuctionCardHeader
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.components.AuctionInfoSection
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.components.AuctionSellerSection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 
 @Composable
 fun AuctionDetailScreen(
@@ -159,17 +163,17 @@ private fun AuctionDetailScreenPreview() {
         AuctionDetailScreen(
             uiState = AuctionDetailUiState(
                 cardName = "Piplup",
-                cardCategory = "Pokemon",
-                cardCollection = "Pokemon 151",
+                cardCategory = CardCategory.POKEMON,
+                cardCollection = CardCollection.POKEMON_151,
                 cardNumber = "393",
                 cardImage = "",
-                status = AuctionDetailStatus.ACTIVE,
+                status = AuctionStatus.ACTIVE,
                 isOwner = false,
                 currentBid = 45.0,
                 startingPrice = 10.0,
                 bidCount = 12,
                 remainingTime = "2 h 35 min",
-                cardCondition = "Buen estado",
+                cardCondition = CardCondition.GOOD,
                 minimumIncrement = 1.0,
                 publishedAt = "12/10/2026, 14h20",
                 description = "Subasto la carta ya que la tengo repe :p",

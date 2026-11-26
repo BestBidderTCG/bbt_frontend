@@ -27,7 +27,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import coil3.compose.AsyncImage
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import com.gps_g6.bestbiddertcg.R
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
@@ -40,7 +42,7 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
 @Composable
 fun AuctionItem(
     cardName: String,
-    cardImage: String,
+    cardImage: String?,
     currentBid: Double,
     remainingTime: String,
     modifier: Modifier = Modifier,
@@ -59,17 +61,19 @@ fun AuctionItem(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            val context = LocalContext.current
+
             AsyncImage(
-                model = if (cardImage.isBlank()) {
-                    R.drawable.sample_piplup
-                } else {
-                    cardImage
-                },
+                model = cardImage,
+                imageLoader = NetworkModule.imageLoader(context),
                 contentDescription = cardName,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
-                contentScale = ContentScale.Fit
+                contentScale = ContentScale.Fit,
+                placeholder = painterResource(R.drawable.sample_piplup),
+                error = painterResource(R.drawable.sample_piplup),
+                fallback = painterResource(R.drawable.sample_piplup)
             )
 
             Spacer(modifier = Modifier.height(AppSpacing.s))

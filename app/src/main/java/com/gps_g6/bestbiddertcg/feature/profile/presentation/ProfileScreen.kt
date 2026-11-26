@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.gps_g6.bestbiddertcg.core.ui.theme.*
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.components.*
@@ -72,7 +73,7 @@ fun ProfileScreen(
                     )
 
                     Button(onClick = onRetryClick) {
-                        Text("Reintentar")
+                        Text(stringResource(R.string.common_retry))
                     }
                 }
             }
@@ -88,6 +89,13 @@ fun ProfileScreen(
                 )
             }
         }
+
+        ProfileWalletCard(
+            modifier = Modifier.padding(
+                horizontal = AppSpacing.l,
+                vertical = AppSpacing.m
+            )
+        )
 
         // Tabs fijas
         ProfileTabs(
@@ -125,12 +133,14 @@ fun ProfileScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = profile.cardsError,
+                                    text = stringResource(
+                                        R.string.profile_collection_load_error
+                                    ),
                                     color = TextSecondary
                                 )
 
                                 TextButton(onClick = onRetryCardsClick) {
-                                    Text("Reintentar")
+                                    Text(stringResource(R.string.common_retry))
                                 }
                             }
                         }

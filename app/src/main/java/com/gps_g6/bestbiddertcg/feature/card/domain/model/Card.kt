@@ -6,9 +6,11 @@ data class Card(
     val ownerId: String,
     val name: String,
     val image: String,
-    val category: String,
-    val collection: String?,
+    val category: CardCategory?,
+    val collection: CardCollection?,
     val num: Int?,
-    val state: String,
-    val description: String?
+    val state: CardCondition,
+    val description: String?,
+    val createdAt: String? = null,
+    val auction: CardAuction? = null
 )

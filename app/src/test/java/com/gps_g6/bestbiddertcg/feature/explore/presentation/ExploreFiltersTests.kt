@@ -1,8 +1,12 @@
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -113,7 +117,9 @@ class ExploreFiltersTest {
     fun `condition filter shows matching auctions`() = runTest(testDispatcher) {
         prepareAuctions(this)
 
-        viewModel.applyFilters(condition = "USED")
+        viewModel.applyFilters(
+            condition = CardCondition.LIGHT_PLAYED.apiValue
+        )
 
         assertEquals(
             listOf("Pikachu"),
@@ -128,7 +134,7 @@ class ExploreFiltersTest {
     fun `collection filter shows matching auctions`() = runTest(testDispatcher) {
         prepareAuctions(this)
 
-        viewModel.applyFilters(collection = "Magic")
+        viewModel.applyFilters(collection = CardCollection.WILDS_OF_ELDRAINE.apiValue)
 
         assertEquals(
             listOf("Black Lotus"),
@@ -143,10 +149,10 @@ class ExploreFiltersTest {
     fun `category filter shows matching auctions`() = runTest(testDispatcher) {
         prepareAuctions(this)
 
-        viewModel.applyFilters(category = "Electric")
+        viewModel.applyFilters(category = CardCategory.MAGIC.apiValue)
 
         assertEquals(
-            listOf("Pikachu"),
+            listOf("Black Lotus"),
             viewModel.auctions.value.map { it.cardName }
         )
     }
@@ -178,7 +184,7 @@ class ExploreFiltersTest {
             active = true,
             minPrice = 30.0,
             maxPrice = 60.0,
-            collection = "Pokemon"
+            collection = CardCollection.POKEMON_151.apiValue
         )
 
         assertEquals(
@@ -214,28 +220,28 @@ class ExploreFiltersTest {
     private fun prepareAuctions(testScope: TestScope) {
         val auctions = listOf(
             createAuction(
-                "1", "Charizard", 50.0, 1, "IN_PROGRESS",
-                collection = "Pokemon",
-                condition = "NEW",
-                category = "Fire"
+                "1", "Charizard", 50.0, 1, AuctionStatus.ACTIVE,
+                collection = CardCollection.POKEMON_151,
+                condition = CardCondition.NEW,
+                category = CardCategory.POKEMON
             ),
             createAuction(
-                "2", "Pikachu", 20.0, 2, "UPCOMING",
-                collection = "Pokemon",
-                condition = "USED",
-                category = "Electric"
+                "2", "Pikachu", 20.0, 2, AuctionStatus.UPCOMING,
+                collection = CardCollection.DESTINOS_DE_PALDEA,
+                condition = CardCondition.LIGHT_PLAYED,
+                category = CardCategory.POKEMON
             ),
             createAuction(
-                "3", "Black Lotus", 100.0, 5, "IN_PROGRESS",
-                collection = "Magic",
-                condition = "NEW",
-                category = "Artifact"
+                "3", "Black Lotus", 100.0, 5, AuctionStatus.ACTIVE,
+                collection = CardCollection.WILDS_OF_ELDRAINE,
+                condition = CardCondition.NEW,
+                category = CardCategory.MAGIC
             ),
             createAuction(
-                "4", "Mewtwo", 80.0, 3, "IN_PROGRESS",
-                collection = "Pokemon",
-                condition = "NEW",
-                category = "Psychic"
+                "4", "Mewtwo", 80.0, 3, AuctionStatus.ACTIVE,
+                collection = CardCollection.SURGING_SPARKS,
+                condition = CardCondition.NEW,
+                category = CardCategory.POKEMON
             )
         )
 
@@ -255,10 +261,10 @@ class ExploreFiltersTest {
         name: String,
         price: Double,
         days: Int,
-        status: String,
-        collection: String,
-        condition: String,
-        category: String
+        status: AuctionStatus,
+        category: CardCategory,
+        collection: CardCollection,
+        condition: CardCondition
     ): AuctionSummary {
         return AuctionSummary(
             id = id,

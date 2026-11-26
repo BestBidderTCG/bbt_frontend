@@ -2,47 +2,52 @@
 package com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.Box
-import com.gps_g6.bestbiddertcg.core.ui.theme.Background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import androidx.compose.material3.Icon
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import com.gps_g6.bestbiddertcg.R
-import androidx.compose.ui.tooling.preview.Preview
-import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.runtime.remember
+import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
 import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.Background
+import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Success
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
-import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailStatus
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
 
 /**
  * Barra de encabezado de la pantalla de detalle de subasta.
@@ -60,12 +65,11 @@ fun AuctionCardHeader(
             .padding(horizontal = AppSpacing.l),
         verticalAlignment = Alignment.Top
     ) {
+        val context = LocalContext.current
+
         AsyncImage(
-            model = if (uiState.cardImage.isBlank()) {
-                R.drawable.sample_piplup
-            } else {
-                uiState.cardImage
-            },
+            model = uiState.cardImage,
+            imageLoader = NetworkModule.imageLoader(context),
             contentDescription = uiState.cardName,
             modifier = Modifier
                 .width(136.dp)
@@ -74,7 +78,10 @@ fun AuctionCardHeader(
                     color = Surface,
                     shape = RoundedCornerShape(AppCornerRadius.medium)
                 ),
-            contentScale = androidx.compose.ui.layout.ContentScale.Fit
+            contentScale = ContentScale.Fit,
+            placeholder = painterResource(R.drawable.sample_piplup),
+            error = painterResource(R.drawable.sample_piplup),
+            fallback = painterResource(R.drawable.sample_piplup)
         )
 
         Spacer(modifier = Modifier.width(AppSpacing.l))
@@ -88,10 +95,14 @@ fun AuctionCardHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                val isActive = uiState.status == AuctionDetailStatus.ACTIVE
+                val isActive = uiState.status == AuctionStatus.ACTIVE
 
                 Text(
-                    text = if (isActive) "Activa" else "Próxima",
+                    text = when (uiState.status) {
+                        AuctionStatus.ACTIVE -> stringResource(R.string.auction_status_active)
+                        AuctionStatus.UPCOMING -> stringResource(R.string.auction_status_upcoming)
+                        AuctionStatus.FINISHED -> stringResource(R.string.auction_status_finished)
+                    },
                     modifier = Modifier
                         .background(
                             color = if (isActive) {
@@ -125,14 +136,14 @@ fun AuctionCardHeader(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_favorites_active),
-                                contentDescription = "Añadir a favoritos",
+                                contentDescription = stringResource(R.string.favorites_add),
                                 tint = Color.Unspecified,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
                     }
 
-                    uiState.status == AuctionDetailStatus.UPCOMING -> {
+                    uiState.status == AuctionStatus.UPCOMING -> {
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
@@ -146,7 +157,7 @@ fun AuctionCardHeader(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_edit),
-                                contentDescription = "Editar subasta",
+                                contentDescription = stringResource(R.string.auction_edit),
                                 tint = Color.Unspecified,
                                 modifier = Modifier.size(24.dp)
                             )
@@ -163,25 +174,29 @@ fun AuctionCardHeader(
             )
 
             Text(
-                text = "Categoría",
+                text = stringResource(R.string.category_string),
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
 
             Text(
-                text = uiState.cardCategory,
+                text = uiState.cardCategory?.let {
+                    stringResource(it.labelRes)
+                } ?: "—",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextPrimary
             )
 
             Text(
-                text = "Colección",
+                text = stringResource(R.string.collection_string),
                 style = MaterialTheme.typography.bodySmall,
                 color = TextSecondary
             )
 
             Text(
-                text = uiState.cardCollection,
+                text = uiState.cardCollection?.let {
+                    stringResource(it.labelRes)
+                } ?: "—",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextPrimary
             )
@@ -198,7 +213,7 @@ fun AuctionCardHeader(
 
 @Composable
 private fun AuctionCardHeaderPreviewContent(
-    status: AuctionDetailStatus,
+    status: AuctionStatus,
     isOwner: Boolean,
     isFavorite: Boolean = false
 ) {
@@ -212,8 +227,8 @@ private fun AuctionCardHeaderPreviewContent(
                 uiState = AuctionDetailUiState(
                     cardName = "Piplup",
                     cardImage = "",
-                    cardCategory = "Pokemon",
-                    cardCollection = "Pokemon 151",
+                    cardCategory = CardCategory.POKEMON,
+                    cardCollection = CardCollection.POKEMON_151,
                     cardNumber = "393",
                     status = status,
                     isOwner = isOwner,
@@ -237,7 +252,7 @@ private fun AuctionCardHeaderPreviewContent(
 @Composable
 private fun ActiveOtherUserPreview() {
     AuctionCardHeaderPreviewContent(
-        status = AuctionDetailStatus.ACTIVE,
+        status = AuctionStatus.ACTIVE,
         isOwner = false
     )
 }
@@ -253,7 +268,7 @@ private fun ActiveOtherUserPreview() {
 @Composable
 private fun UpcomingOtherUserPreview() {
     AuctionCardHeaderPreviewContent(
-        status = AuctionDetailStatus.UPCOMING,
+        status = AuctionStatus.UPCOMING,
         isOwner = false
     )
 }
@@ -269,7 +284,7 @@ private fun UpcomingOtherUserPreview() {
 @Composable
 private fun ActiveOwnerPreview() {
     AuctionCardHeaderPreviewContent(
-        status = AuctionDetailStatus.ACTIVE,
+        status = AuctionStatus.ACTIVE,
         isOwner = true
     )
 }
@@ -285,7 +300,7 @@ private fun ActiveOwnerPreview() {
 @Composable
 private fun UpcomingOwnerPreview() {
     AuctionCardHeaderPreviewContent(
-        status = AuctionDetailStatus.UPCOMING,
+        status = AuctionStatus.UPCOMING,
         isOwner = true
     )
 }

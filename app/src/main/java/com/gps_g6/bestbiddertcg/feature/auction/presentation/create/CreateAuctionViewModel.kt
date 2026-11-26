@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.CreateAuction
 import com.gps_g6.bestbiddertcg.feature.auction.domain.usecase.CreateAuctionUseCase
-import com.gps_g6.bestbiddertcg.feature.card.domain.model.Card
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardSummary
 import com.gps_g6.bestbiddertcg.feature.card.domain.usecase.GetMyCardsUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.session.ProfileManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -60,8 +60,15 @@ class CreateAuctionViewModel(
         }
     }
 
-    fun selectCard(card: Card) {
-        _uiState.update { it.copy(selectedCard = card, errorMessage = null) }
+    fun selectCard(card: CardSummary) {
+        if (card.inAuction) return
+
+        _uiState.update {
+            it.copy(
+                selectedCard = card,
+                errorMessage = null
+            )
+        }
     }
 
     fun updateStartingPrice(value: String) {
@@ -110,6 +117,16 @@ class CreateAuctionViewModel(
             showError("Selecciona una carta.")
             return
         }
+
+        // Comprobación extra por si se ha actualizado el listado de cartas
+        // (mediante sse) y la carta deja de estar disponible
+        val latestCard = state.cards.firstOrNull { it.id == card.id }
+
+        if (latestCard == null || latestCard.inAuction) {
+            showError("La carta seleccionada ya no está disponible para subastar.")
+            return
+        }
+
         if (price == null || price <= 0.0) {
             showError("Introduce un precio inicial válido.")
             return

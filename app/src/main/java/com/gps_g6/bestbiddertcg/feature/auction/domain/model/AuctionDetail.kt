@@ -1,13 +1,18 @@
 package com.gps_g6.bestbiddertcg.feature.auction.domain.model
 
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCategory
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCollection
+import com.gps_g6.bestbiddertcg.feature.card.domain.model.CardCondition
+
 data class AuctionDetail(
     val id: String,
-    val status: String,
+    val status: AuctionStatus,
     val cardName: String,
-    val cardImage: String,
-    val cardCollection: String?,
+    val cardImage: String?,
+    val cardCategory: CardCategory?,
+    val cardCollection: CardCollection?,
     val cardNumber: Int?,
-    val cardState: String,
+    val cardState: CardCondition,
     val minPrize: Double,
     val increment: Double,
     val lastBid: Double?,

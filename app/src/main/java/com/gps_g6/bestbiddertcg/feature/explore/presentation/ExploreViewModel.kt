@@ -1,9 +1,11 @@
 
 package com.gps_g6.bestbiddertcg.feature.explore.presentation
 
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSort
+import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionSummary
 import com.gps_g6.bestbiddertcg.feature.auction.domain.repository.AuctionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -106,7 +108,7 @@ class ExploreViewModel(
 
     fun clearFilters() {
         filters = ExploreFilters()
-        loadAuctions()
+        _auctions.value = filterAuctions(allAuctions)
     }
 
     private fun filterAuctions(auctions: List<AuctionSummary>): List<AuctionSummary> {
@@ -115,10 +117,16 @@ class ExploreViewModel(
             (f.query == null || auction.cardName.contains(f.query, ignoreCase = true)) &&
                     (f.minPrice == null || auction.currentBid >= f.minPrice) &&
                     (f.maxPrice == null || auction.currentBid <= f.maxPrice) &&
-                    (f.condition == null || auction.cardState.equals(f.condition, ignoreCase = true)) &&
-                    (f.collection == null || auction.cardCollection.equals(f.collection, ignoreCase = true)) &&
-                    (f.category == null || auction.cardCategory.equals(f.category, ignoreCase = true)) &&
-                    (f.active == null || auction.status.equals(if (f.active) "IN_PROGRESS" else "UPCOMING", ignoreCase = true)) &&
+                    (f.condition == null || auction.cardState.apiValue.equals(f.condition, ignoreCase = true)) &&
+                    (f.category == null ||
+                            auction.cardCategory?.apiValue.equals(f.category, ignoreCase = true)) &&
+                    (f.collection == null ||
+                            auction.cardCollection?.apiValue.equals(f.collection, ignoreCase = true)) &&
+                    (f.active == null || auction.status == if (f.active) {
+                        AuctionStatus.ACTIVE
+                    } else {
+                        AuctionStatus.UPCOMING
+                    }) &&
                     (f.endingWithinDays == null || auction.remainingDays <= maxOf(f.endingWithinDays, 1))
         }
     }
