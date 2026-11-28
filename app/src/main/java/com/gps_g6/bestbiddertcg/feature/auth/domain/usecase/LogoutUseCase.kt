@@ -6,20 +6,35 @@ import kotlinx.coroutines.CancellationException
 
 class LogoutUseCase(
     private val repository: AuthRepository,
-    private val sessionManager: SessionManager
+    private val sessionManager: SessionManager,
+    private val unregisterDevice: suspend () -> Unit = {}
 ) {
 
     suspend operator fun invoke() {
         val refreshToken = sessionManager.getRefreshToken()
 
         try {
-            if (!refreshToken.isNullOrBlank()) {
-                repository.logout(refreshToken)
+            // Unregister FCM before revoking authentication.
+            try {
+                if (sessionManager.isAuthenticated()) {
+                    unregisterDevice()
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // FCM failure must not prevent local logout.
             }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            // Remote revocation may fail, but local logout proceeds.
+
+            // Revoke the authentication session.
+            try {
+                if (!refreshToken.isNullOrBlank()) {
+                    repository.logout(refreshToken)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                // Remote revocation may fail.
+            }
         } finally {
             sessionManager.clearSession()
         }

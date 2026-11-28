@@ -1,14 +1,21 @@
 package com.gps_g6.bestbiddertcg.app
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.gps_g6.bestbiddertcg.app.navigation.AppNavigation
 import com.gps_g6.bestbiddertcg.core.network.NetworkModule
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
+import com.gps_g6.bestbiddertcg.feature.notification.presentation.NotificationChannelManager
+
 
 /**
  *
@@ -17,8 +24,31 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
  */
 class MainActivity : ComponentActivity() {
 
+    private val notificationPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { granted ->
+            // El usuario puede aceptar o rechazar el permiso.
+            // La aplicación seguirá funcionando en ambos casos.
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        NotificationChannelManager.createChannel(this)
+
+        if (
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            notificationPermissionLauncher.launch(
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+        }
+
         NetworkModule.initialize(applicationContext)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)

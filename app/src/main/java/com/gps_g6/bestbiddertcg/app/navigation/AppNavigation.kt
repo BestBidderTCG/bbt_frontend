@@ -1,5 +1,6 @@
 package com.gps_g6.bestbiddertcg.app.navigation
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -24,6 +25,7 @@ import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.RestoreSessionUseCas
 import com.gps_g6.bestbiddertcg.feature.auth.presentation.*
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 import com.gps_g6.bestbiddertcg.feature.card.presentation.details.MyCardDetailsRoute
+import com.gps_g6.bestbiddertcg.feature.notification.data.fcm.FcmTokenManager
 import com.gps_g6.bestbiddertcg.feature.profile.domain.usecase.ProfileSetupUseCase
 import com.gps_g6.bestbiddertcg.feature.profile.presentation.*
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountRequestedScreen
@@ -32,6 +34,7 @@ import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountScree
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.DeleteAccountUiState
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.SettingsRoute
 import com.gps_g6.bestbiddertcg.feature.settings.presentation.SettingsScreen
+import kotlinx.coroutines.CancellationException
 
 /**
  * Coordinates navigation between authentication,
@@ -357,6 +360,28 @@ fun AppNavigation() {
 
         // Main application
         composable(AppDestination.MAIN.route) {
+
+            LaunchedEffect(Unit) {
+                if (NetworkModule.sessionManager.isAuthenticated()) {
+                    try {
+                        FcmTokenManager().registerCurrentDevice()
+
+                        Log.d(
+                            "BestBidderFCM",
+                            "FCM device registered successfully"
+                        )
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Log.e(
+                            "BestBidderFCM",
+                            "Unable to register FCM device",
+                            e
+                        )
+                    }
+                }
+            }
+
             BestBidderApp(
                 onCardClick = { cardId ->
                     navController.navigate("card_details/$cardId") {
@@ -370,7 +395,6 @@ fun AppNavigation() {
                 }
             )
         }
-
 
         // Own card details
         composable(

@@ -19,6 +19,4 @@ interface DeviceApi {
         @Query("token") token: String
     ): Response<Unit>
 
-    @POST("api/devices/test-push")
-    suspend fun sendTestPush(): Response<Unit>
 }

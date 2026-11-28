@@ -19,6 +19,7 @@ import com.gps_g6.bestbiddertcg.feature.auth.data.AuthRepositoryImpl
 import com.gps_g6.bestbiddertcg.feature.auth.data.remote.AuthApi
 import com.gps_g6.bestbiddertcg.feature.auth.domain.usecase.LogoutUseCase
 import com.gps_g6.bestbiddertcg.feature.auth.presentation.LogoutViewModel
+import com.gps_g6.bestbiddertcg.feature.notification.data.fcm.FcmTokenManager
 import com.gps_g6.bestbiddertcg.feature.profile.di.ProfileModule
 
 @Composable
@@ -47,9 +48,14 @@ fun SettingsRoute(
 
                 val repository = AuthRepositoryImpl(api)
 
+                val fcmTokenManager = FcmTokenManager()
+
                 val logoutUseCase = LogoutUseCase(
                     repository = repository,
-                    sessionManager = NetworkModule.sessionManager
+                    sessionManager = NetworkModule.sessionManager,
+                    unregisterDevice = {
+                        fcmTokenManager.unregisterCurrentDevice()
+                    }
                 )
 
                 return LogoutViewModel(logoutUseCase) as T

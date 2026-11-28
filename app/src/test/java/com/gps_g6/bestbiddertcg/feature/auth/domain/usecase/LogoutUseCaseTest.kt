@@ -93,4 +93,63 @@ class LogoutUseCaseTest {
         assertFalse(manager.isAuthenticated())
         assertNull(storage.getTokens())
     }
+
+    @Test
+    fun `logout unregisters FCM device before revoking session`() =
+        runBlocking {
+            val storage = FakeStorage()
+            val manager = SessionManager(storage)
+            val repository = FakeAuthRepository()
+
+            manager.saveSession("access-test", "refresh-test")
+
+            var deviceUnregistered = false
+
+            val useCase = LogoutUseCase(
+                repository = repository,
+                sessionManager = manager,
+                unregisterDevice = {
+                    assertTrue(manager.isAuthenticated())
+                    assertNull(repository.receivedRefreshToken)
+                    deviceUnregistered = true
+                }
+            )
+
+            useCase()
+
+            assertTrue(deviceUnregistered)
+            assertEquals(
+                "refresh-test",
+                repository.receivedRefreshToken
+            )
+            assertFalse(manager.isAuthenticated())
+        }
+
+    @Test
+    fun `logout continues when FCM unregistration fails`() =
+        runBlocking {
+            val storage = FakeStorage()
+            val manager = SessionManager(storage)
+            val repository = FakeAuthRepository()
+
+            manager.saveSession("access-test", "refresh-test")
+
+            val useCase = LogoutUseCase(
+                repository = repository,
+                sessionManager = manager,
+                unregisterDevice = {
+                    throw IOException("FCM unavailable")
+                }
+            )
+
+            useCase()
+
+            assertEquals(
+                "refresh-test",
+                repository.receivedRefreshToken
+            )
+            assertFalse(manager.isAuthenticated())
+            assertNull(storage.getTokens())
+        }
+
 }

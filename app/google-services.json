@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "624607088006",
+    "project_id": "bestbiddertcg",
+    "storage_bucket": "bestbiddertcg.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624607088006:android:99246ca2db0435dcec7007",
+        "android_client_info": {
+          "package_name": "com.gps_g6.bestbiddertcg"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZSB3PgUYVkZA2HpTQQ-YPWwK6xRT6Bk4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

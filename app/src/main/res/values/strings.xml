@@ -217,6 +217,10 @@
     <string name="common_understood">Entendido</string>
     <string name="common_retry">Reintentar</string>
 
+    <!-- Notificaciones push -->
+    <string name="notification_channel_name">Actividad de BestBidder TCG</string>
+    <string name="notification_channel_description">Nuevos seguidores, pujas superadas y actividad en tus subastas</string>
+
     <!-- Accessibility -->
     <string name="profile_avatar_description">Avatar del usuario</string>
     <string name="notifications_description">Notificaciones</string>
