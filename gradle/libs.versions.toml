@@ -20,6 +20,8 @@ firebaseCrashlyticsBuildtools = "3.0.8"
 kotlinxCoroutines = "1.10.2"
 mockk = "1.14.9"
 coil = "3.3.0"
+firebaseBom = "35.2.0"
+googleServices = "4.6.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -47,9 +49,11 @@ androidx-compose-foundation-layout = { group = "androidx.compose.foundation", na
 firebase-crashlytics-buildtools = { group = "com.google.firebase", name = "firebase-crashlytics-buildtools", version.ref = "firebaseCrashlyticsBuildtools" }
 kotlinx-coroutines-test = {  group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging" }
 
 [plugins]
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
