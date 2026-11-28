@@ -11,12 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.gps_g6.bestbiddertcg.R
+import com.gps_g6.bestbiddertcg.core.ui.theme.Accent
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppTypography
+import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
+import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 
 @Composable
@@ -27,24 +30,23 @@ fun BidWarningSection(
         modifier = modifier
             .fillMaxWidth()
             .background(
-                color = Color(0xFFFFEDD5),
-                shape = RoundedCornerShape(12.dp)
+                color = PrimaryLight,
+                shape = RoundedCornerShape(AppCornerRadius.medium)
             )
-            .padding(16.dp),
+            .padding(AppSpacing.l),
         verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.m)
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_info),
             contentDescription = null,
-            tint = Color(0xFFD0440A)
+            tint = Accent
         )
 
         Text(
             text = "Las pujas son irrevocables. Una vez confirmada, no podrás retirarla.",
-            color = Color(0xFF303846),
-            fontSize = 16.sp,
-            lineHeight = 22.sp
+            color = TextPrimary,
+            style = AppTypography.bodyMedium
         )
     }
 }

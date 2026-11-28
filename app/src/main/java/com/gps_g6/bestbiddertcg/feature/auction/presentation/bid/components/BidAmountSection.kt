@@ -8,21 +8,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppTypography
+import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 
 @Composable
 fun BidAmountSection(
@@ -35,22 +36,26 @@ fun BidAmountSection(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = AppSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppCornerRadius.large),
         border = BorderStroke(1.dp, Border)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            modifier = Modifier.padding(AppSpacing.l),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.m)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Puja actual", color = TextSecondary, fontSize = 18.sp)
+                Text(
+                    text = "Puja actual",
+                    color = TextSecondary,
+                    style = AppTypography.bodyLarge
+                )
                 Text(
                     text = "%.2f €".format(currentBid),
                     color = TextPrimary,
-                    fontSize = 18.sp
+                    style = AppTypography.bodyLarge
                 )
             }
 
@@ -60,11 +65,15 @@ fun BidAmountSection(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text("Incremento mínimo", color = TextSecondary, fontSize = 18.sp)
+                Text(
+                    text = "Incremento mínimo",
+                    color = TextSecondary,
+                    style = AppTypography.bodyLarge
+                )
                 Text(
                     text = "%.2f €".format(minimumIncrement),
                     color = TextPrimary,
-                    fontSize = 18.sp
+                    style = AppTypography.bodyLarge
                 )
             }
 
@@ -78,15 +87,13 @@ fun BidAmountSection(
                 Text(
                     text = "Puja mínima permitida",
                     color = TextPrimary,
-                    fontSize = 17.sp,
-                    fontWeight = FontWeight.SemiBold
+                    style = AppTypography.labelMedium
                 )
 
                 Text(
                     text = "%.2f €".format(minimumAllowedBid),
-                    color = Color(0xFFD0440A),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold
+                    color = Primary,
+                    style = AppTypography.headlineLarge
                 )
             }
         }

@@ -18,6 +18,7 @@ data class AuctionDetailUiState(
 
     val status: AuctionStatus = AuctionStatus.ACTIVE,
     val isOwner: Boolean = false,
+    val isWinningBid: Boolean = false,
 
     val currentBid: Double = 0.0,
     val startingPrice: Double = 0.0,

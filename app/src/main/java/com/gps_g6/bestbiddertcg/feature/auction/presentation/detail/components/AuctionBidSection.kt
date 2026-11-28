@@ -36,6 +36,7 @@ import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
+import com.gps_g6.bestbiddertcg.feature.auction.presentation.bid.components.BidLeadingSection
 import com.gps_g6.bestbiddertcg.feature.auction.domain.model.AuctionStatus
 import com.gps_g6.bestbiddertcg.feature.auction.presentation.detail.AuctionDetailUiState
 import java.util.Locale
@@ -137,37 +138,66 @@ fun AuctionBidSection(
         }
 
         if (isActive) {
-            Button(
-                onClick = if (uiState.isOwner) onHistoryClick else onBidClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                shape = RoundedCornerShape(AppCornerRadius.medium),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Primary
-                )
-            ) {
-                Icon(
-                    painter = painterResource(
-                        if (uiState.isOwner) R.drawable.ic_history
-                        else R.drawable.ic_bid_white
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp),
-                    tint = Color.Unspecified
-                )
+            when {
+                uiState.isOwner -> {
+                    Button(
+                        onClick = onHistoryClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(AppCornerRadius.medium),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Primary
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_history),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.Unspecified
+                        )
 
-                Spacer(modifier = Modifier.size(AppSpacing.s))
+                        Spacer(modifier = Modifier.size(AppSpacing.s))
 
-                Text(
-                    text = if (uiState.isOwner) {
-                        "Ver historial de pujas"
-                    } else {
-                        "Pujar"
-                    },
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.White
-                )
+                        Text(
+                            text = "Ver historial de pujas",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    }
+                }
+
+                uiState.isWinningBid -> {
+                    BidLeadingSection()
+                }
+
+                else -> {
+                    Button(
+                        onClick = onBidClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                        shape = RoundedCornerShape(AppCornerRadius.medium),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Primary
+                        )
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_bid_white),
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                            tint = Color.Unspecified
+                        )
+
+                        Spacer(modifier = Modifier.size(AppSpacing.s))
+
+                        Text(
+                            text = "Pujar",
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.White
+                        )
+                    }
+                }
             }
         } else {
             Column(
@@ -213,7 +243,8 @@ fun AuctionBidSection(
 @Composable
 private fun AuctionBidSectionPreviewContent(
     status: AuctionStatus,
-    isOwner: Boolean
+    isOwner: Boolean,
+    isWinningBid: Boolean = false
 ) {
     BestBidderTCGTheme {
         Column(
@@ -225,6 +256,7 @@ private fun AuctionBidSectionPreviewContent(
                 uiState = AuctionDetailUiState(
                     status = status,
                     isOwner = isOwner,
+                    isWinningBid = isWinningBid,
                     currentBid = 45.0,
                     startingPrice = 10.0,
                     bidCount = 12,
@@ -298,6 +330,23 @@ private fun UpcomingOwnerBidPreview() {
     AuctionBidSectionPreviewContent(
         status = AuctionStatus.UPCOMING,
         isOwner = true
+    )
+}
+
+/**
+ * Vista previa de subasta activa en la que el usuario tiene la puja más alta.
+ */
+@Preview(
+    name = "Activa - Voy ganando",
+    showBackground = true,
+    backgroundColor = 0xFFFFF9F5
+)
+@Composable
+private fun ActiveWinningBidPreview() {
+    AuctionBidSectionPreviewContent(
+        status = AuctionStatus.ACTIVE,
+        isOwner = false,
+        isWinningBid = true
     )
 }
 

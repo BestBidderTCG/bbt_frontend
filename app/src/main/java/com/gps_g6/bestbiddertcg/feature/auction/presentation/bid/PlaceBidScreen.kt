@@ -79,6 +79,10 @@ fun PlaceBidScreen(
                 remainingTime = uiState.remainingTime
             )
 
+            if (uiState.hasOutbid) {
+                BidOutbidSection()
+            }
+
             BidAmountSection(
                 currentBid = uiState.currentBid,
                 minimumIncrement = uiState.minimumIncrement
@@ -90,7 +94,11 @@ fun PlaceBidScreen(
                 onBidAmountChange = onBidAmountChange
             )
 
-            BidWarningSection()
+            if (uiState.errorMessage != null) {
+                BidErrorSection()
+            } else {
+                BidWarningSection()
+            }
         }
 
         // Botón inferior fijo
@@ -103,7 +111,10 @@ fun PlaceBidScreen(
                 onClick = {
                     showConfirmationDialog = true
                 },
-                enabled = uiState.isBidAmountValid && !uiState.isLoading,
+                enabled = uiState.isBidAmountValid &&
+                        !uiState.isLoading &&
+                        !uiState.isAuctionFinished &&
+                        uiState.errorMessage == null,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
@@ -135,6 +146,12 @@ fun PlaceBidScreen(
             onDismiss = {
                 showConfirmationDialog = false
             }
+        )
+    }
+
+    if (uiState.isAuctionFinished) {
+        AuctionFinishedDialog(
+            onDismiss = onBackClick
         )
     }
 }

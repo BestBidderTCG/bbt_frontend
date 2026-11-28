@@ -25,12 +25,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.gps_g6.bestbiddertcg.core.ui.theme.Accent
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppTypography
+import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
+import com.gps_g6.bestbiddertcg.core.ui.theme.PrimaryLight
+import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
+import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
+import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
 import com.gps_g6.bestbiddertcg.R
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 
@@ -47,19 +54,19 @@ fun BidConfirmationDialog(
             modifier = Modifier
                 .fillMaxWidth()
                 .widthIn(max = 300.dp),
-            shape = RoundedCornerShape(16.dp),
-            color = Color.White
+            shape = RoundedCornerShape(AppCornerRadius.large),
+            color = AppSurface
         ) {
             Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                modifier = Modifier.padding(AppSpacing.l),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.m),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
                         .size(48.dp)
                         .background(
-                            color = Color(0xFFFFEDD5),
+                            color = PrimaryLight,
                             shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
@@ -67,72 +74,69 @@ fun BidConfirmationDialog(
                     Icon(
                         painter = painterResource(R.drawable.ic_bid_orange),
                         contentDescription = null,
-                        tint = Color.Unspecified,
+                        tint = Accent,
                         modifier = Modifier.size(26.dp)
                     )
                 }
 
                 Text(
                     text = "¿Confirmar puja?",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF263142)
+                    style = AppTypography.headlineMedium,
+                    color = TextPrimary
                 )
 
                 Text(
                     text = "Vas a realizar una puja por la siguiente cantidad:",
-                    fontSize = 14.sp,
-                    color = Color(0xFF737D8D),
+                    style = AppTypography.bodyMedium,
+                    color = TextSecondary,
                     textAlign = TextAlign.Center
                 )
 
                 Text(
                     text = "%.2f €".format(bidAmount),
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFFD0440A)
+                    style = AppTypography.headlineLarge,
+                    color = Primary
                 )
 
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            color = Color(0xFFFFEDD5),
-                            shape = RoundedCornerShape(8.dp)
+                            color = PrimaryLight,
+                            shape = RoundedCornerShape(AppCornerRadius.small)
                         )
-                        .padding(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        .padding(AppSpacing.m),
+                    horizontalArrangement = Arrangement.spacedBy(AppSpacing.s),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "ⓘ",
-                        color = Color(0xFFD0440A),
-                        fontSize = 18.sp
+                    Icon(
+                        painter = painterResource(R.drawable.ic_info),
+                        contentDescription = null,
+                        tint = Accent
                     )
 
                     Text(
                         text = "Esta puja es irrevocable. Una vez confirmada, no podrás retirarla.",
-                        fontSize = 12.sp,
-                        color = Color(0xFF303846)
+                        style = AppTypography.bodySmall,
+                        color = TextPrimary
                     )
                 }
 
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(AppSpacing.xs))
 
                 Button(
                     onClick = onConfirm,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    shape = RoundedCornerShape(9.dp),
+                    shape = RoundedCornerShape(AppCornerRadius.medium),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFFD0440A)
+                        containerColor = Primary
                     )
                 ) {
                     Text(
                         text = "Confirmar puja",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                        style = AppTypography.labelMedium
                     )
                 }
 
@@ -141,12 +145,12 @@ fun BidConfirmationDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp),
-                    shape = RoundedCornerShape(9.dp)
+                    shape = RoundedCornerShape(AppCornerRadius.medium)
                 ) {
                     Text(
                         text = "Volver y revisar",
-                        fontSize = 14.sp,
-                        color = Color(0xFFD0440A)
+                        style = AppTypography.labelMedium,
+                        color = Primary
                     )
                 }
             }

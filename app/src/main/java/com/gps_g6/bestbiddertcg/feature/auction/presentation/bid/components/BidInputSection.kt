@@ -12,16 +12,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.gps_g6.bestbiddertcg.core.ui.theme.BestBidderTCGTheme
 import com.gps_g6.bestbiddertcg.core.ui.theme.Border
 import com.gps_g6.bestbiddertcg.core.ui.theme.Surface as AppSurface
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextPrimary
 import com.gps_g6.bestbiddertcg.core.ui.theme.TextSecondary
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppCornerRadius
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppSpacing
+import com.gps_g6.bestbiddertcg.core.ui.theme.AppTypography
+import com.gps_g6.bestbiddertcg.core.ui.theme.Primary
 
 @Composable
 fun BidInputSection(
@@ -33,18 +35,17 @@ fun BidInputSection(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = AppSurface,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppCornerRadius.large),
         border = BorderStroke(1.dp, Border)
     ) {
         Column(
-            modifier = Modifier.padding(20.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.padding(AppSpacing.l),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.m)
         ) {
             Text(
                 text = "Tu puja (€)",
                 color = TextPrimary,
-                fontSize = 17.sp,
-                fontWeight = FontWeight.SemiBold
+                style = AppTypography.bodyLarge
             )
 
             OutlinedTextField(
@@ -61,7 +62,13 @@ fun BidInputSection(
                     )
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(14.dp),
+                colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = Primary,
+                    unfocusedBorderColor = Border,
+                    focusedLabelColor = Primary,
+                    cursorColor = Primary
+                ),
+                shape = RoundedCornerShape(AppCornerRadius.medium),
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Decimal
                 )
@@ -71,7 +78,7 @@ fun BidInputSection(
                 text = "Introduce un importe igual o superior a %.2f €."
                     .format(minimumAllowedBid),
                 color = TextSecondary,
-                fontSize = 14.sp
+                style = AppTypography.bodyMedium
             )
         }
     }

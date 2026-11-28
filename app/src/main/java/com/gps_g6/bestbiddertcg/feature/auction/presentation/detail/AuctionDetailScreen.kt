@@ -187,3 +187,43 @@ private fun AuctionDetailScreenPreview() {
         )
     }
 }
+
+/**
+ * Vista previa del detalle cuando el usuario tiene la puja más alta.
+ */
+@Preview(
+    name = "Detalle - Voy ganando",
+    showBackground = true,
+    showSystemUi = false
+)
+@Composable
+private fun AuctionDetailWinningBidPreview() {
+    BestBidderTCGTheme {
+        AuctionDetailScreen(
+            uiState = AuctionDetailUiState(
+                cardName = "Piplup",
+                cardCategory = CardCategory.POKEMON,
+                cardCollection = CardCollection.POKEMON_151,
+                cardNumber = "393",
+                cardImage = "",
+                status = AuctionStatus.ACTIVE,
+                isOwner = false,
+                isWinningBid = true,
+                currentBid = 45.0,
+                startingPrice = 10.0,
+                bidCount = 12,
+                remainingTime = "2 h 35 min",
+                cardCondition = CardCondition.GOOD,
+                minimumIncrement = 1.0,
+                publishedAt = "12/10/2026, 14h20",
+                description = "Subasto la carta ya que la tengo repe :p",
+                sellerName = "PokeCollector"
+            ),
+            onBackClick = {},
+            onFavoriteClick = {},
+            onEditClick = {},
+            onBidClick = {},
+            onHistoryClick = {}
+        )
+    }
+}
